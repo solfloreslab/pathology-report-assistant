@@ -1,0 +1,47 @@
+{
+  "classification": {
+    "specimen_type": "cytology",
+    "organ_system": "cervix",
+    "tumor_type_suspected": "Lesión intraepitelial escamosa de alto grado (HSIL), compatible con CIN 2-3",
+    "protocol_to_apply": "cytology-cervical",
+    "confidence": 1.0
+  },
+  "extracted_data": {
+    "sample_type": "Citología cérvico-vaginal (medio líquido)",
+    "adequacy": "satisfactory",
+    "endocervical_component": "present",
+    "bethesda_category": "HSIL",
+    "organisms": "not_reported",
+    "cytologic_description": "Se observan células escamosas con aumento de relación núcleo-citoplasma, hipercromasia nuclear e irregularidad de la membrana nuclear, compatibles con CIN 2-3. No se identifican células glandulares atípicas.",
+    "recommendations": "Se recomienda colposcopia con biopsia dirigida según protocolo",
+    "hpv_correlation": "Correlacionar con resultado de test VPH si disponible"
+  },
+  "validation": {
+    "completeness_score": 80,
+    "total_required_fields": 5,
+    "reported_fields": 4,
+    "missing_fields": 1,
+    "status": "mostly_complete",
+    "missing_required": [
+      {
+        "field": "organisms",
+        "severity": "major",
+        "recommendation": "Reportar presencia o ausencia de organismos (Candida, Trichomonas, Actinomyces, flora bacteriana, VPH) o especificar 'ninguno identificado'"
+      }
+    ],
+    "inconsistencies": [],
+    "quality_notes": "Informe bien estructurado con categorización Bethesda correcta (HSIL). La descripción citológica es consistente con el diagnóstico. Las recomendaciones de colposcopia son apropiadas para HSIL. Falta únicamente el campo de organismos, lo cual no afecta la toma de decisiones clínicas."
+  },
+  "audit_trail": {
+    "timestamp": "2026-03-14T02:39:51.534049Z",
+    "input_hash": "b2b342ce6a759e1b6a010eae51435fc7f831599a14c22b680f6afe59a6e22b36",
+    "classification_confidence": 1.0,
+    "protocol_used": "cytology-cervical",
+    "completeness_score": 80,
+    "model_version": "z-ai/glm-5",
+    "provider": "openrouter",
+    "processing_time_ms": 57328,
+    "pipeline_version": "0.1.0"
+  },
+  "needs_human_review": false
+}

@@ -1,0 +1,125 @@
+protocol:
+  id: colon-resection
+  name: "Colon Resection — CAP/ICCR-based"
+  version: "1.0"
+  organ: colon
+  specimen_types:
+    - resection
+
+fields:
+  - name: procedure_type
+    severity: required
+    type: string
+    description: "Tipo de procedimiento quirurgico"
+
+  - name: tumor_location
+    severity: required
+    type: string
+    description: "Localizacion anatomica del tumor"
+
+  - name: histologic_type
+    severity: required
+    type: string
+    reference: "WHO Classification"
+    description: "Tipo histologico segun OMS"
+
+  - name: histologic_grade
+    severity: required
+    type: string
+    values: ["G1", "G2", "G3"]
+    description: "Grado de diferenciacion"
+
+  - name: depth_of_invasion
+    severity: required
+    type: string
+    description: "Extension de la invasion (submucosa, muscular, subserosa, serosa)"
+
+  - name: pTNM
+    severity: required
+    type: string
+    description: "Estadificacion patologica AJCC (edicion vigente)"
+
+  - name: lymph_nodes_examined
+    severity: required
+    type: integer
+    minimum: 0
+    description: "Numero total de ganglios aislados"
+
+  - name: lymph_nodes_positive
+    severity: required
+    type: integer
+    minimum: 0
+    description: "Numero de ganglios con metastasis"
+
+  - name: margins_proximal
+    severity: required
+    type: string
+    description: "Estado del margen proximal (libre/afecto + distancia)"
+
+  - name: margins_distal
+    severity: required
+    type: string
+    description: "Estado del margen distal (libre/afecto + distancia)"
+
+  - name: margins_radial
+    severity: required
+    type: string
+    description: "Estado del margen radial/circunferencial"
+
+  - name: lymphovascular_invasion
+    severity: required
+    type: string
+    values: ["present", "absent", "not_reported"]
+    description: "Invasion linfovascular"
+
+  - name: perineural_invasion
+    severity: required
+    type: string
+    values: ["present", "absent", "not_reported"]
+    description: "Invasion perineural"
+
+  - name: mmr_msi
+    severity: required
+    type: string
+    description: "Estado MMR/MSI — obligatorio en todo colorrectal"
+
+  - name: tumor_size
+    severity: recommended
+    type: string
+    description: "Tamano del tumor (cm)"
+
+  - name: tumor_perforation
+    severity: recommended
+    type: string
+    description: "Perforacion tumoral"
+
+  - name: extranodal_extension
+    severity: recommended
+    type: string
+    description: "Extension extranodal en ganglios positivos"
+
+  - name: tumor_deposits
+    severity: recommended
+    type: string
+    description: "Depositos tumorales"
+
+  - name: associated_findings
+    severity: recommended
+    type: string
+    description: "Hallazgos asociados (polipos, colitis, etc.)"
+
+rules:
+  - condition: "pT >= pT3"
+    check: "lymph_nodes_examined must be reported"
+    severity: critical
+    message: "En tumores pT3+ el conteo de ganglios es obligatorio"
+
+  - condition: "lymph_nodes_examined < 12"
+    check: "warning"
+    severity: warning
+    message: "Menos de 12 ganglios examinados — por debajo del minimo recomendado"
+
+  - condition: "always"
+    check: "mmr_msi must be reported"
+    severity: required
+    message: "MMR/MSI es obligatorio en todo carcinoma colorrectal"

@@ -1,0 +1,97 @@
+protocol:
+  id: breast-biopsy
+  name: "Breast Biopsy (BAG) — CAP/ICCR-based"
+  version: "1.0"
+  organ: breast
+  specimen_types:
+    - biopsy
+
+fields:
+  - name: histologic_type
+    severity: required
+    type: string
+    description: "Tipo histologico (ductal NOS, lobular, etc.)"
+
+  - name: histologic_grade
+    severity: required
+    type: string
+    description: "Grado de Nottingham (score 3 componentes + total /9)"
+
+  - name: tubule_formation
+    severity: required
+    type: integer
+    values: [1, 2, 3]
+    description: "Score formacion tubular (Nottingham)"
+
+  - name: nuclear_pleomorphism
+    severity: required
+    type: integer
+    values: [1, 2, 3]
+    description: "Score pleomorfismo nuclear (Nottingham)"
+
+  - name: mitotic_count
+    severity: required
+    type: integer
+    values: [1, 2, 3]
+    description: "Score indice mitotico (Nottingham)"
+
+  - name: estrogen_receptor
+    severity: required
+    type: string
+    description: "RE: porcentaje y/o score Allred"
+
+  - name: progesterone_receptor
+    severity: required
+    type: string
+    description: "RP: porcentaje y/o score Allred"
+
+  - name: her2_status
+    severity: required
+    type: string
+    description: "HER2/neu: score IHQ (0, 1+, 2+, 3+) + FISH si 2+"
+
+  - name: ki67
+    severity: required
+    type: string
+    description: "Indice de proliferacion Ki-67 (%)"
+
+  - name: in_situ_component
+    severity: required
+    type: string
+    description: "Componente in situ asociado (tipo, patron, grado)"
+
+  - name: molecular_subtype
+    severity: recommended
+    type: string
+    description: "Perfil molecular subrogado (Luminal A/B, HER2+, Triple neg)"
+
+  - name: tumor_size
+    severity: recommended
+    type: string
+    description: "Tamano del tumor si valorable en biopsia"
+
+rules:
+  - condition: "always"
+    check: "estrogen_receptor must be reported"
+    severity: required
+    message: "RE es obligatorio en todo carcinoma de mama"
+
+  - condition: "always"
+    check: "progesterone_receptor must be reported"
+    severity: required
+    message: "RP es obligatorio en todo carcinoma de mama"
+
+  - condition: "always"
+    check: "her2_status must be reported"
+    severity: required
+    message: "HER2 es obligatorio en todo carcinoma de mama"
+
+  - condition: "always"
+    check: "ki67 must be reported"
+    severity: required
+    message: "Ki-67 es obligatorio en todo carcinoma de mama"
+
+  - condition: "her2_status == '2+'"
+    check: "FISH/SISH must be reported"
+    severity: warning
+    message: "HER2 2+ requiere confirmacion con FISH/SISH"

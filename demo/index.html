@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pathology Report Structuring Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --text: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #dbeafe;
+    --primary-glow: rgba(59,130,246,0.15);
+    --accent: #6366f1;
+    --accent-light: #e0e7ff;
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --green-dark: #059669;
+    --yellow: #f59e0b;
+    --yellow-light: #fef3c7;
+    --red: #ef4444;
+    --red-light: #fee2e2;
+    --red-dark: #dc2626;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+    --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1e1b4b 100%);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 300px at 20% 50%, rgba(59,130,246,0.15), transparent),
+      radial-gradient(ellipse 400px 200px at 80% 30%, rgba(99,102,241,0.12), transparent);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px 32px 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .header-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+  }
+
+  .header-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-text h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  .header-text p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .header-badges {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .header-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(4px);
+  }
+
+  @media (max-width: 900px) {
+    .header-badges { display: none; }
+    .header-inner { padding: 20px 18px; }
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 24px;
+    padding: 24px 32px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .main {
+      grid-template-columns: 1fr;
+      padding: 16px;
+      gap: 16px;
+    }
+  }
+
+  /* ===== CARDS / PANELS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow var(--transition);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-header-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+  }
+
+  .card-header-icon.input-icon {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .card-header-icon.output-icon {
+    background: var(--accent-light);
+    color: var(--accent);
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .card-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .card-body {
+    padding: 20px 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* ===== FORM ELEMENTS ===== */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  select, textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    resize: vertical;
+  }
+
+  select:hover, textarea:hover {
+    border-color: #cbd5e1;
+  }
+
+  select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+  }
+
+  textarea {
+    min-height: 280px;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    background: var(--surface-alt);
+  }
+
+  /* ===== BUTTON ===== */
+  .btn-analyze {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 13px 28px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 2px 8px rgba(59,130,246,0.25);
+    letter-spacing: -0.01em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-analyze::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+
+  .btn-analyze:hover::before { opacity: 1; }
+  .btn-analyze:hover {
+    box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-analyze:active { transform: translateY(0); }
+
+  .btn-analyze:disabled {
+    background: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-analyze:disabled::before { display: none; }
+
+  .btn-icon {
+    display: flex;
+    align-items: center;
+  }
+
+  .btn-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ===== PROGRESS STEPS ===== */
+  .pipeline-steps {
+    display: none;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-alt);
+    gap: 6px;
+    align-items: center;
+  }
+
+  .pipeline-steps.visible { display: flex; }
+
+  .pipeline-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .pipeline-step .step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .pipeline-step.active {
+    color: var(--primary);
+    background: var(--primary-light);
+    border-color: var(--primary);
+  }
+
+  .pipeline-step.active .step-dot {
+    background: var(--primary);
+    animation: dotPulse 1.2s ease-in-out infinite;
+  }
+
+  .pipeline-step.done {
+    color: var(--green-dark);
+    background: var(--green-light);
+    border-color: var(--green);
+  }
+
+  .pipeline-step.done .step-dot {
+    background: var(--green);
+  }
+
+  .step-connector {
+    width: 20px;
+    height: 1.5px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.6); opacity: 0.6; }
+  }
+
+  /* ===== RESULTS AREA ===== */
+  .result-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    text-align: center;
+    padding: 50px 30px;
+    gap: 16px;
+  }
+
+  .placeholder-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: var(--surface-alt);
+    border: 2px dashed var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    color: var(--text-muted);
+  }
+
+  .results { display: none; flex-direction: column; gap: 18px; }
+  .results.visible { display: flex; }
+
+  /* ===== COMPLETENESS SCORE ===== */
+  .score-card {
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    background: var(--surface-alt);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  .score-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
+  .score-card.yellow::before { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
+  .score-card.red::before { background: linear-gradient(90deg, var(--red), #f87171); }
+
+  .score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 12px;
+  }
+
+  .score-label {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .score-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .score-number {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .score-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+
+  .score-status.green { background: var(--green-light); color: var(--green-dark); }
+  .score-status.yellow { background: var(--yellow-light); color: #92400e; }
+  .score-status.red { background: var(--red-light); color: var(--red-dark); }
+
+  .score-bar-track {
+    height: 8px;
+    background: var(--border-light);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+  }
+
+  .score-bar-fill.green { background: linear-gradient(90deg, var(--green), #34d399); }
+  .score-bar-fill.yellow { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
+  .score-bar-fill.red { background: linear-gradient(90deg, var(--red), #f87171); }
+
+  .score-fields {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .score-fields span { font-weight: 600; color: var(--text-secondary); }
+
+  /* ===== COLLAPSIBLE SECTIONS ===== */
+  .section {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: box-shadow var(--transition);
+  }
+
+  .section:hover { box-shadow: var(--shadow-sm); }
+
+  .section-toggle {
+    width: 100%;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: none;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background var(--transition);
+  }
+
+  .section-toggle:hover { background: var(--surface-alt); }
+
+  .section-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .section-icon.classify { background: var(--primary-light); color: var(--primary); }
+  .section-icon.missing { background: var(--red-light); color: var(--red); }
+  .section-icon.incon { background: var(--yellow-light); color: #92400e; }
+  .section-icon.extract { background: var(--green-light); color: var(--green-dark); }
+
+  .section-toggle .count-badge {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--surface-alt);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .count-badge.alert {
+    background: var(--red-light);
+    color: var(--red-dark);
+    border-color: #fca5a5;
+  }
+
+  .section-toggle .arrow-icon {
+    margin-left: auto;
+    transition: transform 0.25s ease;
+    color: var(--text-muted);
+    font-size: 0.6rem;
+    flex-shrink: 0;
+  }
+
+  .section.open .arrow-icon { transform: rotate(90deg); }
+
+  .section-content {
+    display: none;
+    padding: 16px 18px;
+    border-top: 1px solid var(--border-light);
+    background: var(--surface-alt);
+  }
+
+  .section.open .section-content { display: block; }
+
+  /* ===== CLASSIFICATION CHIPS ===== */
+  .chip-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border: 1px solid #93c5fd;
+  }
+
+  .chip.confidence {
+    background: var(--green-light);
+    color: var(--green-dark);
+    border-color: #6ee7b7;
+  }
+
+  .chip.protocol {
+    background: var(--accent-light);
+    color: #4338ca;
+    border-color: #a5b4fc;
+  }
+
+  .chip.review {
+    background: var(--red-light);
+    color: var(--red-dark);
+    border-color: #fca5a5;
+  }
+
+  .chip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ===== ALERT LIST ===== */
+  .alert-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .alert-item {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: transform var(--transition);
+  }
+
+  .alert-item:hover { transform: translateX(2px); }
+
+  .alert-item.critical {
+    background: var(--red-light);
+    border-left: 3px solid var(--red);
+  }
+
+  .alert-item.major, .alert-item.warning {
+    background: var(--yellow-light);
+    border-left: 3px solid var(--yellow);
+  }
+
+  .alert-item.minor {
+    background: var(--primary-light);
+    border-left: 3px solid var(--primary);
+  }
+
+  .alert-item.error {
+    background: var(--red-light);
+    border-left: 3px solid var(--red);
+  }
+
+  .alert-severity {
+    flex-shrink: 0;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .alert-severity.critical { background: var(--red); color: #fff; }
+  .alert-severity.major, .alert-severity.warning { background: var(--yellow); color: #fff; }
+  .alert-severity.minor { background: var(--primary); color: #fff; }
+  .alert-severity.error { background: var(--red); color: #fff; }
+
+  .alert-body { flex: 1; }
+  .alert-field { font-weight: 700; color: var(--text); }
+  .alert-rec { color: var(--text-secondary); font-size: 0.76rem; margin-top: 2px; display: block; }
+
+  .no-issues {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--green-dark);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 8px 0;
+  }
+
+  /* ===== DATA TABLE ===== */
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.8rem;
+  }
+
+  .data-table th {
+    padding: 8px 14px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .data-table tr:hover td { background: rgba(59,130,246,0.03); }
+
+  .data-table .field-name {
+    font-weight: 600;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .data-table .nr {
+    color: var(--red);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  /* ===== AUDIT TRAIL ===== */
+  .audit-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    padding: 14px 0 0;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .audit-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .audit-item strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 18px 32px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 6px 20px;
+  }
+
+  footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition);
+  }
+
+  footer a:hover { color: var(--primary-dark); }
+
+  .footer-sep {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  /* ===== ACCESS CODE ===== */
+  .access-code-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .access-code-row input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    letter-spacing: 2px;
+  }
+
+  .access-code-row input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+  }
+
+  .access-code-row input::placeholder {
+    letter-spacing: normal;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+  }
+
+  .toggle-visibility {
+    background: var(--surface-alt);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 9px 10px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+  }
+
+  .toggle-visibility:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  /* ===== ERROR MSG ===== */
+  .error-msg {
+    display: none;
+    padding: 14px 16px;
+    background: var(--red-light);
+    border: 1.5px solid #fca5a5;
+    border-radius: var(--radius-sm);
+    color: var(--red-dark);
+    font-size: 0.84rem;
+    font-weight: 500;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .results.visible { animation: fadeInUp 0.4s ease-out; }
+
+  /* ===== SPINNER ===== */
+  .spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .spinner.visible { display: block; }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+        <rect x="9" y="3" width="6" height="4" rx="1"/>
+        <path d="M9 14l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Pathology Report Structuring Agent</h1>
+      <p>AI-powered structured data extraction and quality control following CAP/ICCR protocols</p>
+    </div>
+    <div class="header-badges">
+      <span class="header-badge">CAP / ICCR</span>
+      <span class="header-badge">5 Protocols</span>
+      <span class="header-badge">Synthetic Data Only</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- LEFT: Input -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon input-icon">&#9997;</div>
+      <div>
+        <div class="card-title">Input Report</div>
+        <div class="card-subtitle">Paste a pathology report or select a sample case</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="field-group">
+        <label class="field-label" for="sample-select">Sample Cases</label>
+        <select id="sample-select">
+          <option value="">-- Select a sample report --</option>
+          <option value="colon">Colon adenocarcinoma (complete resection)</option>
+          <option value="breast">Breast ductal carcinoma (BAG biopsy)</option>
+          <option value="melanoma">Cutaneous melanoma (excisional biopsy)</option>
+          <option value="cytology">Cervical cytology HSIL (Bethesda)</option>
+          <option value="gastric">Gastric carcinoma (INCOMPLETE &mdash; designed to fail)</option>
+        </select>
+      </div>
+      <div class="field-group" style="flex:1;display:flex;flex-direction:column">
+        <label class="field-label" for="report-input">Report Text</label>
+        <textarea id="report-input" placeholder="Paste a pathology report in Spanish here, or select a sample case above..."></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="access-code">Access Code</label>
+        <div class="access-code-row">
+          <input type="password" id="access-code" placeholder="Enter access code to analyze" autocomplete="off" spellcheck="false">
+          <button type="button" class="toggle-visibility" id="toggle-code" title="Show/hide code">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn-analyze" id="analyze-btn" type="button">
+        <span class="btn-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        <span id="btn-label">Analyze Report</span>
+        <div class="spinner" id="btn-spinner"></div>
+      </button>
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Results -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon output-icon">&#128202;</div>
+      <div>
+        <div class="card-title">Analysis Results</div>
+        <div class="card-subtitle">Classification, extraction, and quality validation</div>
+      </div>
+    </div>
+
+    <div class="pipeline-steps" id="steps">
+      <div class="pipeline-step" id="step-classify"><span class="step-dot"></span> Classifying</div>
+      <div class="step-connector"></div>
+      <div class="pipeline-step" id="step-extract"><span class="step-dot"></span> Extracting</div>
+      <div class="step-connector"></div>
+      <div class="pipeline-step" id="step-validate"><span class="step-dot"></span> Validating</div>
+    </div>
+
+    <div class="card-body">
+      <div class="result-placeholder" id="placeholder">
+        <div class="placeholder-icon">&#128300;</div>
+        <div>
+          <div style="font-weight:600;color:var(--text-secondary);margin-bottom:4px">Ready to analyze</div>
+          Select a sample report or paste your own, then click <strong>Analyze Report</strong>
+        </div>
+      </div>
+
+      <div class="results" id="results">
+        <!-- Completeness Score -->
+        <div class="score-card" id="score-card">
+          <div class="score-header">
+            <div>
+              <div class="score-label">Report Completeness</div>
+              <div class="score-fields" id="score-fields"></div>
+            </div>
+            <div class="score-meta">
+              <div class="score-number" id="score-number">--</div>
+              <div class="score-status" id="score-status"></div>
+            </div>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Classification -->
+        <div class="section open" id="sec-classification">
+          <button class="section-toggle" type="button" onclick="toggleSection('sec-classification')">
+            <span class="section-icon classify">&#128301;</span>
+            Classification
+            <span class="arrow-icon">&#9654;</span>
+          </button>
+          <div class="section-content">
+            <div class="chip-grid" id="classification-chips"></div>
+          </div>
+        </div>
+
+        <!-- Missing Fields -->
+        <div class="section open" id="sec-missing">
+          <button class="section-toggle" type="button" onclick="toggleSection('sec-missing')">
+            <span class="section-icon missing">&#9888;</span>
+            Missing / Incomplete Fields
+            <span class="count-badge" id="missing-count" style="display:none"></span>
+            <span class="arrow-icon">&#9654;</span>
+          </button>
+          <div class="section-content">
+            <div class="alert-list" id="missing-list"></div>
+          </div>
+        </div>
+
+        <!-- Inconsistencies -->
+        <div class="section" id="sec-inconsistencies">
+          <button class="section-toggle" type="button" onclick="toggleSection('sec-inconsistencies')">
+            <span class="section-icon incon">&#128269;</span>
+            Inconsistencies
+            <span class="count-badge" id="incon-count" style="display:none"></span>
+            <span class="arrow-icon">&#9654;</span>
+          </button>
+          <div class="section-content">
+            <div class="alert-list" id="inconsistency-list"></div>
+          </div>
+        </div>
+
+        <!-- Extracted Data -->
+        <div class="section" id="sec-extraction">
+          <button class="section-toggle" type="button" onclick="toggleSection('sec-extraction')">
+            <span class="section-icon extract">&#128203;</span>
+            Extracted Data
+            <span class="count-badge" id="fields-count" style="display:none"></span>
+            <span class="arrow-icon">&#9654;</span>
+          </button>
+          <div class="section-content">
+            <table class="data-table" id="extraction-table">
+              <thead><tr><th>Field</th><th>Value</th></tr></thead>
+              <tbody id="extraction-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Audit Trail -->
+        <div class="audit-bar" id="audit-trail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>Not a medical device &mdash; for demonstration purposes only</span>
+  <span class="footer-sep"></span>
+  <span>All data is synthetic</span>
+  <span class="footer-sep"></span>
+  <a href="https://github.com/solfloreslab/pathology-report-agent" target="_blank" rel="noopener">GitHub</a>
+  <span class="footer-sep"></span>
+  <span>Built by a pathologist &amp; AI engineer</span>
+</footer>
+
+<script>
+// --- Sample reports (embedded) ---
+const SAMPLES = {
+  colon: `INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00341
+Paciente: Martínez Ruiz, Carmen (ID: 00101)
+Fecha recepción: 2026-03-10
+Médico solicitante: Dr. García López (Cirugía General)
+Tipo de muestra: Hemicolectomía derecha
+
+DESCRIPCIÓN MACROSCÓPICA:
+Segmento de colon derecho de 22 cm de longitud que incluye 8 cm de íleon terminal y apéndice cecal. A 6 cm del margen de resección distal se identifica una lesión exofítica de 4,5 x 3,2 cm que ocupa el 60% de la circunferencia. La lesión infiltra hasta la grasa pericolónica. Se aíslan 18 ganglios linfáticos.
+
+DESCRIPCIÓN MICROSCÓPICA:
+Adenocarcinoma de tipo intestinal moderadamente diferenciado (G2) que infiltra a través de la muscular propia hasta la subserosa (tejido adiposo pericolónico) sin alcanzar la superficie serosa. Se identifica invasión linfovascular. No se observa invasión perineural. Márgenes de resección proximal y distal libres de tumor (margen más cercano a 4,2 cm). Margen radial libre (>1 mm).
+De los 18 ganglios aislados, 3 presentan metástasis de adenocarcinoma (3/18), sin extensión extranodal.
+Apéndice cecal sin alteraciones significativas.
+Mucosa adyacente con adenoma tubular con displasia de bajo grado.
+
+DIAGNÓSTICO:
+Adenocarcinoma de colon derecho (ciego), tipo intestinal, moderadamente diferenciado (G2).
+Estadificación patológica: pT3 N1a (3/18) M0 — Estadio IIIB (AJCC 8ª ed.)
+Márgenes libres. Invasión linfovascular presente. Invasión perineural ausente.
+
+INMUNOHISTOQUÍMICA:
+- MLH1: Expresión conservada
+- MSH2: Expresión conservada
+- MSH6: Expresión conservada
+- PMS2: Expresión conservada
+Conclusión: Sin pérdida de expresión de proteínas reparadoras (no sugestivo de inestabilidad de microsatélites).
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-14`,
+
+  breast: `INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00342
+Paciente: López Fernández, María (ID: 00102)
+Fecha recepción: 2026-03-11
+Médico solicitante: Dra. Sánchez Vega (Ginecología)
+Tipo de muestra: BAG mama izquierda (CSE), 4 cilindros
+
+DESCRIPCIÓN MICROSCÓPICA:
+Los cuatro cilindros muestran infiltración por carcinoma ductal infiltrante de tipo no especial (NOS), grado histológico 2 (formación tubular: 3, pleomorfismo nuclear: 2, índice mitótico: 1; score de Nottingham 6/9).
+Se observa componente de carcinoma ductal in situ asociado, patrón cribiforme, grado nuclear intermedio, sin necrosis.
+
+DIAGNÓSTICO:
+Carcinoma ductal infiltrante, tipo NOS, grado histológico 2 (Nottingham).
+Componente in situ asociado (CDIS cribiforme, grado intermedio).
+
+INMUNOHISTOQUÍMICA / BIOMARCADORES:
+- Receptores de estrógeno (RE): Positivo, 90% de células tumorales, intensidad fuerte (Allred 8/8)
+- Receptores de progesterona (RP): Positivo, 70%, intensidad moderada (Allred 7/8)
+- HER2/neu: Negativo (score 1+)
+- Ki-67: 15%
+Perfil molecular subrogado: Luminal A-like
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-14`,
+
+  melanoma: `INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00343
+Paciente: Navarro Blanco, Pedro (ID: 00103)
+Fecha recepción: 2026-03-09
+Médico solicitante: Dr. Rodríguez Pérez (Dermatología)
+Tipo de muestra: Biopsia escisional lesión pigmentada espalda
+
+DESCRIPCIÓN MACROSCÓPICA:
+Elipse cutánea de 2,5 x 1,8 x 0,6 cm con lesión pigmentada asimétrica de 1,2 cm de diámetro mayor, coloración heterogénea marrón-negra.
+
+DESCRIPCIÓN MICROSCÓPICA:
+Melanoma de extensión superficial con componente invasivo.
+Espesor de Breslow: 1,8 mm. Nivel de Clark: IV (infiltra dermis reticular).
+Índice mitótico: 3 mitosis/mm². Ulceración: Presente.
+Invasión linfovascular: No identificada. Neurotropismo: No identificado.
+Satelitosis microscópica: No identificada. Regresión: Ausente.
+Bordes laterales: Libres (margen más cercano 3 mm). Borde profundo: Libre (margen 2 mm).
+Infiltrado linfocitario tumoral: No intenso (non-brisk).
+
+DIAGNÓSTICO:
+Melanoma cutáneo de extensión superficial, espalda.
+Breslow 1,8 mm, Clark IV, ulcerado, 3 mitosis/mm².
+pT2b (AJCC 8ª edición). Márgenes libres (recomendable ampliación a 1-2 cm según protocolo).
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-13`,
+
+  cytology: `INFORME DE CITOLOGÍA
+
+Nº Citología: CIT-2026-01587
+Paciente: Torres Moreno, Laura (ID: 00104)
+Fecha recepción: 2026-03-12
+Médico solicitante: Dra. Díaz García (Ginecología)
+Tipo de muestra: Citología cérvico-vaginal (medio líquido)
+
+IDONEIDAD DE LA MUESTRA:
+Satisfactoria para evaluación. Presencia de componente endocervical/zona de transformación.
+
+RESULTADO (Sistema Bethesda 2014):
+Lesión intraepitelial escamosa de alto grado (HSIL).
+Se observan células escamosas con aumento de relación núcleo-citoplasma, hipercromasia nuclear e irregularidad de la membrana nuclear, compatibles con CIN 2-3.
+No se identifican células glandulares atípicas.
+
+OBSERVACIONES:
+Se recomienda colposcopia con biopsia dirigida según protocolo.
+Correlacionar con resultado de test VPH si disponible.
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-13`,
+
+  gastric: `INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00345
+Paciente: Gómez Herrera, José (ID: 00105)
+Fecha recepción: 2026-03-08
+Médico solicitante: Dr. Muñoz Serrano (Cirugía General)
+Tipo de muestra: Gastrectomía subtotal
+
+DESCRIPCIÓN MACROSCÓPICA:
+Pieza de gastrectomía subtotal de 14 cm de curvatura mayor. Lesión ulcerada de 3,8 cm en antro gástrico.
+
+DESCRIPCIÓN MICROSCÓPICA:
+Adenocarcinoma gástrico de tipo difuso con células en anillo de sello que infiltra toda la pared gástrica alcanzando la serosa. Márgenes de resección libres.
+
+DIAGNÓSTICO:
+Adenocarcinoma gástrico, tipo difuso (Lauren), células en anillo de sello. Infiltra hasta serosa.
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-12`,
+};
+
+// --- Worker API URL ---
+const API_URL = "https://pathology-agent-api.solfloreslab.workers.dev/api/analyze";
+
+// --- UI helpers ---
+function toggleSection(id) {
+  document.getElementById(id).classList.toggle("open");
+}
+
+function showError(msg) {
+  const el = document.getElementById("error-msg");
+  el.textContent = msg;
+  el.classList.add("visible");
+}
+
+function hideError() {
+  document.getElementById("error-msg").classList.remove("visible");
+}
+
+function setStep(stepId) {
+  document.querySelectorAll(".pipeline-step").forEach((s) => {
+    if (s.id === stepId) {
+      s.classList.add("active");
+      s.classList.remove("done");
+    } else if (s.classList.contains("active")) {
+      s.classList.remove("active");
+      s.classList.add("done");
+    }
+  });
+}
+
+function completeAllSteps() {
+  document.querySelectorAll(".pipeline-step").forEach((s) => {
+    s.classList.remove("active");
+    s.classList.add("done");
+  });
+}
+
+function getScoreClass(score) {
+  if (score >= 80) return "green";
+  if (score >= 50) return "yellow";
+  return "red";
+}
+
+// --- Render results ---
+function renderResults(data) {
+  const results = document.getElementById("results");
+  results.classList.add("visible");
+  document.getElementById("placeholder").style.display = "none";
+
+  // Completeness score
+  const score = data.validation.completeness_score;
+  const cls = getScoreClass(score);
+
+  const scoreCard = document.getElementById("score-card");
+  scoreCard.className = "score-card " + cls;
+
+  document.getElementById("score-number").textContent = score + "%";
+  document.getElementById("score-number").style.color =
+    cls === "green" ? "var(--green-dark)" :
+    cls === "yellow" ? "#92400e" : "var(--red-dark)";
+
+  const bar = document.getElementById("score-bar");
+  bar.className = "score-bar-fill " + cls;
+  bar.style.width = score + "%";
+
+  const statusText = (data.validation.status || "").replace(/_/g, " ");
+  const statusEl = document.getElementById("score-status");
+  statusEl.textContent = statusText;
+  statusEl.className = "score-status " + cls;
+
+  const fields = document.getElementById("score-fields");
+  fields.innerHTML = `<span>${data.validation.reported_fields || 0}</span> reported / <span>${data.validation.total_required_fields || 0}</span> required &mdash; <span>${data.validation.missing_fields || 0}</span> missing`;
+
+  // Classification chips
+  const chips = document.getElementById("classification-chips");
+  chips.innerHTML = "";
+  const c = data.classification;
+  const chipData = [
+    { label: c.specimen_type, cls: "" },
+    { label: c.organ_system, cls: "" },
+    { label: c.tumor_type_suspected, cls: "" },
+    { label: c.protocol_to_apply, cls: "protocol" },
+    { label: (c.confidence * 100).toFixed(0) + "% confidence", cls: "confidence" },
+  ];
+  chipData.forEach((ch) => {
+    const span = document.createElement("span");
+    span.className = "chip " + ch.cls;
+    span.textContent = ch.label;
+    chips.appendChild(span);
+  });
+
+  if (data.needs_human_review) {
+    const span = document.createElement("span");
+    span.className = "chip review";
+    span.textContent = "Needs human review";
+    chips.appendChild(span);
+  }
+
+  // Missing fields
+  const missingList = document.getElementById("missing-list");
+  missingList.innerHTML = "";
+  const missing = data.validation.missing_required || [];
+  const missingBadge = document.getElementById("missing-count");
+
+  if (missing.length === 0) {
+    missingList.innerHTML = '<div class="no-issues">&#10003; No missing required fields</div>';
+    missingBadge.style.display = "none";
+  } else {
+    missingBadge.style.display = "";
+    missingBadge.textContent = missing.length;
+    missingBadge.className = "count-badge alert";
+    missing.forEach((m) => {
+      const div = document.createElement("div");
+      div.className = "alert-item " + m.severity;
+      div.innerHTML = `<span class="alert-severity ${m.severity}">${m.severity}</span>
+        <div class="alert-body"><span class="alert-field">${m.field}</span><span class="alert-rec">${m.recommendation || ""}</span></div>`;
+      missingList.appendChild(div);
+    });
+  }
+
+  // Inconsistencies
+  const inconList = document.getElementById("inconsistency-list");
+  inconList.innerHTML = "";
+  const incons = data.validation.inconsistencies || [];
+  const inconBadge = document.getElementById("incon-count");
+
+  if (incons.length === 0) {
+    inconList.innerHTML = '<div class="no-issues">&#10003; No inconsistencies detected</div>';
+    inconBadge.style.display = "none";
+  } else {
+    document.getElementById("sec-inconsistencies").classList.add("open");
+    inconBadge.style.display = "";
+    inconBadge.textContent = incons.length;
+    inconBadge.className = "count-badge alert";
+    incons.forEach((i) => {
+      const div = document.createElement("div");
+      div.className = "alert-item " + i.severity;
+      div.innerHTML = `<span class="alert-severity ${i.severity}">${i.severity}</span>
+        <div class="alert-body">${i.finding}</div>`;
+      inconList.appendChild(div);
+    });
+  }
+
+  // Extracted data table
+  const tbody = document.getElementById("extraction-body");
+  tbody.innerHTML = "";
+  const extracted = data.extracted_data || {};
+  const fieldKeys = Object.keys(extracted);
+  const fieldsBadge = document.getElementById("fields-count");
+  fieldsBadge.style.display = "";
+  fieldsBadge.textContent = fieldKeys.length + " fields";
+
+  fieldKeys.forEach((key) => {
+    const val = extracted[key];
+    const tr = document.createElement("tr");
+    const valStr = typeof val === "object" ? JSON.stringify(val) : String(val);
+    const isNR = valStr === "not_reported";
+    tr.innerHTML = `<td class="field-name">${key}</td><td class="${isNR ? "nr" : ""}">${isNR ? "Not reported" : valStr}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Audit trail
+  const audit = document.getElementById("audit-trail");
+  audit.innerHTML = "";
+  if (data.audit_trail) {
+    const a = data.audit_trail;
+    const items = [
+      ["Model", a.model_version],
+      ["Protocol", a.protocol_used],
+      ["Time", (a.processing_time_ms || 0) + "ms"],
+      ["Pipeline", a.pipeline_version],
+    ];
+    items.forEach(([label, value]) => {
+      const span = document.createElement("span");
+      span.className = "audit-item";
+      span.innerHTML = `<strong>${label}:</strong> ${value || "—"}`;
+      audit.appendChild(span);
+    });
+  }
+}
+
+// --- Event listeners ---
+document.getElementById("sample-select").addEventListener("change", (e) => {
+  const key = e.target.value;
+  if (key && SAMPLES[key]) {
+    document.getElementById("report-input").value = SAMPLES[key];
+  }
+});
+
+// Toggle access code visibility
+document.getElementById("toggle-code").addEventListener("click", () => {
+  const input = document.getElementById("access-code");
+  input.type = input.type === "password" ? "text" : "password";
+});
+
+document.getElementById("analyze-btn").addEventListener("click", async () => {
+  const reportText = document.getElementById("report-input").value.trim();
+  const accessCode = document.getElementById("access-code").value.trim();
+
+  if (!accessCode) {
+    showError("Please enter the access code.");
+    document.getElementById("access-code").focus();
+    return;
+  }
+
+  if (!reportText) {
+    showError("Please enter or select a pathology report.");
+    return;
+  }
+
+  hideError();
+  const btn = document.getElementById("analyze-btn");
+  const btnLabel = document.getElementById("btn-label");
+  const spinner = document.getElementById("btn-spinner");
+  btn.disabled = true;
+  btnLabel.textContent = "Analyzing...";
+  spinner.classList.add("visible");
+
+  // Reset results
+  document.getElementById("results").classList.remove("visible");
+  document.getElementById("placeholder").style.display = "none";
+  document.querySelectorAll(".pipeline-step").forEach((s) => {
+    s.classList.remove("active", "done");
+  });
+
+  const steps = document.getElementById("steps");
+  steps.classList.add("visible");
+  setStep("step-classify");
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ report_text: reportText, access_code: accessCode }),
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.user_message || err.error || `HTTP ${response.status}`);
+    }
+
+    // Animate steps
+    setStep("step-extract");
+    await new Promise((r) => setTimeout(r, 400));
+    setStep("step-validate");
+    await new Promise((r) => setTimeout(r, 400));
+    completeAllSteps();
+
+    const data = await response.json();
+    renderResults(data);
+  } catch (err) {
+    showError(err.message || "Error connecting to the analysis service.");
+    document.getElementById("placeholder").style.display = "flex";
+    steps.classList.remove("visible");
+  } finally {
+    btn.disabled = false;
+    btnLabel.textContent = "Analyze Report";
+    spinner.classList.remove("visible");
+  }
+});
+</script>
+</body>
+</html>

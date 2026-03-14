@@ -1,0 +1,106 @@
+protocol:
+  id: melanoma
+  name: "Cutaneous Melanoma — CAP/ICCR-based"
+  version: "1.0"
+  organ: skin
+  specimen_types:
+    - biopsy
+    - resection
+
+fields:
+  - name: histologic_type
+    severity: required
+    type: string
+    description: "Tipo histologico (extension superficial, nodular, lentigo maligno, acral)"
+
+  - name: breslow_thickness
+    severity: required
+    type: number
+    unit: mm
+    description: "Espesor de Breslow en mm — campo critico"
+
+  - name: ulceration
+    severity: required
+    type: string
+    values: ["present", "absent", "not_reported"]
+    description: "Presencia de ulceracion"
+
+  - name: mitotic_index
+    severity: required
+    type: string
+    description: "Indice mitotico (mitosis/mm2) — obligatorio si Breslow <=1mm"
+
+  - name: clark_level
+    severity: required
+    type: string
+    values: ["I", "II", "III", "IV", "V"]
+    description: "Nivel de Clark"
+
+  - name: margins_lateral
+    severity: required
+    type: string
+    description: "Estado del margen lateral (libre/afecto + distancia)"
+
+  - name: margins_deep
+    severity: required
+    type: string
+    description: "Estado del margen profundo (libre/afecto + distancia)"
+
+  - name: lymphovascular_invasion
+    severity: required
+    type: string
+    values: ["present", "absent", "not_identified"]
+    description: "Invasion linfovascular"
+
+  - name: neurotropism
+    severity: required
+    type: string
+    values: ["present", "absent", "not_identified"]
+    description: "Neurotropismo/invasion perineural"
+
+  - name: microsatellitosis
+    severity: required
+    type: string
+    values: ["present", "absent", "not_identified"]
+    description: "Satelitosis microscopica"
+
+  - name: pT_stage
+    severity: required
+    type: string
+    description: "Estadificacion pT segun AJCC 8a edicion"
+
+  - name: regression
+    severity: recommended
+    type: string
+    description: "Presencia/ausencia de regresion"
+
+  - name: til_status
+    severity: recommended
+    type: string
+    description: "Infiltrado linfocitario tumoral (brisk/non-brisk/absent)"
+
+  - name: growth_phase
+    severity: recommended
+    type: string
+    description: "Fase de crecimiento (radial/vertical)"
+
+rules:
+  - condition: "breslow_thickness is missing"
+    check: "error"
+    severity: critical
+    message: "Sin Breslow el melanoma no se puede estadificar — campo critico"
+
+  - condition: "breslow_thickness > 1.0 and ulceration is missing"
+    check: "warning"
+    severity: warning
+    message: "Breslow >1mm sin informar ulceracion"
+
+  - condition: "margins_lateral < 1mm or margins_deep < 1mm"
+    check: "warning"
+    severity: warning
+    message: "Margenes <1mm — valorar ampliacion"
+
+  - condition: "pT_stage >= pT2b"
+    check: "recommend sentinel lymph node"
+    severity: warning
+    message: "pT2b+ — recomendar biopsia de ganglio centinela si no realizada"

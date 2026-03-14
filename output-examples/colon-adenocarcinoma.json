@@ -1,0 +1,52 @@
+{
+  "classification": {
+    "specimen_type": "resection",
+    "organ_system": "colon",
+    "tumor_type_suspected": "Moderately differentiated intestinal-type adenocarcinoma of right colon (cecum), pT3 N1a, Stage IIIB",
+    "protocol_to_apply": "colon-resection",
+    "confidence": 0.98
+  },
+  "extracted_data": {
+    "procedure_type": "Hemicolectomía derecha",
+    "tumor_location": "Ciego",
+    "histologic_type": "Adenocarcinoma tipo intestinal",
+    "histologic_grade": "G2",
+    "depth_of_invasion": "Infiltra hasta subserosa (tejido adiposo pericolónico)",
+    "pTNM": "pT3 N1a (3/18) M0",
+    "lymph_nodes_examined": 18,
+    "lymph_nodes_positive": 3,
+    "margins_proximal": "Libre (4,2 cm)",
+    "margins_distal": "Libre (4,2 cm)",
+    "margins_radial": "Libre (>1 mm)",
+    "lymphovascular_invasion": "present",
+    "perineural_invasion": "absent",
+    "mmr_msi": "Sin pérdida de expresión (estable)",
+    "tumor_size": "4,5 x 3,2 cm",
+    "tumor_perforation": "not_reported",
+    "extranodal_extension": "absent",
+    "tumor_deposits": "not_reported",
+    "associated_findings": "Adenoma tubular con displasia de bajo grado"
+  },
+  "validation": {
+    "completeness_score": 100,
+    "total_required_fields": 14,
+    "reported_fields": 14,
+    "missing_fields": 0,
+    "status": "complete",
+    "missing_required": [],
+    "inconsistencies": [],
+    "quality_notes": "Reporte completo. Todos los campos obligatorios están presentes y correctamente documentados. Cumple con el protocolo CAP/ICCR para carcinoma colorrectal. Los campos recomendados tumor_perforation y tumor_deposits no fueron reportados, pero no afectan la completitud del informe. Estadificación pTNM consistente con los hallazgos descritos (pT3 con invasión de subserosa, N1a con 3/18 ganglios positivos)."
+  },
+  "audit_trail": {
+    "timestamp": "2026-03-14T02:36:26.584502Z",
+    "input_hash": "a3079a811d76521a009cba2a67247d09459d17b204251715c7ff3ae985b4d890",
+    "classification_confidence": 0.98,
+    "protocol_used": "colon-resection",
+    "completeness_score": 100,
+    "model_version": "z-ai/glm-5",
+    "provider": "openrouter",
+    "processing_time_ms": 30594,
+    "pipeline_version": "0.1.0"
+  },
+  "needs_human_review": false
+}

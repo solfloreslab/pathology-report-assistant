@@ -1,0 +1,104 @@
+{
+  "classification": {
+    "specimen_type": "resection",
+    "organ_system": "gastric",
+    "tumor_type_suspected": "Adenocarcinoma gástrico tipo difuso con células en anillo de sello",
+    "protocol_to_apply": "gastric",
+    "confidence": 0.95
+  },
+  "extracted_data": {
+    "histologic_type": "Adenocarcinoma gástrico, tipo difuso (Lauren), células en anillo de sello",
+    "histologic_grade": "not_reported",
+    "tumor_location": "Antro gástrico",
+    "depth_of_invasion": "Infiltra toda la pared gástrica alcanzando la serosa",
+    "pT_stage": "not_reported",
+    "pN_stage": "not_reported",
+    "lymph_nodes_examined": "not_reported",
+    "lymph_nodes_positive": "not_reported",
+    "margins_proximal": "Libre",
+    "margins_distal": "Libre",
+    "lymphovascular_invasion": "not_reported",
+    "perineural_invasion": "not_reported",
+    "her2_status": "not_reported",
+    "tumor_size": "3.8 cm",
+    "extranodal_extension": "not_reported",
+    "pdl1_cps": "not_reported",
+    "msi_mmr": "not_reported"
+  },
+  "validation": {
+    "completeness_score": 38,
+    "total_required_fields": 13,
+    "reported_fields": 5,
+    "missing_fields": 8,
+    "status": "critically_incomplete",
+    "missing_required": [
+      {
+        "field": "pT_stage",
+        "severity": "critical",
+        "recommendation": "Asignar estadificación pT según profundidad de invasión (serosa = pT3)"
+      },
+      {
+        "field": "pN_stage",
+        "severity": "critical",
+        "recommendation": "Reportar estadificación pN basada en ganglios afectos/total"
+      },
+      {
+        "field": "lymph_nodes_examined",
+        "severity": "critical",
+        "recommendation": "Reportar número total de ganglios aislados (mínimo recomendado: 16)"
+      },
+      {
+        "field": "lymph_nodes_positive",
+        "severity": "critical",
+        "recommendation": "Reportar número de ganglios con metástasis"
+      },
+      {
+        "field": "histologic_grade",
+        "severity": "major",
+        "recommendation": "Consignar G3 (por definición en carcinoma difuso)"
+      },
+      {
+        "field": "lymphovascular_invasion",
+        "severity": "major",
+        "recommendation": "Reportar presencia o ausencia de invasión linfovascular"
+      },
+      {
+        "field": "perineural_invasion",
+        "severity": "major",
+        "recommendation": "Reportar presencia o ausencia de invasión perineural"
+      },
+      {
+        "field": "her2_status",
+        "severity": "major",
+        "recommendation": "Realizar estudio HER2 - obligatorio en gástrico avanzado según NCCN/ESMO"
+      }
+    ],
+    "inconsistencies": [
+      {
+        "finding": "Tipo difuso sin grado explícito — G3 por definición (consignar)",
+        "severity": "warning"
+      },
+      {
+        "finding": "Profundidad de invasión reportada (serosa) sin estadificación pT asignada",
+        "severity": "error"
+      },
+      {
+        "finding": "Gástrico avanzado (invasión de serosa) sin HER2 reportado - obligatorio según NCCN/ESMO",
+        "severity": "warning"
+      }
+    ],
+    "quality_notes": "Informe críticamente incompleto. Faltan elementos esenciales para estadificación AJCC (pT, pN, conteo ganglionar) que impiden la planificación terapéutica. El tipo histológico difuso requiere grado G3 por definición. La invasión de serosa indica enfermedad avanzada que obliga estudio HER2. Se requiere completar urgentemente."
+  },
+  "audit_trail": {
+    "timestamp": "2026-03-14T02:41:20.211737Z",
+    "input_hash": "9c73690498698afbbb96e4c9d7c42acbd2b1a75cf4f87ef6a34de10dafcbb01c",
+    "classification_confidence": 0.95,
+    "protocol_used": "gastric",
+    "completeness_score": 38,
+    "model_version": "z-ai/glm-5",
+    "provider": "openrouter",
+    "processing_time_ms": 60375,
+    "pipeline_version": "0.1.0"
+  },
+  "needs_human_review": false
+}

@@ -1,0 +1,45 @@
+# Environment
+.env
+.env.local
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code
+.claude/
+
+# Cloudflare
+.wrangler/
+node_modules/
+
+# Clinical data (NEVER commit real patient data)
+real-data/
+private/
+confidential/
+*.hl7
+*.dcm
+
+# Internal docs (plans, research, AI assistant config)
+_private/
+
+# Plans (local only)
+*.plan.md

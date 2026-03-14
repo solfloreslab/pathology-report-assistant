@@ -1,0 +1,52 @@
+{
+  "classification": {
+    "specimen_type": "biopsy",
+    "organ_system": "skin",
+    "tumor_type_suspected": "Melanoma cutáneo de extensión superficial",
+    "protocol_to_apply": "melanoma",
+    "confidence": 0.95
+  },
+  "extracted_data": {
+    "histologic_type": "Melanoma de extensión superficial",
+    "breslow_thickness": 1.8,
+    "ulceration": "present",
+    "mitotic_index": "3 mitosis/mm²",
+    "clark_level": "IV",
+    "margins_lateral": "Libre (3 mm)",
+    "margins_deep": "Libre (2 mm)",
+    "lymphovascular_invasion": "not_identified",
+    "neurotropism": "not_identified",
+    "microsatellitosis": "not_identified",
+    "pT_stage": "pT2b",
+    "regression": "absent",
+    "til_status": "non-brisk",
+    "growth_phase": "not_reported"
+  },
+  "validation": {
+    "completeness_score": 97,
+    "total_required_fields": 11,
+    "reported_fields": 11,
+    "missing_fields": 0,
+    "status": "complete",
+    "missing_required": [],
+    "inconsistencies": [
+      {
+        "finding": "pT2b+ — recomendar biopsia de ganglio centinela si no realizada",
+        "severity": "warning"
+      }
+    ],
+    "quality_notes": "Informe completo con todos los campos requeridos correctamente documentados. Melanoma pT2b (Breslow 1.8mm) con ulceración presente. Márgenes libres adecuados (>1mm). Campo recomendado growth_phase no informado. Se recomienda valorar biopsia de ganglio centinela dada la categoría pT2b."
+  },
+  "audit_trail": {
+    "timestamp": "2026-03-14T02:38:49.078529Z",
+    "input_hash": "d67da36410b2b21d3034432d962a48f1e1f52507fb05472f9fd742f236c71824",
+    "classification_confidence": 0.95,
+    "protocol_used": "melanoma",
+    "completeness_score": 97,
+    "model_version": "z-ai/glm-5",
+    "provider": "openrouter",
+    "processing_time_ms": 83483,
+    "pipeline_version": "0.1.0"
+  },
+  "needs_human_review": false
+}
