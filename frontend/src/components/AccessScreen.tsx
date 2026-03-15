@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Microscope, ArrowRight, ShieldCheck } from 'lucide-react'
+import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { motion } from 'motion/react'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
+import { MicroscopeMascot } from './MicroscopeMascot'
 
 interface AccessScreenProps {
   lang: Lang
@@ -34,9 +35,7 @@ export function AccessScreen({ lang, toggleLang, onLogin }: AccessScreenProps) {
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="flex justify-center mb-6"
         >
-          <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-2xl flex items-center justify-center shadow-xl">
-            <Microscope className="w-10 h-10 text-white" />
-          </div>
+          <MicroscopeMascot size="medium" />
         </motion.div>
 
         {/* Title */}

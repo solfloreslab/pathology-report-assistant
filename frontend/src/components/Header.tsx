@@ -1,7 +1,7 @@
 import { t } from '../data/i18n'
 import type { Lang } from '../data/i18n'
 import { Plus, Minus, Moon, Sun, LogOut } from 'lucide-react'
-import { AnimatedLogo } from './AnimatedLogo'
+import { MicroscopeMascot } from './MicroscopeMascot'
 
 interface HeaderProps {
   lang: Lang
@@ -22,7 +22,7 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0A5249] to-[#0E6B5E] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3 cursor-pointer" onClick={onHome} title={onHome ? (lang === 'es' ? 'Volver al inicio' : 'Back to home') : undefined}>
-          <AnimatedLogo />
+          <MicroscopeMascot size="small" />
           <div>
             <h1 className="text-sm font-bold leading-tight text-white">
               {t('app.title', lang)}
