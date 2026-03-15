@@ -159,8 +159,12 @@ export function generateReport(protocol: ProtocolDef, values: FormValues, lang: 
   if (histType) diagParts.push(histType)
   if (histGrade) diagParts.push(histGrade)
 
-  const ptnm = val(values, 'pTNM') || val(values, 'pt_stage')
-  if (ptnm) diagParts.push(ptnm)
+  // Build pTNM from separate fields
+  const ptStage = val(values, 'pt_stage')
+  const pnStage = val(values, 'pn_stage')
+  const pmStage = val(values, 'pm_stage')
+  const ptnmParts = [ptStage, pnStage, pmStage].filter(Boolean)
+  if (ptnmParts.length > 0) diagParts.push(ptnmParts.join(' '))
 
   if (diagParts.length > 0) {
     lines.push(diagParts.join(', ') + '.')

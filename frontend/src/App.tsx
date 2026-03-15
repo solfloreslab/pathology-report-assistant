@@ -101,7 +101,18 @@ export default function App() {
                 {t('form.include_macro', lang)}
               </label>
 
-              <QuickNotes lang={lang} onPrefill={handlePrefill} />
+              <QuickNotes
+                lang={lang}
+                onPrefill={handlePrefill}
+                protocolId={protocol.id}
+                onRealtimeParse={(matches) => {
+                  const newValues: Record<string, string> = {}
+                  for (const m of matches) {
+                    newValues[m.field] = m.value
+                  }
+                  bulkSetValues(newValues)
+                }}
+              />
 
               <ProtocolForm
                 protocol={protocol}

@@ -28,7 +28,7 @@ export function StagingPopup({ reference, suggestion, lang, darkMode }: StagingP
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <div className="fixed inset-0 z-[100] bg-black/20" onClick={() => setIsOpen(false)} />
           <div className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-96 rounded-xl shadow-2xl border ${
             darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[var(--color-border)]'
           }`}>

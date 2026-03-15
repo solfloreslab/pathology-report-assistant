@@ -69,6 +69,7 @@ export function ReportPreview({
           mode: 'auditor',
           report_text: reportText,
           access_code: accessCode,
+          lang: lang,
         }),
       })
       if (!res.ok) throw new Error('API error')
@@ -154,12 +155,50 @@ export function ReportPreview({
               </p>
             </div>
           )}
-          {criticalPending.length === 0 && majorPending.length === 0 && (
+          {criticalPending.length === 0 && majorPending.length === 0 && !reviewResult && (
             <div className="p-3 rounded-lg bg-[var(--color-success-bg)] flex items-center gap-2">
               <Check className="w-5 h-5 text-[var(--color-success)]" />
               <span className="text-sm font-semibold text-[var(--color-success-text)]">
                 {lang === 'es' ? 'Informe completo' : 'Report complete'}
               </span>
+            </div>
+          )}
+
+          {/* AI Review results — shown in alert panel */}
+          {reviewing && (
+            <div className={`p-2.5 rounded-lg flex items-center gap-2 ${dm ? 'bg-blue-900/30' : 'bg-[var(--color-info-bg)]'}`}>
+              <Loader2 className="w-4 h-4 animate-spin text-[var(--color-primary)]" />
+              <span className={`text-[13px] ${dm ? 'text-blue-300' : 'text-[var(--color-info-text)]'}`}>
+                {lang === 'es' ? 'La IA está revisando...' : 'AI is reviewing...'}
+              </span>
+            </div>
+          )}
+
+          {reviewResult && !reviewing && (
+            <div className="space-y-1.5">
+              {reviewResult.inconsistencies?.map((inc, i) => (
+                <div key={i} className={`p-2 rounded-lg text-[13px] flex items-start gap-2 ${
+                  inc.severity === 'error'
+                    ? 'bg-[var(--color-critical-bg)] text-[var(--color-critical-text)]'
+                    : 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]'
+                }`}>
+                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-[10px] uppercase mr-1">
+                      {inc.severity === 'error'
+                        ? (lang === 'es' ? 'ERROR' : 'ERROR')
+                        : (lang === 'es' ? 'AVISO' : 'WARNING')}
+                    </span>
+                    {inc.description || inc.finding}
+                  </div>
+                </div>
+              ))}
+              {reviewResult.quality_notes && (
+                <div className={`p-2 rounded-lg text-[13px] ${dm ? 'bg-blue-900/20 text-blue-300' : 'bg-[var(--color-info-bg)] text-[var(--color-info-text)]'}`}>
+                  <Sparkles className="w-3.5 h-3.5 inline mr-1" />
+                  {reviewResult.quality_notes}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -231,63 +270,7 @@ export function ReportPreview({
                 dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, '<br>') }}
               />
 
-              {/* AI Review results */}
-              {reviewing && (
-                <div className="mt-4 flex items-center gap-2 text-sm text-[var(--color-primary)]">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  {lang === 'es' ? 'La IA está revisando el informe...' : 'AI is reviewing the report...'}
-                </div>
-              )}
-
-              {reviewResult && (
-                <div className="mt-4 border-t border-[var(--color-border)] pt-3 space-y-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-[var(--color-primary)]" />
-                    <span className="text-[13px] font-semibold">
-                      {lang === 'es' ? 'Revisión IA' : 'AI Review'}
-                    </span>
-                    <span className="text-[12px] font-mono" style={{
-                      color: reviewResult.completeness_score >= 80 ? 'var(--color-success)' :
-                        reviewResult.completeness_score >= 50 ? 'var(--color-warning-text)' : 'var(--color-critical)',
-                    }}>
-                      {reviewResult.completeness_score}%
-                    </span>
-                  </div>
-
-                  {reviewResult.missing_fields?.length > 0 && (
-                    <div className="space-y-1">
-                      {reviewResult.missing_fields.map((mf, i) => (
-                        <div key={i} className={`text-[12px] p-2 rounded ${
-                          mf.severity === 'critical' ? 'bg-[var(--color-critical-bg)] text-[var(--color-critical-text)]' :
-                          mf.severity === 'major' ? 'bg-[var(--color-major-bg)] text-[var(--color-major-text)]' :
-                          'bg-[var(--color-na-bg)] text-[var(--color-text-secondary)]'
-                        }`}>
-                          <span className="font-semibold uppercase text-[10px]">{mf.severity}</span> {mf.field}: {mf.recommendation}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {reviewResult.inconsistencies?.length > 0 && (
-                    <div className="space-y-1">
-                      <span className="text-[12px] font-semibold text-[var(--color-warning-text)]">
-                        {lang === 'es' ? 'Inconsistencias:' : 'Inconsistencies:'}
-                      </span>
-                      {reviewResult.inconsistencies.map((inc, i) => (
-                        <div key={i} className="text-[12px] p-2 rounded bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]">
-                          {inc.description}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {reviewResult.quality_notes && (
-                    <div className="text-[12px] p-2 rounded bg-[var(--color-info-bg)] text-[var(--color-info-text)]">
-                      {reviewResult.quality_notes}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* AI Review results are shown in the alert panel above */}
             </>
           ) : (
             <div className="flex items-center justify-center h-full min-h-[200px] text-sm text-[var(--color-text-tertiary)]">

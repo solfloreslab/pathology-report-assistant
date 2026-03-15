@@ -300,9 +300,10 @@ function parseJSON(raw) {
 }
 
 // --- Pipeline: Auditor mode ---
-async function runAuditor(env, reportText, protocol, protocolId) {
+async function runAuditor(env, reportText, protocol, protocolId, lang = 'es') {
   const fieldsText = protocol.fields.join(", ");
   const rulesText = protocol.rules.join("\n");
+  const langFull = lang === 'es' ? 'Spanish (español)' : 'English';
 
   // Extract
   const extractorPrompt = EXTRACTOR_PROMPT_TEMPLATE.replace("{FIELDS}", fieldsText);
@@ -312,7 +313,8 @@ async function runAuditor(env, reportText, protocol, protocolId) {
   // Validate
   const validatorPrompt = VALIDATOR_PROMPT_TEMPLATE
     .replace("{FIELDS}", fieldsText)
-    .replace("{RULES}", rulesText);
+    .replace("{RULES}", rulesText)
+    .replace(/{LANG}/g, langFull);
   const validateRaw = await callLLM(env, validatorPrompt, JSON.stringify(extractedData, null, 2));
   const validation = parseJSON(validateRaw);
 
@@ -456,7 +458,8 @@ export default {
 
       // Auditor mode (default)
       if (protocol) {
-        const auditor = await runAuditor(env, reportText, protocol, protocolId);
+        const userLang = body.lang || 'es';
+        const auditor = await runAuditor(env, reportText, protocol, protocolId, userLang);
 
         return Response.json({
           mode: "auditor",

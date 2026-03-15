@@ -120,7 +120,7 @@ function suggestColonPt(values: FormValues): StagingSuggestion | null {
   const [es, en] = depthLabels[depth] || [depth, depth]
 
   return {
-    field: 'pTNM',
+    field: 'pt_stage',
     value: stage,
     reasoning_es: `Profundidad: ${es}`,
     reasoning_en: `Depth: ${en}`,
@@ -140,11 +140,43 @@ function suggestColonPn(values: FormValues): StagingSuggestion | null {
   else stage = 'pN2b'
 
   return {
-    field: 'pTNM',
+    field: 'pn_stage',
     value: stage,
     reasoning_es: `${pos}/${exam} ganglios positivos`,
     reasoning_en: `${pos}/${exam} positive nodes`,
   }
+}
+
+// ─── MELANOMA pN ───
+
+const melanomaPnTable: StagingReference = {
+  title_es: 'Estadificación pN — Melanoma cutáneo',
+  title_en: 'pN Staging — Cutaneous Melanoma',
+  source: 'AJCC 8th Edition, 2017',
+  entries: [
+    { stage: 'pN0', criteria_es: 'Sin metástasis ganglionar', criteria_en: 'No regional node metastasis' },
+    { stage: 'pN1a', criteria_es: '1 ganglio clínicamente oculto', criteria_en: '1 clinically occult node' },
+    { stage: 'pN1b', criteria_es: '1 ganglio clínicamente detectado', criteria_en: '1 clinically detected node' },
+    { stage: 'pN2a', criteria_es: '2–3 ganglios clínicamente ocultos', criteria_en: '2–3 clinically occult nodes' },
+    { stage: 'pN2b', criteria_es: '2–3 ganglios clínicamente detectados', criteria_en: '2–3 clinically detected nodes' },
+    { stage: 'pN3', criteria_es: '≥4 ganglios, o en tránsito/satélites con ganglios+', criteria_en: '≥4 nodes, or in-transit/satellites with positive nodes' },
+  ],
+}
+
+// ─── pM (universal — aplica a todos los protocolos) ───
+
+const pmTable: StagingReference = {
+  title_es: 'Estadificación pM — Metástasis a distancia',
+  title_en: 'pM Staging — Distant Metastasis',
+  source: 'AJCC 8th Edition, 2017',
+  entries: [
+    { stage: 'M0', criteria_es: 'Sin metástasis a distancia', criteria_en: 'No distant metastasis' },
+    { stage: 'M1', criteria_es: 'Metástasis a distancia presente', criteria_en: 'Distant metastasis present' },
+    { stage: 'M1a', criteria_es: 'Metástasis en un solo órgano (sin peritoneo)', criteria_en: 'Metastasis to single organ (without peritoneum)' },
+    { stage: 'M1b', criteria_es: 'Metástasis en más de un órgano (sin peritoneo)', criteria_en: 'Metastasis to more than one organ (without peritoneum)' },
+    { stage: 'M1c', criteria_es: 'Metástasis peritoneal (con o sin otros órganos)', criteria_en: 'Peritoneal metastasis (with or without other organs)' },
+    { stage: 'pMX', criteria_es: 'No evaluable', criteria_en: 'Cannot be assessed' },
+  ],
 }
 
 // ─── PUBLIC API ───
@@ -161,21 +193,28 @@ export function getSuggestions(protocolId: string, values: FormValues): StagingS
     const pt = suggestColonPt(values)
     if (pt) suggestions.push(pt)
     const pn = suggestColonPn(values)
-    if (pn) suggestions.push({ ...pn, value: pt ? `${pt.value} ${pn.value}` : pn.value })
+    if (pn) suggestions.push(pn)
   }
 
   return suggestions
 }
 
 export function getReference(protocolId: string, fieldName: string): StagingReference | null {
-  if (protocolId === 'melanoma' && fieldName === 'pt_stage') return melanomaPtTable
-  if (protocolId === 'colon-resection' && fieldName === 'pTNM') return colonPtTable
+  // pM is universal
+  if (fieldName === 'pm_stage') return pmTable
+
+  if (protocolId === 'melanoma') {
+    if (fieldName === 'pt_stage') return melanomaPtTable
+    if (fieldName === 'pn_stage') return melanomaPnTable
+  }
+  if (protocolId === 'colon-resection') {
+    if (fieldName === 'pt_stage') return colonPtTable
+    if (fieldName === 'pn_stage') return colonPnTable
+  }
   return null
 }
 
 export function getMatchingStage(reference: StagingReference, suggestion: StagingSuggestion | undefined): string | null {
   if (!suggestion) return null
-  // Extract first pT/pN part for matching
-  const parts = suggestion.value.split(' ')
-  return parts[0] || null
+  return suggestion.value || null
 }
