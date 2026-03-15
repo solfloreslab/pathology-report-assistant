@@ -277,7 +277,6 @@ export function ReportPreview({
               )}
             </div>
           )}
-        </div>
       </div>
 
       {/* Row 2: Informe editable con toolbar */}
