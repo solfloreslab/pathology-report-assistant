@@ -109,37 +109,13 @@ export default function App() {
         onDarkModeToggle={() => setDarkMode(d => !d)}
         onHome={protocol ? () => { setProtocol(null); resetValues() } : undefined}
         onLogout={() => { localStorage.removeItem('patho-access'); localStorage.removeItem('patho-code'); window.location.reload() }}
+        mode={mode}
+        onModeChange={(m) => { setMode(m); if (m === 'auditor') { setProtocol(null); resetValues() } }}
       />
 
       <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
-        {/* Mode tabs — only on home screen */}
-        {!protocol && (
-          <div className="max-w-2xl mx-auto mt-4 mb-2 flex gap-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800 w-fit">
-            <button
-              onClick={() => setMode('copilot')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                mode === 'copilot'
-                  ? 'bg-white shadow text-[var(--color-primary)] dark:bg-gray-700 dark:text-blue-300'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-              }`}
-            >
-              {lang === 'es' ? 'Copiloto' : 'Copilot'}
-            </button>
-            <button
-              onClick={() => setMode('auditor')}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                mode === 'auditor'
-                  ? 'bg-white shadow text-[var(--color-primary)] dark:bg-gray-700 dark:text-blue-300'
-                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-              }`}
-            >
-              {lang === 'es' ? 'Auditor' : 'Auditor'}
-            </button>
-          </div>
-        )}
-
         {/* AUDITOR MODE */}
-        {!protocol && mode === 'auditor' ? (
+        {mode === 'auditor' ? (
           <div className="max-w-4xl mx-auto mt-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-3">

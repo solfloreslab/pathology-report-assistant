@@ -13,9 +13,11 @@ interface HeaderProps {
   onDarkModeToggle: () => void
   onLogout?: () => void
   onHome?: () => void
+  mode?: 'copilot' | 'auditor'
+  onModeChange?: (mode: 'copilot' | 'auditor') => void
 }
 
-export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout, onHome }: HeaderProps) {
+export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout, onHome, mode, onModeChange }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0f2847] to-[#0F62FE] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
@@ -29,6 +31,18 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
               {lang === 'es' ? 'HUMANO EN CONTROL' : 'HUMAN-IN-THE-LOOP'}
             </span>
           </div>
+          {mode && onModeChange && (
+            <div className="flex gap-0.5 p-0.5 rounded-lg bg-white/10 ml-4">
+              <button onClick={() => onModeChange('copilot')}
+                className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${mode === 'copilot' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
+                {lang === 'es' ? 'Copiloto' : 'Copilot'}
+              </button>
+              <button onClick={() => onModeChange('auditor')}
+                className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${mode === 'auditor' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
+                {lang === 'es' ? 'Auditor' : 'Auditor'}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-1.5 flex-shrink-0">
