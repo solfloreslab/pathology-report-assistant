@@ -108,7 +108,7 @@ export default function App() {
         darkMode={darkMode}
         onDarkModeToggle={() => setDarkMode(d => !d)}
         onHome={protocol ? () => { setProtocol(null); resetValues() } : undefined}
-        onLogout={() => { localStorage.removeItem('access_code'); window.location.reload() }}
+        onLogout={() => { localStorage.removeItem('patho-access'); localStorage.removeItem('patho-code'); window.location.reload() }}
       />
 
       <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
