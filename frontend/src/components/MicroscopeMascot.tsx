@@ -99,20 +99,20 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
           >
             <rect x="132" y="38" width="64" height="24" rx="12" transform="rotate(28 132 38)" fill="#0E6B5E" />
 
-            {/* Left eye — separated more */}
-            <motion.g style={{ rotate: ocularRotate, originX: '140px', originY: '65px' }}>
-              <circle cx="140" cy="65" r="28" fill="#0E6B5E" />
-              <circle cx="140" cy="65" r="21" fill="#E6F4F1" />
-              <motion.circle cx="140" cy="65" r="10" fill="#0a1628" style={{ x: leftEyeX, y: eyeOffsetY }} />
-              <motion.circle cx="140" cy="65" r="4" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1.5, 1.5]), y: useTransform(smoothY, [-1, 1], [-1, 1]) }} />
+            {/* Left eye — cx=132 */}
+            <motion.g style={{ rotate: ocularRotate, originX: '132px', originY: '60px' }}>
+              <circle cx="132" cy="60" r="26" fill="#0E6B5E" />
+              <circle cx="132" cy="60" r="19" fill="#E6F4F1" />
+              <motion.circle cx="132" cy="60" r="8" fill="#0a1628" style={{ x: leftEyeX, y: eyeOffsetY }} />
+              <motion.circle cx="132" cy="60" r="3" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1, 1]), y: useTransform(smoothY, [-1, 1], [-0.5, 0.5]) }} />
             </motion.g>
 
-            {/* Right eye — separated more */}
-            <motion.g style={{ rotate: ocularRotate, originX: '190px', originY: '88px' }}>
-              <circle cx="190" cy="88" r="24" fill="#0A5249" />
-              <circle cx="190" cy="88" r="18" fill="#E6F4F1" />
-              <motion.circle cx="190" cy="88" r="8.5" fill="#0a1628" style={{ x: rightEyeX, y: eyeOffsetY }} />
-              <motion.circle cx="190" cy="88" r="3.5" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1.5, 1.5]), y: useTransform(smoothY, [-1, 1], [-1, 1]) }} />
+            {/* Right eye — cx=198 (66px apart = clear separation) */}
+            <motion.g style={{ rotate: ocularRotate, originX: '198px', originY: '82px' }}>
+              <circle cx="198" cy="82" r="22" fill="#0A5249" />
+              <circle cx="198" cy="82" r="16" fill="#E6F4F1" />
+              <motion.circle cx="198" cy="82" r="7" fill="#0a1628" style={{ x: rightEyeX, y: eyeOffsetY }} />
+              <motion.circle cx="198" cy="82" r="2.5" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1, 1]), y: useTransform(smoothY, [-1, 1], [-0.5, 0.5]) }} />
             </motion.g>
           </motion.g>
 
