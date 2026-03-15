@@ -197,7 +197,7 @@ export const protocols: ProtocolDef[] = [
         ['M1d', 'M1d — CNS', 'M1d — SNC'],
       ])},
       { name: 'regression', label_en: 'Regression', label_es: 'Regresión', section: 'additional', severity: 'minor', type: 'tristate' },
-      { name: 'til_status', label_en: 'TIL status', label_es: 'Estado TIL', section: 'additional', severity: 'minor', type: 'dropdown', options: opts([
+      { name: 'til_status', label_en: 'TIL (tumor-infiltrating lymphocytes)', label_es: 'TIL (linfocitos infiltrantes)', section: 'additional', severity: 'minor', type: 'dropdown', options: opts([
         ['brisk', 'Brisk', 'Intenso'], ['nonbrisk', 'Non-brisk', 'No intenso'], ['absent', 'Absent', 'Ausente'],
       ])},
     ],

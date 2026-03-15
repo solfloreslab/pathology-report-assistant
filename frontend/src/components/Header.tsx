@@ -12,9 +12,10 @@ interface HeaderProps {
   darkMode: boolean
   onDarkModeToggle: () => void
   onLogout?: () => void
+  onHome?: () => void
 }
 
-export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout }: HeaderProps) {
+export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout, onHome }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0f2847] to-[#0F62FE] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
