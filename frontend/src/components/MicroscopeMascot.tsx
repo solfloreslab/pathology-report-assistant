@@ -24,6 +24,17 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
       const rect = wrapRef.current.getBoundingClientRect()
       const cx = rect.left + rect.width / 2
       const cy = rect.top + rect.height / 2
+
+      // For small size (header): only react when mouse is nearby (within 150px)
+      if (size === 'small') {
+        const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2)
+        if (dist > 150) {
+          mouseX.set(0)
+          mouseY.set(0)
+          return
+        }
+      }
+
       const nx = (e.clientX - cx) / (rect.width / 2)
       const ny = (e.clientY - cy) / (rect.height / 2)
       mouseX.set(Math.max(-1, Math.min(1, nx)))
@@ -37,11 +48,15 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
       window.removeEventListener('mousemove', handleMove)
       window.removeEventListener('mouseleave', reset)
     }
-  }, [mouseX, mouseY])
+  }, [mouseX, mouseY, size])
 
-  const eyeOffsetX = useTransform(smoothX, [-1, 1], [-7, 7])
   const eyeOffsetY = useTransform(smoothY, [-1, 1], [-5, 5])
-  const ocularRotate = useTransform(smoothX, [-1, 1], [-8, 8])
+  const ocularRotate = useTransform(smoothX, [-1, 1], [-6, 6])
+
+  // Normal: eyes follow mouse. Center (mouse between eyes): cross-eyed
+  // smoothX near 0 AND smoothY near 0 = mouse is between eyes = bizco
+  const leftEyeX = useTransform(smoothX, [-1, -0.2, 0, 0.2, 1], [-9, -5, 7, 8, 9])
+  const rightEyeX = useTransform(smoothX, [-1, -0.2, 0, 0.2, 1], [-9, -8, -7, 5, 9])
 
   const s = size === 'small' ? 42 : 160
   const scale = s / 240
@@ -84,20 +99,20 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
           >
             <rect x="132" y="38" width="64" height="24" rx="12" transform="rotate(28 132 38)" fill="#0E6B5E" />
 
-            {/* Left eye */}
-            <motion.g style={{ rotate: ocularRotate, originX: '147px', originY: '68px' }}>
-              <circle cx="144" cy="67" r="28" fill="#0E6B5E" />
-              <circle cx="144" cy="67" r="21" fill="#E6F4F1" />
-              <motion.circle cx="144" cy="67" r="10" fill="#0a1628" style={{ x: eyeOffsetX, y: eyeOffsetY }} />
-              <motion.circle cx="144" cy="67" r="4" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1.5, 1.5]), y: useTransform(smoothY, [-1, 1], [-1, 1]) }} />
+            {/* Left eye — separated more */}
+            <motion.g style={{ rotate: ocularRotate, originX: '140px', originY: '65px' }}>
+              <circle cx="140" cy="65" r="28" fill="#0E6B5E" />
+              <circle cx="140" cy="65" r="21" fill="#E6F4F1" />
+              <motion.circle cx="140" cy="65" r="10" fill="#0a1628" style={{ x: leftEyeX, y: eyeOffsetY }} />
+              <motion.circle cx="140" cy="65" r="4" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1.5, 1.5]), y: useTransform(smoothY, [-1, 1], [-1, 1]) }} />
             </motion.g>
 
-            {/* Right eye */}
-            <motion.g style={{ rotate: ocularRotate, originX: '184px', originY: '88px' }}>
-              <circle cx="184" cy="89" r="24" fill="#0A5249" />
-              <circle cx="184" cy="89" r="18" fill="#E6F4F1" />
-              <motion.circle cx="184" cy="89" r="8.5" fill="#0a1628" style={{ x: eyeOffsetX, y: eyeOffsetY }} />
-              <motion.circle cx="184" cy="89" r="3.5" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1.5, 1.5]), y: useTransform(smoothY, [-1, 1], [-1, 1]) }} />
+            {/* Right eye — separated more */}
+            <motion.g style={{ rotate: ocularRotate, originX: '190px', originY: '88px' }}>
+              <circle cx="190" cy="88" r="24" fill="#0A5249" />
+              <circle cx="190" cy="88" r="18" fill="#E6F4F1" />
+              <motion.circle cx="190" cy="88" r="8.5" fill="#0a1628" style={{ x: rightEyeX, y: eyeOffsetY }} />
+              <motion.circle cx="190" cy="88" r="3.5" fill="#ffffff" style={{ x: useTransform(smoothX, [-1, 1], [-1.5, 1.5]), y: useTransform(smoothY, [-1, 1], [-1, 1]) }} />
             </motion.g>
           </motion.g>
 
