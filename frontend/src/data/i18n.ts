@@ -71,7 +71,7 @@ const translations = {
   // Footer
   'footer.disclaimer': { es: 'No es un dispositivo médico — solo para demostración', en: 'Not a medical device — for demonstration only' },
   'footer.synthetic': { es: 'Todos los datos son sintéticos', en: 'All data is synthetic' },
-  'footer.built': { es: 'Desarrollado por una patóloga e ingeniera de IA', en: 'Built by a pathologist & AI engineer' },
+  'footer.built': { es: 'Desarrollado por solfloreslab', en: 'Built by solfloreslab' },
 } as const
 
 export type TranslationKey = keyof typeof translations
