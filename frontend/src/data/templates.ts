@@ -1,5 +1,6 @@
 import type { FormValues, } from '../hooks/useFormState'
 import type { ProtocolDef, FieldDef } from './protocols'
+import { CIE_O_CODES } from './protocols'
 import type { Lang } from './i18n'
 
 function label(f: FieldDef, lang: Lang): string {
@@ -40,10 +41,33 @@ export const REPORT_STYLES: { value: ReportStyle; label_es: string; label_en: st
   { value: 'mixed', label_es: 'Mixto', label_en: 'Mixed' },
 ]
 
+function generateCodingSection(protocolId: string, values: FormValues, lang: Lang): string {
+  const codes = CIE_O_CODES[protocolId]
+  if (!codes) return ''
+
+  const locationField = values['tumor_location'] || ''
+  const histField = values['histologic_type'] || ''
+
+  const topo = codes.topography[locationField] || codes.topography[''] || null
+  const morph = codes.morphology[histField] || null
+
+  if (!topo && !morph) return ''
+
+  const header = lang === 'es' ? 'CODIFICACIÓN:' : 'CODING:'
+  const lines = ['\n' + header]
+  if (topo) lines.push(`${lang === 'es' ? 'Topografía' : 'Topography'}: ${topo} (${locationField || protocolId})`)
+  if (morph) lines.push(`${lang === 'es' ? 'Morfología' : 'Morphology'}: ${morph} (${histField})`)
+  return lines.join('\n')
+}
+
 export function generateReport(protocol: ProtocolDef, values: FormValues, lang: Lang, includeMacro: boolean, style: ReportStyle = 'prose'): string {
-  if (style === 'synoptic') return generateSynoptic(protocol, values, lang)
-  if (style === 'mixed') return generateMixed(protocol, values, lang)
-  return generateProse(protocol, values, lang, includeMacro)
+  let report = ''
+  if (style === 'synoptic') report = generateSynoptic(protocol, values, lang)
+  else if (style === 'mixed') report = generateMixed(protocol, values, lang)
+  else report = generateProse(protocol, values, lang, includeMacro)
+
+  report += generateCodingSection(protocol.id, values, lang)
+  return report
 }
 
 function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, includeMacro: boolean): string {
