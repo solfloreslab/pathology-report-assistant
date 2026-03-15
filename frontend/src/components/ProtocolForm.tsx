@@ -13,11 +13,10 @@ interface ProtocolFormProps {
   onChange: (fieldName: string, value: string) => void
   sectionStatuses: SectionStatus[]
   lang: Lang
+  darkMode?: boolean
 }
 
-// No emojis — professional medical interface
-
-export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang }: ProtocolFormProps) {
+export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang, darkMode }: ProtocolFormProps) {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set())
 
   const toggleSection = (sectionId: string) => {
@@ -59,18 +58,18 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
           <div
             key={sectionId}
             id={`section-${sectionId}`}
-            className="bg-white rounded-lg border border-[var(--color-border)] overflow-hidden"
+            className={`rounded-lg border overflow-hidden ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'}`}
           >
             <button
               onClick={() => toggleSection(sectionId)}
-              className="w-full flex items-center justify-between px-3 py-2 hover:bg-[var(--color-surface-alt)] transition-colors"
+              className={`w-full flex items-center justify-between px-3 py-2 transition-colors ${darkMode ? 'hover:bg-gray-800' : 'hover:bg-[var(--color-surface-alt)]'}`}
             >
               <div className="flex items-center gap-2">
                 {isCollapsed
                   ? <ChevronRight className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
                   : <ChevronDown className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
                 }
-                <span className="text-[13px] font-semibold text-[var(--color-text)]">
+                <span className={`text-[13px] font-semibold ${darkMode ? 'text-gray-200' : 'text-[var(--color-text)]'}`}>
                   {sectionLabel(sectionId)}
                 </span>
               </div>
@@ -86,6 +85,7 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
                     value={values[field.name] || ''}
                     onChange={v => onChange(field.name, v)}
                     lang={lang}
+                    darkMode={darkMode}
                   />
                 ))}
               </div>

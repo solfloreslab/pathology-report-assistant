@@ -20,9 +20,14 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
           <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
             <Microscope className="w-4 h-4 text-white" />
           </div>
-          <h1 className={`text-sm font-semibold leading-tight ${darkMode ? 'text-gray-100' : 'text-[var(--color-text)]'}`}>
-            {t('app.title', lang)}
-          </h1>
+          <div>
+            <h1 className={`text-sm font-semibold leading-tight ${darkMode ? 'text-gray-100' : 'text-[var(--color-text)]'}`}>
+              {t('app.title', lang)}
+            </h1>
+            <span className={`text-[10px] uppercase tracking-widest font-medium ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>
+              {lang === 'es' ? 'HUMANO EN CONTROL' : 'HUMAN-IN-THE-LOOP'}
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

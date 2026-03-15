@@ -5,9 +5,10 @@ interface TriStateControlProps {
   value: string
   onChange: (value: string) => void
   lang: Lang
+  darkMode?: boolean
 }
 
-export function TriStateControl({ value, onChange, lang }: TriStateControlProps) {
+export function TriStateControl({ value, onChange, lang, darkMode }: TriStateControlProps) {
   const options = [
     { key: 'present', color: 'bg-[var(--color-major-bg)] text-[var(--color-major-text)] border-[var(--color-major)]' },
     { key: 'absent', color: 'bg-[var(--color-success-bg)] text-[var(--color-success-text)] border-[var(--color-success)]' },
@@ -28,7 +29,9 @@ export function TriStateControl({ value, onChange, lang }: TriStateControlProps)
             className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-all ${
               isSelected
                 ? opt.color + ' border-current'
-                : 'bg-white text-[var(--color-text-tertiary)] border-[var(--color-border)] hover:border-[var(--color-text-secondary)]'
+                : darkMode
+                  ? 'bg-gray-800 text-gray-400 border-gray-600 hover:border-gray-400'
+                  : 'bg-white text-[var(--color-text-tertiary)] border-[var(--color-border)] hover:border-[var(--color-text-secondary)]'
             }`}
           >
             {label}

@@ -109,6 +109,7 @@ export default function App() {
                 onChange={setValue}
                 sectionStatuses={sectionStatuses}
                 lang={lang}
+                darkMode={darkMode}
               />
             </div>
 
