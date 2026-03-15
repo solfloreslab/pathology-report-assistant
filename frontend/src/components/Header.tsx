@@ -19,7 +19,7 @@ interface HeaderProps {
 
 export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout, onHome, mode, onModeChange }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0f2847] to-[#0F62FE] shadow-lg">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0A5249] to-[#0E6B5E] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3 cursor-pointer" onClick={onHome} title={onHome ? (lang === 'es' ? 'Volver al inicio' : 'Back to home') : undefined}>
           <AnimatedLogo />

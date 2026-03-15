@@ -1,17 +1,19 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @theme {
-  /* Clinical color tokens (NHS + Carbon inspired) */
-  --color-primary: #0F62FE;
-  --color-primary-dark: #002D9C;
-  --color-primary-light: #D0E2FF;
-  --color-secondary: #0E6B5E;
-  --color-secondary-light: #DEFBE6;
+  /* Clinical color tokens — Teal healthcare palette */
+  --color-primary: #0E6B5E;
+  --color-primary-dark: #0A5249;
+  --color-primary-light: #E6F4F1;
+  --color-accent: #0F62FE;
+  --color-accent-light: #D0E2FF;
 
   /* Surfaces */
-  --color-page: #F0F4F5;
+  --color-page: #F7F8FA;
   --color-surface: #FFFFFF;
-  --color-surface-alt: #F4F4F4;
+  --color-surface-alt: #F0F2F5;
 
   /* Text */
   --color-text: #161616;
@@ -19,7 +21,7 @@
   --color-text-tertiary: #6F6F6F;
 
   /* Borders */
-  --color-border: #C6C6C6;
+  --color-border: #E2E5EA;
   --color-border-input: #4C6272;
 
   /* Severity system */
@@ -43,10 +45,9 @@
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Lora', 'Georgia', 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', 'Fira Mono', ui-monospace, monospace;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   body {
@@ -70,13 +71,27 @@
     box-sizing: border-box;
   }
 
-  /* Modern card hover effects */
+  /* Card hover */
   .card-hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
   .card-hover:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(15, 98, 254, 0.08);
+    box-shadow: 0 4px 20px rgba(14, 107, 94, 0.1);
+  }
+
+  /* Report text uses serif */
+  .report-text {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* TNM codes use mono */
+  .tnm-code {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.02em;
   }
 
   /* Smooth section transitions */
@@ -84,7 +99,7 @@
     transition: all 0.2s ease;
   }
 
-  /* Scrollbar styling */
+  /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -92,15 +107,15 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.15);
+    background: rgba(14, 107, 94, 0.2);
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0,0,0,0.25);
+    background: rgba(14, 107, 94, 0.35);
   }
 
-  /* Selection color */
+  /* Selection */
   ::selection {
-    background: rgba(15, 98, 254, 0.2);
+    background: rgba(14, 107, 94, 0.15);
   }
 }

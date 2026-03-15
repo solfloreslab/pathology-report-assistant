@@ -349,7 +349,7 @@ export function ReportPreview({
                 ref={reportRef}
                 contentEditable
                 suppressContentEditableWarning
-                className="outline-none leading-relaxed whitespace-pre-wrap break-words text-[var(--color-text)]"
+                className="outline-none whitespace-pre-wrap break-words text-[var(--color-text)] report-text"
                 style={{ fontFamily: 'var(--font-sans)' }}
                 dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, '<br>') }}
               />
