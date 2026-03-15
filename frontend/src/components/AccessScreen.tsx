@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Microscope, ArrowRight } from 'lucide-react'
+import { Microscope, ArrowRight, ShieldCheck } from 'lucide-react'
+import { motion } from 'motion/react'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
 
@@ -23,58 +24,105 @@ export function AccessScreen({ lang, toggleLang, onLogin }: AccessScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-page)] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4"
+      style={{ background: 'radial-gradient(ellipse at 30% 20%, #E6F4F1 0%, #F7F8FA 50%, #EDF5FF 100%)' }}>
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[var(--color-primary)] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Microscope className="w-8 h-8 text-white" />
+        {/* Microscope with parallax */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="flex justify-center mb-6"
+        >
+          <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-2xl flex items-center justify-center shadow-xl">
+            <Microscope className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-xl font-semibold text-[var(--color-text)]">
+        </motion.div>
+
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.4 }}
+          className="text-center mb-6"
+        >
+          <h1 className="text-2xl font-bold text-[var(--color-text)]">
             {t('app.title', lang)}
           </h1>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1.5">
             {t('app.subtitle', lang)}
           </p>
-        </div>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-[var(--color-border)] p-6 shadow-sm">
-          <label className="block text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider mb-2">
-            {t('access.title', lang)}
-          </label>
+        {/* Login card with glassmorphism */}
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          onSubmit={handleSubmit}
+          className="rounded-2xl p-6 shadow-lg border border-white/40"
+          style={{
+            background: 'rgba(255, 255, 255, 0.75)',
+            backdropFilter: 'blur(16px)',
+          }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <ShieldCheck className="w-4 h-4 text-[var(--color-primary)]" />
+            <label className="text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider">
+              {t('access.title', lang)}
+            </label>
+          </div>
           <input
             type="password"
             value={code}
             onChange={e => { setCode(e.target.value); setError(false) }}
             placeholder={t('access.placeholder', lang)}
             autoFocus
-            className={`w-full px-4 py-3 text-sm border rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent ${
-              error ? 'border-[var(--color-critical)] ring-2 ring-[var(--color-critical)]' : 'border-[var(--color-border-input)]'
+            className={`w-full px-4 py-3 text-sm border rounded-xl bg-white/80 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all ${
+              error ? 'border-[var(--color-critical)] ring-2 ring-[var(--color-critical)] animate-[shake_0.3s]' : 'border-[var(--color-border)]'
             }`}
           />
           {error && (
-            <p className="text-xs text-[var(--color-critical)] mt-2">{t('access.error', lang)}</p>
+            <motion.p
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-xs text-[var(--color-critical)] mt-2"
+            >
+              {t('access.error', lang)}
+            </motion.p>
           )}
           <button
             type="submit"
-            className="w-full mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-colors"
+            className="w-full mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-all hover:shadow-lg active:scale-[0.98]"
           >
             {t('access.submit', lang)}
             <ArrowRight className="w-4 h-4" />
           </button>
-        </form>
+        </motion.form>
 
-        <div className="text-center mt-4">
+        {/* Language toggle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-5"
+        >
           <button
             onClick={toggleLang}
-            className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+            className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)] transition-colors"
           >
             {lang === 'es' ? 'Switch to English' : 'Cambiar a Español'}
           </button>
-        </div>
+        </motion.div>
 
-        <p className="text-center text-[10px] text-[var(--color-text-tertiary)] mt-6">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="text-center text-[10px] text-[var(--color-text-tertiary)] mt-5"
+        >
           {t('footer.disclaimer', lang)}
-        </p>
+        </motion.p>
       </div>
     </div>
   )
