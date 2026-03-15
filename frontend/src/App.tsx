@@ -122,30 +122,36 @@ export default function App() {
       <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
         {/* AUDITOR MODE */}
         {mode === 'auditor' ? (
-          <div className="max-w-4xl mx-auto mt-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="space-y-3">
-                <h3 className="text-lg font-bold">{lang === 'es' ? 'Pegar informe para auditar' : 'Paste report to audit'}</h3>
-                <p className="text-sm text-gray-500">{lang === 'es' ? 'Pegue un informe de anatomía patológica ya firmado. La IA detectará inconsistencias y campos faltantes.' : 'Paste a signed pathology report. AI will detect inconsistencies and missing fields.'}</p>
-                <textarea
-                  value={auditorText}
-                  onChange={(e) => setAuditorText(e.target.value)}
-                  placeholder={lang === 'es' ? 'Pegue aquí el informe completo...' : 'Paste the full report here...'}
-                  className={`w-full h-64 p-3 rounded-lg border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
-                />
+          <div className="max-w-5xl mx-auto mt-4">
+            {/* Input area — full width */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-base font-bold">{lang === 'es' ? 'Pegar informe para auditar' : 'Paste report to audit'}</h3>
+                  <p className="text-xs text-gray-500">{lang === 'es' ? 'La IA detectará inconsistencias, campos faltantes y sugerirá codificación CIE-O.' : 'AI will detect inconsistencies, missing fields and suggest ICD-O coding.'}</p>
+                </div>
                 <button
                   onClick={handleAudit}
                   disabled={auditorReviewing || !auditorText.trim()}
-                  className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium flex items-center gap-2 hover:opacity-90 disabled:opacity-50"
                 >
                   {auditorReviewing ? (
                     <><span className="animate-spin">⏳</span> {lang === 'es' ? 'Analizando...' : 'Analyzing...'}</>
                   ) : (
-                    <>{lang === 'es' ? '🔍 Auditar informe' : '🔍 Audit report'}</>
+                    <>{lang === 'es' ? 'Auditar informe' : 'Audit report'}</>
                   )}
                 </button>
               </div>
-              <div>
+              <textarea
+                value={auditorText}
+                onChange={(e) => { setAuditorText(e.target.value); setAuditorResult(null) }}
+                placeholder={lang === 'es' ? 'Pegue aquí el informe completo de anatomía patológica...' : 'Paste the full pathology report here...'}
+                className={`w-full h-48 p-3 rounded-xl border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
+              />
+            </div>
+
+            {/* Results — grid below */}
+            <div>
                 {auditorResult ? (
                   <div className="space-y-3">
                     {/* Completeness score */}
@@ -244,20 +250,25 @@ export default function App() {
                       </div>
                     )}
 
-                    {/* No issues */}
-                    {(!auditorResult.validation?.missing_required?.length && !auditorResult.validation?.inconsistencies?.length && !auditorResult.validation?.clinical_alerts?.length) && (
+                    {/* Not recognized as pathology report */}
+                    {auditorResult.validation?.total_required_fields === 0 && (
+                      <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-700">
+                        ⚠ {lang === 'es' ? 'No se reconoce como informe de anatomía patológica. Pegue un informe con diagnóstico histológico, tipo tumoral, estadificación, etc.' : 'Not recognized as a pathology report. Paste a report with histologic diagnosis, tumor type, staging, etc.'}
+                      </div>
+                    )}
+
+                    {/* No issues (only if it IS a valid report) */}
+                    {auditorResult.validation?.total_required_fields > 0 && !auditorResult.validation?.missing_required?.length && !auditorResult.validation?.inconsistencies?.length && !auditorResult.validation?.clinical_alerts?.length && (
                       <div className="p-3 rounded-xl bg-green-50 border border-green-200 text-sm font-medium text-green-700">
-                        ✓ {lang === 'es' ? 'Sin problemas detectados' : 'No issues detected'}
+                        ✓ {lang === 'es' ? 'Informe completo — sin problemas detectados' : 'Complete report — no issues detected'}
                       </div>
                     )}
                   </div>
-                ) : !auditorReviewing && (
-                  <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
+                ) : !auditorReviewing ? (
+                  <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
                     {lang === 'es' ? 'Pegue un informe y pulse Auditar' : 'Paste a report and click Audit'}
                   </div>
-                )}
-              </div>
-            </div>
+                ) : null}
           </div>
         ) : !protocol ? (
           <div className="mt-4">
