@@ -4,7 +4,8 @@ import type { ProtocolDef } from '../data/protocols'
 import type { FormValues, SectionStatus } from '../hooks/useFormState'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
-import { generateReport } from '../data/templates'
+import { generateReport, REPORT_STYLES } from '../data/templates'
+import type { ReportStyle } from '../data/templates'
 import type { FieldDef } from '../data/protocols'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
@@ -26,11 +27,14 @@ interface ReportPreviewProps {
   sectionStatuses: SectionStatus[]
   accessCode: string
   darkMode?: boolean
+  reportStyle: ReportStyle
+  onStyleChange: (style: ReportStyle) => void
 }
 
 export function ReportPreview({
   protocol, values, lang, includeMacro,
   completionPercent, pendingFields, sectionStatuses, accessCode, darkMode,
+  reportStyle, onStyleChange,
 }: ReportPreviewProps) {
   const [copied, setCopied] = useState(false)
   const [reviewing, setReviewing] = useState(false)
@@ -38,8 +42,8 @@ export function ReportPreview({
   const reportRef = useRef<HTMLDivElement>(null)
 
   const report = useMemo(
-    () => generateReport(protocol, values, lang, includeMacro),
-    [protocol, values, lang, includeMacro]
+    () => generateReport(protocol, values, lang, includeMacro, reportStyle),
+    [protocol, values, lang, includeMacro, reportStyle]
   )
 
   const handleCopy = async () => {
@@ -209,10 +213,19 @@ export function ReportPreview({
         {/* Toolbar: formato + copiar + IA */}
         <div className="flex items-center justify-between px-2 py-1 border-b border-[var(--color-surface-alt)]">
           <div className="flex items-center gap-1">
-            <span className="text-[12px] font-semibold uppercase tracking-wider mr-2 text-[var(--color-text-secondary)]">
+            <span className={`text-[12px] font-semibold uppercase tracking-wider mr-2 ${textSec}`}>
               {t('report.title', lang)}
             </span>
-            <div className="flex items-center border rounded border-[var(--color-border)]">
+            <select
+              value={reportStyle}
+              onChange={e => onStyleChange(e.target.value as ReportStyle)}
+              className={`text-[11px] px-1.5 py-0.5 rounded border mr-2 ${dm ? 'bg-gray-800 border-gray-600 text-gray-300' : 'bg-white border-[var(--color-border)] text-[var(--color-text)]'}`}
+            >
+              {REPORT_STYLES.map(s => (
+                <option key={s.value} value={s.value}>{lang === 'es' ? s.label_es : s.label_en}</option>
+              ))}
+            </select>
+            <div className={`flex items-center border rounded ${dm ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
               <button onClick={() => applyFormat('bold')} className={toolbarBtn} title="Bold">
                 <Bold className="w-3.5 h-3.5" />
               </button>

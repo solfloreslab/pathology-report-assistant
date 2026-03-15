@@ -41,11 +41,11 @@ const colonRules: DictRule[] = [
   { patterns: [/\btransvers/i], field: 'tumor_location', value: 'transverse' },
   { patterns: [/\brecto\b/i, /\brectal\b/i, /\brectum\b/i], field: 'tumor_location', value: 'rectum' },
 
-  // Lymph nodes: "2/18", "2 de 18", "2 of 18"
-  { patterns: [/(\d+)\s*[\/de]+\s*(\d+)\s*gang/i, /(\d+)\s*[\/de]+\s*(\d+)\s*node/i, /(\d+)\s*[\/de]+\s*(\d+)\s*ln/i, /(\d+)\s*[\/]+\s*(\d+)/],
+  // Lymph nodes: "2/18", "2.18", "2-18", "2 de 18", "2 of 18", "2/18 gang"
+  { patterns: [/(\d+)\s*[\/\.\-de]+\s*(\d+)\s*gang/i, /(\d+)\s*[\/\.\-de]+\s*(\d+)\s*node/i, /(\d+)\s*[\/\.\-de]+\s*(\d+)\s*ln/i, /(\d+)\s*[\/\.\-]+\s*(\d+)/],
     field: 'lymph_nodes_positive',
     value: (m: RegExpMatchArray) => m[1] },
-  { patterns: [/(\d+)\s*[\/de]+\s*(\d+)\s*gang/i, /(\d+)\s*[\/de]+\s*(\d+)\s*node/i, /(\d+)\s*[\/de]+\s*(\d+)\s*ln/i, /(\d+)\s*[\/]+\s*(\d+)/],
+  { patterns: [/(\d+)\s*[\/\.\-de]+\s*(\d+)\s*gang/i, /(\d+)\s*[\/\.\-de]+\s*(\d+)\s*node/i, /(\d+)\s*[\/\.\-de]+\s*(\d+)\s*ln/i, /(\d+)\s*[\/\.\-]+\s*(\d+)/],
     field: 'lymph_nodes_examined',
     value: (m: RegExpMatchArray) => m[2] },
 

@@ -1,6 +1,6 @@
 import { t } from '../data/i18n'
 import type { Lang } from '../data/i18n'
-import { Microscope, Plus, Minus, Moon, Sun } from 'lucide-react'
+import { Microscope, Plus, Minus, Moon, Sun, LogOut } from 'lucide-react'
 
 interface HeaderProps {
   lang: Lang
@@ -10,9 +10,10 @@ interface HeaderProps {
   onFontSizeChange: (size: number) => void
   darkMode: boolean
   onDarkModeToggle: () => void
+  onLogout?: () => void
 }
 
-export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle }: HeaderProps) {
+export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0f2847] to-[#0F62FE] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
@@ -74,6 +75,13 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
               <Plus className="w-3.5 h-3.5 text-white/70" />
             </button>
           </div>
+
+          {/* Logout */}
+          {onLogout && (
+            <button onClick={onLogout} className="p-1.5 rounded-full border border-white/20 hover:bg-white/10 transition-colors" title={lang === 'es' ? 'Cerrar sesión' : 'Logout'}>
+              <LogOut className="w-4 h-4 text-white/70" />
+            </button>
+          )}
         </div>
       </div>
     </header>

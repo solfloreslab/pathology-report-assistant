@@ -10,6 +10,7 @@ import { useAccessCode } from './hooks/useAccessCode'
 import { useFormState } from './hooks/useFormState'
 import type { ProtocolDef } from './data/protocols'
 import { t } from './data/i18n'
+import type { ReportStyle } from './data/templates'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -20,6 +21,7 @@ export default function App() {
   const [includeMacro, setIncludeMacro] = useState(false)
   const [fontSize, setFontSize] = useState(15)
   const [darkMode, setDarkMode] = useState(false)
+  const [reportStyle, setReportStyle] = useState<ReportStyle>('prose')
 
   const {
     values, setValue, bulkSetValues, resetValues,
@@ -75,6 +77,7 @@ export default function App() {
         onFontSizeChange={setFontSize}
         darkMode={darkMode}
         onDarkModeToggle={() => setDarkMode(d => !d)}
+        onLogout={() => { localStorage.removeItem('access_code'); window.location.reload() }}
       />
 
       <main className="mx-auto px-[10px] py-3" style={{ maxWidth: 'calc(100vw - 20px)' }}>
@@ -91,17 +94,7 @@ export default function App() {
             <div className="space-y-3">
               <ProtocolSearch lang={lang} onSelect={handleSelectProtocol} selected={protocol} />
 
-              <label className="flex items-center gap-2 text-xs opacity-70 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={includeMacro}
-                  onChange={e => setIncludeMacro(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded"
-                />
-                {t('form.include_macro', lang)}
-              </label>
-
-              <QuickNotes
+<QuickNotes
                 lang={lang}
                 onPrefill={handlePrefill}
                 protocolId={protocol.id}
@@ -130,11 +123,14 @@ export default function App() {
                   protocol={protocol}
                   values={values}
                   lang={lang}
-                  includeMacro={includeMacro}
+                  includeMacro={false}
                   completionPercent={completionPercent}
                   pendingFields={pendingFields}
                   sectionStatuses={sectionStatuses}
                   accessCode={getCode()}
+                  darkMode={darkMode}
+                  reportStyle={reportStyle}
+                  onStyleChange={setReportStyle}
                 />
               </div>
             </div>
@@ -142,7 +138,7 @@ export default function App() {
         )}
       </main>
 
-      <footer className={`mt-auto py-3 text-center border-t ${darkMode ? 'border-gray-800' : 'border-[var(--color-border)]'}`}>
+      <footer className={`fixed bottom-0 left-0 right-0 py-2 text-center border-t z-10 ${darkMode ? 'border-gray-800 bg-gray-950' : 'border-[var(--color-border)] bg-[var(--color-page)]'}`}>
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] opacity-50">
           <span>{t('footer.disclaimer', lang)}</span>
           <span>·</span>
@@ -151,6 +147,8 @@ export default function App() {
           <a href="https://github.com/solfloreslab/pathology-report-agent" target="_blank" rel="noopener" className="text-[var(--color-primary)] hover:underline">GitHub</a>
           <span>·</span>
           <span>{t('footer.built', lang)}</span>
+          <span>·</span>
+          <span>© 2026 solfloreslab</span>
         </div>
       </footer>
     </div>

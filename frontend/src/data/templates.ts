@@ -32,7 +32,21 @@ function tristateText(v: string | null, lang: Lang): string | null {
   return v
 }
 
-export function generateReport(protocol: ProtocolDef, values: FormValues, lang: Lang, includeMacro: boolean): string {
+export type ReportStyle = 'prose' | 'synoptic' | 'mixed'
+
+export const REPORT_STYLES: { value: ReportStyle; label_es: string; label_en: string }[] = [
+  { value: 'prose', label_es: 'Prosa narrativa', label_en: 'Narrative prose' },
+  { value: 'synoptic', label_es: 'Sinóptico (checklist)', label_en: 'Synoptic (checklist)' },
+  { value: 'mixed', label_es: 'Mixto', label_en: 'Mixed' },
+]
+
+export function generateReport(protocol: ProtocolDef, values: FormValues, lang: Lang, includeMacro: boolean, style: ReportStyle = 'prose'): string {
+  if (style === 'synoptic') return generateSynoptic(protocol, values, lang)
+  if (style === 'mixed') return generateMixed(protocol, values, lang)
+  return generateProse(protocol, values, lang, includeMacro)
+}
+
+function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, includeMacro: boolean): string {
   const lines: string[] = []
   const hasAny = protocol.fields.some(f => val(values, f.name))
   if (!hasAny) return ''
@@ -215,6 +229,111 @@ export function generateReport(protocol: ProtocolDef, values: FormValues, lang: 
     const lastMicro = lines.findIndex(l => l.startsWith(lang === 'es' ? 'DIAGNÓSTICO' : 'DIAGNOSIS'))
     if (lastMicro > 0) lines.splice(lastMicro, 0, (lang === 'es' ? `Regresión: ${regression}.` : `Regression: ${regression}.`), '')
   }
+
+  return lines.join('\n')
+}
+
+// ─── SYNOPTIC (checklist) ───
+
+function generateSynoptic(protocol: ProtocolDef, values: FormValues, lang: Lang): string {
+  const lines: string[] = []
+  const hasAny = protocol.fields.some(f => val(values, f.name))
+  if (!hasAny) return ''
+
+  lines.push(lang === 'es' ? 'INFORME SINÓPTICO DE ANATOMÍA PATOLÓGICA' : 'SYNOPTIC PATHOLOGY REPORT')
+  lines.push(lang === 'es' ? `Protocolo: ${protocol.name_es}` : `Protocol: ${protocol.name_en}`)
+  lines.push('')
+
+  for (const field of protocol.fields) {
+    const v = val(values, field.name)
+    if (!v) continue
+
+    const fieldLabel = lang === 'es' ? field.label_es : field.label_en
+    let displayValue = v
+
+    // Translate dropdown values
+    if (field.options) {
+      const opt = field.options.find(o => o.value === v)
+      if (opt) displayValue = lang === 'es' ? opt.label_es : opt.label_en
+    }
+
+    // Translate tristate
+    if (field.type === 'tristate') {
+      displayValue = tristateText(v, lang) || v
+    }
+
+    lines.push(`• ${fieldLabel}: ${displayValue}`)
+  }
+
+  // TNM summary
+  const pt = val(values, 'pt_stage')
+  const pn = val(values, 'pn_stage')
+  const pm = val(values, 'pm_stage')
+  if (pt || pn || pm) {
+    lines.push('')
+    lines.push(lang === 'es' ? 'ESTADIFICACIÓN:' : 'STAGING:')
+    lines.push([pt, pn, pm].filter(Boolean).join(' '))
+  }
+
+  return lines.join('\n')
+}
+
+// ─── MIXED (micro in prose, diagnosis in synoptic) ───
+
+function generateMixed(protocol: ProtocolDef, values: FormValues, lang: Lang): string {
+  // Use prose for the microscopic description
+  const proseReport = generateProse(protocol, values, lang, false)
+  if (!proseReport) return ''
+
+  // Split at DIAGNÓSTICO/DIAGNOSIS and replace with synoptic diagnosis
+  const diagHeader = lang === 'es' ? 'DIAGNÓSTICO:' : 'DIAGNOSIS:'
+  const parts = proseReport.split(diagHeader)
+
+  if (parts.length < 2) return proseReport
+
+  const microPart = parts[0]
+  const lines: string[] = [microPart.trimEnd(), '', diagHeader]
+
+  // Build synoptic diagnosis
+  const loc = displayVal(protocol, values, 'tumor_location', lang)
+  const histType = displayVal(protocol, values, 'histologic_type', lang)
+  const histGrade = displayVal(protocol, values, 'histologic_grade', lang)
+
+  if (loc) lines.push(`• ${lang === 'es' ? 'Localización' : 'Location'}: ${loc}`)
+  if (histType) lines.push(`• ${lang === 'es' ? 'Tipo histológico' : 'Histologic type'}: ${histType}`)
+  if (histGrade) lines.push(`• ${lang === 'es' ? 'Grado' : 'Grade'}: ${histGrade}`)
+
+  const pt = val(values, 'pt_stage')
+  const pn = val(values, 'pn_stage')
+  const pm = val(values, 'pm_stage')
+  if (pt || pn || pm) {
+    lines.push(`• ${lang === 'es' ? 'Estadificación' : 'Staging'}: ${[pt, pn, pm].filter(Boolean).join(' ')}`)
+  }
+
+  const lnExam = val(values, 'lymph_nodes_examined')
+  const lnPos = val(values, 'lymph_nodes_positive')
+  if (lnExam && lnPos) {
+    lines.push(`• ${lang === 'es' ? 'Ganglios' : 'Lymph nodes'}: ${lnPos}/${lnExam} ${lang === 'es' ? 'positivos' : 'positive'}`)
+  }
+
+  const lvi = tristateText(val(values, 'lymphovascular_invasion'), lang)
+  if (lvi) lines.push(`• ${lang === 'es' ? 'Invasión linfovascular' : 'Lymphovascular invasion'}: ${lvi}`)
+
+  const pni = tristateText(val(values, 'perineural_invasion'), lang)
+  if (pni) lines.push(`• ${lang === 'es' ? 'Invasión perineural' : 'Perineural invasion'}: ${pni}`)
+
+  // Margins
+  const marginFields = ['margins', 'margins_proximal', 'margins_distal', 'margins_radial', 'lateral_margin', 'deep_margin']
+  for (const mf of marginFields) {
+    const mv = val(values, mf)
+    if (mv) {
+      const field = protocol.fields.find(f => f.name === mf)
+      if (field) lines.push(`• ${label(field, lang)}: ${mv}`)
+    }
+  }
+
+  const mmr = displayVal(protocol, values, 'mmr_msi', lang) || displayVal(protocol, values, 'msi_mmr', lang)
+  if (mmr) lines.push(`• MMR/MSI: ${mmr}`)
 
   return lines.join('\n')
 }
