@@ -416,8 +416,8 @@ export const CIE_O_CODES: Record<string, {
 }> = {
   'colon-resection': {
     topography: {
-      'cecum': 'C18.0', 'ascending': 'C18.2', 'hepatic_flexure': 'C18.3',
-      'transverse': 'C18.4', 'splenic_flexure': 'C18.5', 'descending': 'C18.6',
+      'cecum': 'C18.0', 'ascending': 'C18.2', 'hepatic': 'C18.3',
+      'transverse': 'C18.4', 'splenic': 'C18.5', 'descending': 'C18.6',
       'sigmoid': 'C18.7', 'rectum': 'C20.9',
     },
     morphology: {
