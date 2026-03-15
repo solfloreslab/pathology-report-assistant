@@ -25,11 +25,12 @@ interface ReportPreviewProps {
   pendingFields: FieldDef[]
   sectionStatuses: SectionStatus[]
   accessCode: string
+  darkMode?: boolean
 }
 
 export function ReportPreview({
   protocol, values, lang, includeMacro,
-  completionPercent, pendingFields, sectionStatuses, accessCode,
+  completionPercent, pendingFields, sectionStatuses, accessCode, darkMode,
 }: ReportPreviewProps) {
   const [copied, setCopied] = useState(false)
   const [reviewing, setReviewing] = useState(false)
@@ -85,15 +86,19 @@ export function ReportPreview({
   const criticalPending = pendingFields.filter(f => f.severity === 'critical')
   const majorPending = pendingFields.filter(f => f.severity === 'major')
 
-  const toolbarBtn = "p-1.5 rounded hover:bg-black/10 transition-colors"
+  const dm = darkMode
+  const cardClass = dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'
+  const textMain = dm ? 'text-gray-200' : 'text-[var(--color-text)]'
+  const textSec = dm ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'
+  const toolbarBtn = `p-1.5 rounded transition-colors ${dm ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/10'}`
 
   return (
     <div className="space-y-2">
       {/* Row 1: Completitud + Alertas */}
       <div className="flex gap-2">
-        <div className="bg-white rounded-lg border border-[var(--color-border)] p-2.5 min-w-[180px]">
+        <div className={`rounded-lg border p-2.5 min-w-[180px] ${cardClass}`}>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[13px] font-semibold uppercase text-[var(--color-text-secondary)]">
+            <span className={`text-[13px] font-semibold uppercase ${textSec}`}>
               {t('completion.title', lang)}
             </span>
             <span className="text-sm font-bold font-mono" style={{
@@ -101,7 +106,7 @@ export function ReportPreview({
                 completionPercent >= 50 ? 'var(--color-warning-text)' : 'var(--color-critical)',
             }}>{completionPercent}%</span>
           </div>
-          <div className="w-full h-1.5 bg-[var(--color-surface-alt)] rounded-full overflow-hidden mb-1.5">
+          <div className={`w-full h-1.5 rounded-full overflow-hidden mb-1.5 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
             <div className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${completionPercent}%`,

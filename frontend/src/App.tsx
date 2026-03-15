@@ -87,7 +87,7 @@ export default function App() {
             <ProtocolSearch lang={lang} onSelect={handleSelectProtocol} selected={null} />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[45%_1fr] gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-3">
             <div className="space-y-3">
               <ProtocolSearch lang={lang} onSelect={handleSelectProtocol} selected={protocol} />
 

@@ -6,6 +6,7 @@ import { sectionOrder } from '../data/protocols'
 import type { FormValues, SectionStatus } from '../hooks/useFormState'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
+import { getSuggestions, getReference } from '../data/staging'
 
 interface ProtocolFormProps {
   protocol: ProtocolDef
@@ -18,6 +19,7 @@ interface ProtocolFormProps {
 
 export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang, darkMode }: ProtocolFormProps) {
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set())
+  const suggestions = getSuggestions(protocol.id, values)
 
   const toggleSection = (sectionId: string) => {
     setCollapsedSections(prev => {
@@ -86,6 +88,8 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
                     onChange={v => onChange(field.name, v)}
                     lang={lang}
                     darkMode={darkMode}
+                    suggestion={suggestions.find(s => s.field === field.name)}
+                    reference={getReference(protocol.id, field.name)}
                   />
                 ))}
               </div>

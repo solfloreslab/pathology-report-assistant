@@ -14,60 +14,66 @@ interface HeaderProps {
 
 export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle }: HeaderProps) {
   return (
-    <header className={`border-b sticky top-0 z-50 ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'}`}>
-      <div className="px-4 h-12 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0f2847] to-[#0F62FE] shadow-lg">
+      <div className="px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-            <Microscope className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 bg-white/15 backdrop-blur rounded-lg flex items-center justify-center border border-white/20">
+            <Microscope className="w-4.5 h-4.5 text-white" />
           </div>
           <div>
-            <h1 className={`text-sm font-semibold leading-tight ${darkMode ? 'text-gray-100' : 'text-[var(--color-text)]'}`}>
+            <h1 className="text-sm font-bold leading-tight text-white">
               {t('app.title', lang)}
             </h1>
-            <span className={`text-[10px] uppercase tracking-widest font-medium ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>
+            <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-blue-300/70">
               {lang === 'es' ? 'HUMANO EN CONTROL' : 'HUMAN-IN-THE-LOOP'}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-shrink-0">
           {completionPercent !== undefined && completionPercent > 0 && (
             <div className="hidden sm:flex items-center gap-2">
-              <div className="w-20 h-1.5 bg-[var(--color-surface-alt)] rounded-full overflow-hidden">
+              <div className="w-16 h-1.5 bg-white/15 rounded-full overflow-hidden">
                 <div className="h-full rounded-full transition-all duration-500"
                   style={{
                     width: `${completionPercent}%`,
-                    backgroundColor: completionPercent >= 80 ? 'var(--color-success)' :
-                      completionPercent >= 50 ? 'var(--color-warning)' : 'var(--color-critical)',
+                    backgroundColor: completionPercent >= 80 ? '#24A148' :
+                      completionPercent >= 50 ? '#F1C21B' : '#DA1E28',
                   }} />
               </div>
-              <span className={`text-xs font-mono ${darkMode ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}>
+              <span className="text-xs font-mono text-white/80">
                 {completionPercent}%
               </span>
             </div>
           )}
 
-          {/* Font size */}
-          <div className={`flex items-center border rounded ${darkMode ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
-            <button onClick={() => onFontSizeChange(Math.max(12, fontSize - 1))} className="p-1 hover:bg-black/10 rounded-l">
-              <Minus className={`w-3.5 h-3.5 ${darkMode ? 'text-gray-300' : ''}`} />
+          {/* Language toggle */}
+          <div className="flex rounded-full overflow-hidden border border-white/20">
+            <button onClick={lang === 'en' ? toggleLang : undefined}
+              className={`px-2.5 py-1 text-[11px] font-bold transition-all ${lang === 'en' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
+              EN
             </button>
-            <span className={`text-[11px] font-mono px-1 ${darkMode ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}>{fontSize}</span>
-            <button onClick={() => onFontSizeChange(Math.min(22, fontSize + 1))} className="p-1 hover:bg-black/10 rounded-r">
-              <Plus className={`w-3.5 h-3.5 ${darkMode ? 'text-gray-300' : ''}`} />
+            <button onClick={lang === 'es' ? undefined : toggleLang}
+              className={`px-2.5 py-1 text-[11px] font-bold transition-all ${lang === 'es' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
+              ES
             </button>
           </div>
 
           {/* Dark mode */}
-          <button onClick={onDarkModeToggle} className={`p-1.5 rounded border ${darkMode ? 'border-gray-600 hover:bg-gray-700' : 'border-[var(--color-border)] hover:bg-[var(--color-surface-alt)]'}`}>
-            {darkMode ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
+          <button onClick={onDarkModeToggle} className="p-1.5 rounded-full border border-white/20 hover:bg-white/10 transition-colors">
+            {darkMode ? <Sun className="w-4 h-4 text-yellow-300" /> : <Moon className="w-4 h-4 text-white/80" />}
           </button>
 
-          {/* Language */}
-          <button onClick={toggleLang}
-            className={`px-2.5 py-1 text-xs font-semibold rounded border ${darkMode ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-[var(--color-border)] hover:bg-[var(--color-surface-alt)]'}`}>
-            {lang === 'es' ? 'EN' : 'ES'}
-          </button>
+          {/* Font size */}
+          <div className="flex items-center rounded-full border border-white/20 overflow-hidden">
+            <button onClick={() => onFontSizeChange(Math.max(12, fontSize - 1))} className="p-1 hover:bg-white/10">
+              <Minus className="w-3.5 h-3.5 text-white/70" />
+            </button>
+            <span className="text-[11px] font-mono px-1 text-white/80">{fontSize}</span>
+            <button onClick={() => onFontSizeChange(Math.min(22, fontSize + 1))} className="p-1 hover:bg-white/10">
+              <Plus className="w-3.5 h-3.5 text-white/70" />
+            </button>
+          </div>
         </div>
       </div>
     </header>

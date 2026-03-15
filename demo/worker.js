@@ -239,11 +239,13 @@ ONLY the JSON object. No explanation, no markdown fences.`;
 
 const VALIDATOR_PROMPT_TEMPLATE = `You are a quality control agent for pathology reports.
 Compare the extracted data against the protocol's REQUIRED fields and rules.
+IMPORTANT: Respond in {LANG}. All recommendations, quality_notes, and finding descriptions MUST be in {LANG}.
 Respond ONLY with a JSON object.
 Output: {"completeness_score":0-100,"total_required_fields":int,"reported_fields":int,"missing_fields":int,"status":"complete"|"mostly_complete"|"incomplete"|"critically_incomplete","missing_required":[{"field":"...","severity":"critical"|"major"|"minor","recommendation":"..."}],"inconsistencies":[{"finding":"...","severity":"warning"|"error"}],"quality_notes":"..."}
 Severity: CRITICAL=prevents staging/treatment, MAJOR=required by protocol, MINOR=recommended.
 Status: complete>=90, mostly_complete 70-89, incomplete 50-69, critically_incomplete<50.
 A field with value "not_reported" or null counts as MISSING.
+Each inconsistency must be a SEPARATE object in the array - never combine multiple issues in one finding.
 --- PROTOCOL FIELDS ---
 {FIELDS}
 --- PROTOCOL RULES ---
