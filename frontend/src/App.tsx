@@ -269,6 +269,7 @@ export default function App() {
                     {lang === 'es' ? 'Pegue un informe y pulse Auditar' : 'Paste a report and click Audit'}
                   </div>
                 ) : null}
+            </div>
           </div>
         ) : !protocol ? (
           <div className="mt-4">
