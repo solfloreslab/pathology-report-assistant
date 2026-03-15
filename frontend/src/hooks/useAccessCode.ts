@@ -4,15 +4,15 @@ const STORAGE_KEY = 'patho-access'
 
 export function useAccessCode() {
   const [authenticated, setAuthenticated] = useState(() => {
-    return sessionStorage.getItem(STORAGE_KEY) === 'true'
+    return localStorage.getItem(STORAGE_KEY) === 'true'
   })
 
   const login = useCallback((code: string): boolean => {
     // Validation happens server-side. Here we just store the code
     // and mark as authenticated for the session
     if (code.trim().length > 0) {
-      sessionStorage.setItem(STORAGE_KEY, 'true')
-      sessionStorage.setItem('patho-code', code.trim())
+      localStorage.setItem(STORAGE_KEY, 'true')
+      localStorage.setItem('patho-code', code.trim())
       setAuthenticated(true)
       return true
     }
@@ -20,7 +20,7 @@ export function useAccessCode() {
   }, [])
 
   const getCode = useCallback((): string => {
-    return sessionStorage.getItem('patho-code') || ''
+    return localStorage.getItem('patho-code') || ''
   }, [])
 
   return { authenticated, login, getCode }
