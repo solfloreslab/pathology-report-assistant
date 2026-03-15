@@ -23,6 +23,10 @@ export default function App() {
   const [fontSize, setFontSize] = useState(15)
   const [darkMode, setDarkMode] = useState(false)
   const [reportStyle, setReportStyle] = useState<ReportStyle>('prose')
+  const [mode, setMode] = useState<'copilot' | 'auditor'>('copilot')
+  const [auditorText, setAuditorText] = useState('')
+  const [auditorResult, setAuditorResult] = useState<any>(null)
+  const [auditorReviewing, setAuditorReviewing] = useState(false)
 
   const {
     values, setValue, bulkSetValues, resetValues,
@@ -64,6 +68,31 @@ export default function App() {
     }
   }, [protocol, getCode, bulkSetValues])
 
+  const handleAudit = useCallback(async () => {
+    if (!auditorText.trim() || auditorReviewing) return
+    setAuditorReviewing(true)
+    setAuditorResult(null)
+    try {
+      const res = await fetch(`${API_URL}/api/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'auditor',
+          report_text: auditorText,
+          access_code: getCode(),
+          lang,
+        }),
+      })
+      if (!res.ok) throw new Error('API error')
+      const data = await res.json()
+      setAuditorResult(data)
+    } catch (err) {
+      console.error('Audit failed:', err)
+    } finally {
+      setAuditorReviewing(false)
+    }
+  }, [auditorText, auditorReviewing, getCode, lang])
+
   if (!authenticated) {
     return <AccessScreen lang={lang} toggleLang={toggleLang} onLogin={login} />
   }
@@ -78,12 +107,104 @@ export default function App() {
         onFontSizeChange={setFontSize}
         darkMode={darkMode}
         onDarkModeToggle={() => setDarkMode(d => !d)}
+        onHome={protocol ? () => { setProtocol(null); resetValues() } : undefined}
         onLogout={() => { localStorage.removeItem('access_code'); window.location.reload() }}
       />
 
       <main className="mx-auto px-[10px] py-3" style={{ maxWidth: 'calc(100vw - 20px)' }}>
-        {!protocol ? (
-          <div className="max-w-2xl mx-auto mt-8 relative">
+        {/* Mode tabs — only on home screen */}
+        {!protocol && (
+          <div className="max-w-2xl mx-auto mt-4 mb-2 flex gap-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800 w-fit">
+            <button
+              onClick={() => setMode('copilot')}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                mode === 'copilot'
+                  ? 'bg-white shadow text-[var(--color-primary)] dark:bg-gray-700 dark:text-blue-300'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+              }`}
+            >
+              {lang === 'es' ? 'Copiloto' : 'Copilot'}
+            </button>
+            <button
+              onClick={() => setMode('auditor')}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                mode === 'auditor'
+                  ? 'bg-white shadow text-[var(--color-primary)] dark:bg-gray-700 dark:text-blue-300'
+                  : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+              }`}
+            >
+              {lang === 'es' ? 'Auditor' : 'Auditor'}
+            </button>
+          </div>
+        )}
+
+        {/* AUDITOR MODE */}
+        {!protocol && mode === 'auditor' ? (
+          <div className="max-w-4xl mx-auto mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold">{lang === 'es' ? 'Pegar informe para auditar' : 'Paste report to audit'}</h3>
+                <p className="text-sm text-gray-500">{lang === 'es' ? 'Pegue un informe de anatomía patológica ya firmado. La IA detectará inconsistencias y campos faltantes.' : 'Paste a signed pathology report. AI will detect inconsistencies and missing fields.'}</p>
+                <textarea
+                  value={auditorText}
+                  onChange={(e) => setAuditorText(e.target.value)}
+                  placeholder={lang === 'es' ? 'Pegue aquí el informe completo...' : 'Paste the full report here...'}
+                  className={`w-full h-64 p-3 rounded-lg border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
+                />
+                <button
+                  onClick={handleAudit}
+                  disabled={auditorReviewing || !auditorText.trim()}
+                  className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50"
+                >
+                  {auditorReviewing ? (
+                    <><span className="animate-spin">⏳</span> {lang === 'es' ? 'Analizando...' : 'Analyzing...'}</>
+                  ) : (
+                    <>{lang === 'es' ? '🔍 Auditar informe' : '🔍 Audit report'}</>
+                  )}
+                </button>
+              </div>
+              <div>
+                {auditorResult ? (
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-bold">{lang === 'es' ? 'Resultado de la auditoría' : 'Audit result'}</h3>
+                    {auditorResult.validation?.completeness_score !== undefined && (
+                      <div className={`p-3 rounded-lg ${auditorResult.validation.completeness_score >= 90 ? 'bg-green-50' : auditorResult.validation.completeness_score >= 70 ? 'bg-yellow-50' : 'bg-red-50'}`}>
+                        <span className="text-2xl font-bold">{auditorResult.validation.completeness_score}%</span>
+                        <span className="text-sm ml-2">{lang === 'es' ? 'completitud' : 'completeness'}</span>
+                      </div>
+                    )}
+                    {auditorResult.validation?.inconsistencies?.map((inc: any, i: number) => (
+                      <div key={i} className={`p-2.5 rounded-lg border-l-3 text-[13px] ${inc.severity === 'error' ? 'bg-red-50 border-l-red-500' : 'bg-amber-50 border-l-amber-500'}`}>
+                        <span className={`text-[10px] font-bold uppercase ${inc.severity === 'error' ? 'text-red-600' : 'text-amber-600'}`}>
+                          {inc.severity === 'error' ? 'ERROR' : (lang === 'es' ? 'AVISO' : 'WARNING')}
+                        </span>
+                        <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(inc.finding || inc.description || '') }} />
+                        {inc.suggestion && <div className="text-gray-500 text-[12px] mt-0.5">→ {inc.suggestion}</div>}
+                      </div>
+                    ))}
+                    {auditorResult.validation?.clinical_alerts?.map((alert: any, i: number) => (
+                      <div key={i} className="p-2.5 rounded-lg border-l-3 border-l-blue-400 bg-blue-50 text-[13px]">
+                        <span className="text-[10px] font-bold uppercase text-blue-600">{lang === 'es' ? 'ALERTA CLÍNICA' : 'CLINICAL ALERT'}</span>
+                        <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(alert.alert || '') }} />
+                      </div>
+                    ))}
+                    {auditorResult.validation?.missing_required?.map((f: any, i: number) => (
+                      <div key={i} className={`p-2 rounded-lg text-[12px] border-l-3 ${f.severity === 'critical' ? 'bg-red-50 border-l-red-400' : 'bg-amber-50 border-l-amber-400'}`}>
+                        <span className="font-bold">{f.label || f.field}</span>
+                        {f.action && <span className="text-gray-500"> — {f.action}</span>}
+                      </div>
+                    ))}
+                  </div>
+                ) : !auditorReviewing && (
+                  <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
+                    {lang === 'es' ? 'Pegue un informe y pulse Auditar' : 'Paste a report and click Audit'}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : !protocol ? (
+          <div className="max-w-2xl mx-auto mt-4 relative">
             <FloatingMicroscope />
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[var(--color-primary)] text-xs font-medium mb-4">
@@ -128,7 +249,7 @@ export default function App() {
             </div>
 
             <div>
-              <div className="lg:sticky lg:top-[60px]">
+              <div className="lg:sticky lg:top-[60px] lg:max-h-[calc(100vh-70px)] lg:overflow-y-auto">
                 <ReportPreview
                   protocol={protocol}
                   values={values}

@@ -108,11 +108,12 @@ export function ReportPreview({
 
   return (
     <div className="space-y-2">
-      {/* Row 1: Completitud + Alertas */}
-      <div className="flex gap-2">
-        <div className={`rounded-lg border p-2.5 min-w-[180px] ${cardClass}`}>
+      {/* Row 1: 3 cuadros — Completitud | Crítico | Mayor */}
+      <div className="grid grid-cols-3 gap-2">
+        {/* Completitud */}
+        <div className={`rounded-lg border p-2.5 ${cardClass}`}>
           <div className="flex items-center justify-between mb-1">
-            <span className={`text-[13px] font-semibold uppercase ${textSec}`}>
+            <span className={`text-[11px] font-semibold uppercase ${textSec}`}>
               {t('completion.title', lang)}
             </span>
             <span className="text-sm font-bold font-mono" style={{
@@ -131,7 +132,7 @@ export function ReportPreview({
           <div className="space-y-0">
             {sectionStatuses.map(s => (
               <a key={s.id} href={`#section-${s.id}`}
-                className="flex items-center justify-between text-[13px] leading-[20px] px-1 rounded hover:bg-[var(--color-surface-alt)]">
+                className="flex items-center justify-between text-[11px] leading-[18px] px-1 rounded hover:bg-[var(--color-surface-alt)]">
                 <span className="text-[var(--color-text-secondary)] truncate">{t(`form.section.${s.id}` as any, lang)}</span>
                 <span className={`font-mono ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
                   {s.status === 'complete' ? '✓' : `${s.filled}/${s.total}`}
@@ -141,41 +142,55 @@ export function ReportPreview({
           </div>
         </div>
 
-        <div className="flex-1 space-y-1.5">
-          {criticalPending.length > 0 && (
-            <div className="p-2 rounded-lg bg-[var(--color-critical-bg)]">
-              <div className="flex items-center gap-1 mb-0.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-critical)]" />
-                <span className="text-[13px] font-bold text-[var(--color-critical-text)] uppercase">
-                  {t('severity.critical', lang)} ({criticalPending.length})
-                </span>
-              </div>
-              <p className="text-[13px] leading-snug text-[var(--color-critical-text)]">
-                {criticalPending.map(f => lang === 'es' ? f.label_es : f.label_en).join(', ')}
-              </p>
+        {/* Crítico */}
+        <div className={`rounded-lg border p-2.5 ${criticalPending.length > 0 ? 'bg-[var(--color-critical-bg)] border-red-200' : cardClass}`}>
+          <div className="flex items-center gap-1 mb-1">
+            {criticalPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-critical)]" />}
+            <span className={`text-[11px] font-bold uppercase ${criticalPending.length > 0 ? 'text-[var(--color-critical-text)]' : textSec}`}>
+              {t('severity.critical', lang)} ({criticalPending.length})
+            </span>
+          </div>
+          {criticalPending.length > 0 ? (
+            <div className="space-y-0.5">
+              {criticalPending.map(f => (
+                <div key={f.name} className="text-[11px] text-[var(--color-critical-text)]">
+                  • <strong>{lang === 'es' ? f.label_es : f.label_en}</strong>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
+              <Check className="w-3 h-3" /> {lang === 'es' ? 'Sin campos críticos' : 'No critical fields'}
             </div>
           )}
-          {majorPending.length > 0 && (
-            <div className="p-2 rounded-lg bg-[var(--color-major-bg)]">
-              <div className="flex items-center gap-1 mb-0.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-major)]" />
-                <span className="text-[13px] font-bold text-[var(--color-major-text)] uppercase">
-                  {t('severity.major', lang)} ({majorPending.length})
-                </span>
-              </div>
-              <p className="text-[13px] leading-snug text-[var(--color-major-text)]">
-                {majorPending.map(f => lang === 'es' ? f.label_es : f.label_en).join(', ')}
-              </p>
+        </div>
+
+        {/* Mayor */}
+        <div className={`rounded-lg border p-2.5 ${majorPending.length > 0 ? 'bg-[var(--color-major-bg)] border-orange-200' : cardClass}`}>
+          <div className="flex items-center gap-1 mb-1">
+            {majorPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-major)]" />}
+            <span className={`text-[11px] font-bold uppercase ${majorPending.length > 0 ? 'text-[var(--color-major-text)]' : textSec}`}>
+              {t('severity.major', lang)} ({majorPending.length})
+            </span>
+          </div>
+          {majorPending.length > 0 ? (
+            <div className="space-y-0.5">
+              {majorPending.map(f => (
+                <div key={f.name} className="text-[11px] text-[var(--color-major-text)]">
+                  • {lang === 'es' ? f.label_es : f.label_en}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
+              <Check className="w-3 h-3" /> {lang === 'es' ? 'Sin campos mayores' : 'No major fields'}
             </div>
           )}
-          {criticalPending.length === 0 && majorPending.length === 0 && !reviewResult && (
-            <div className="p-3 rounded-lg bg-[var(--color-success-bg)] flex items-center gap-2">
-              <Check className="w-5 h-5 text-[var(--color-success)]" />
-              <span className="text-sm font-semibold text-[var(--color-success-text)]">
-                {lang === 'es' ? 'Informe completo' : 'Report complete'}
-              </span>
-            </div>
-          )}
+        </div>
+      </div>
+
+      {/* AI Review alerts — below the 3 boxes */}
+      <div className="space-y-1.5">
 
           {/* AI Review results — shown in alert panel */}
           {reviewing && (
@@ -335,7 +350,7 @@ export function ReportPreview({
                 ref={reportRef}
                 contentEditable
                 suppressContentEditableWarning
-                className="outline-none leading-relaxed whitespace-pre-wrap break-words text-[var(--color-text)] max-h-[60vh] overflow-y-auto"
+                className="outline-none leading-relaxed whitespace-pre-wrap break-words text-[var(--color-text)]"
                 style={{ fontFamily: 'var(--font-sans)' }}
                 dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, '<br>') }}
               />
