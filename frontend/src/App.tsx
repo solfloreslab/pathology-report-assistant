@@ -15,6 +15,7 @@ import { MicroscopeMascot } from './components/MicroscopeMascot'
 import { BodySelector } from './components/BodySelector'
 import { highlightClinical } from './data/utils'
 import { DictionaryEditor } from './components/DictionaryEditor'
+import { FormatConfig } from './components/FormatConfig'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -31,6 +32,7 @@ export default function App() {
   const [auditorResult, setAuditorResult] = useState<any>(null)
   const [auditorReviewing, setAuditorReviewing] = useState(false)
   const [dictOpen, setDictOpen] = useState(false)
+  const [formatOpen, setFormatOpen] = useState(false)
 
   const {
     values, setValue, bulkSetValues, resetValues,
@@ -260,6 +262,7 @@ export default function App() {
       </footer>
 
       <DictionaryEditor lang={lang} open={dictOpen} onClose={() => setDictOpen(false)} />
+      <FormatConfig lang={lang} open={formatOpen} onClose={() => setFormatOpen(false)} />
     </div>
   )
 }
