@@ -123,6 +123,20 @@ export function parseNotes(protocolId: string, text: string): DictMatch[] {
   const matches: DictMatch[] = []
   const matchedFields = new Set<string>()
 
+  // Custom rules from localStorage (user's personal dictionary) — checked FIRST
+  try {
+    const customRules = JSON.parse(localStorage.getItem('patho-custom-dictionary') || '[]') as { abbreviation: string; field: string; value: string }[]
+    for (const cr of customRules) {
+      if (matchedFields.has(cr.field)) continue
+      const regex = new RegExp(`\\b${cr.abbreviation.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')
+      if (regex.test(text)) {
+        matches.push({ field: cr.field, value: cr.value })
+        matchedFields.add(cr.field)
+      }
+    }
+  } catch { /* ignore */ }
+
+  // Built-in rules
   for (const rule of rules) {
     if (matchedFields.has(rule.field)) continue
 

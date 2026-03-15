@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Sparkles, Loader2 } from 'lucide-react'
+import { Sparkles, Loader2, BookOpen } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
 import { parseNotes } from '../data/dictionary'
@@ -9,9 +9,10 @@ interface QuickNotesProps {
   onPrefill: (notes: string) => Promise<void>
   onRealtimeParse?: (matches: { field: string; value: string }[]) => void
   protocolId?: string
+  onOpenDictionary?: () => void
 }
 
-export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId }: QuickNotesProps) {
+export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpenDictionary }: QuickNotesProps) {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [matchCount, setMatchCount] = useState(0)
@@ -41,11 +42,19 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId }: Qui
 
   return (
     <div className="bg-white rounded-xl border border-dashed border-[var(--color-primary)] border-opacity-40 p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <Sparkles className="w-4 h-4 text-[var(--color-primary)]" />
-        <span className="text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider">
-          {t('notes.title', lang)}
-        </span>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-[var(--color-primary)]" />
+          <span className="text-xs font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider">
+            {t('notes.title', lang)}
+          </span>
+        </div>
+        {onOpenDictionary && (
+          <button onClick={onOpenDictionary} className="flex items-center gap-1 text-[11px] text-[var(--color-primary)] hover:underline">
+            <BookOpen className="w-3 h-3" />
+            {lang === 'es' ? 'Mi diccionario' : 'My dictionary'}
+          </button>
+        )}
       </div>
       <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1 italic">
         {lang === 'es'

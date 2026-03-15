@@ -14,6 +14,7 @@ import type { ReportStyle } from './data/templates'
 import { MicroscopeMascot } from './components/MicroscopeMascot'
 import { BodySelector } from './components/BodySelector'
 import { highlightClinical } from './data/utils'
+import { DictionaryEditor } from './components/DictionaryEditor'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -29,6 +30,7 @@ export default function App() {
   const [auditorText, setAuditorText] = useState('')
   const [auditorResult, setAuditorResult] = useState<any>(null)
   const [auditorReviewing, setAuditorReviewing] = useState(false)
+  const [dictOpen, setDictOpen] = useState(false)
 
   const {
     values, setValue, bulkSetValues, resetValues,
@@ -202,6 +204,7 @@ export default function App() {
                 lang={lang}
                 onPrefill={handlePrefill}
                 protocolId={protocol.id}
+                onOpenDictionary={() => setDictOpen(true)}
                 onRealtimeParse={(matches) => {
                   const newValues: Record<string, string> = {}
                   for (const m of matches) {
@@ -255,6 +258,8 @@ export default function App() {
           <span>© 2026 solfloreslab</span>
         </div>
       </footer>
+
+      <DictionaryEditor lang={lang} open={dictOpen} onClose={() => setDictOpen(false)} />
     </div>
   )
 }
