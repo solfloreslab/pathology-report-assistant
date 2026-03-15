@@ -42,9 +42,10 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
   const eyeOffsetY = useTransform(smoothY, [-1, 1], [-5, 5])
   const ocularRotate = useTransform(smoothX, [-1, 1], [-6, 6])
 
-  // Cross-eyed: when mouse is centered, left pupil goes RIGHT, right pupil goes LEFT
-  const leftEyeX = useTransform(smoothX, [-1, -0.15, 0, 0.15, 1], [-8, -3, 6, 7, 8])
-  const rightEyeX = useTransform(smoothX, [-1, -0.15, 0, 0.15, 1], [-8, -7, -6, 3, 8])
+  // Left eye always biased RIGHT (toward center/nose), right eye always biased LEFT
+  // Creates permanent cross-eyed look — pupils pinned to inner edge of iris
+  const leftEyeX = useTransform(smoothX, [-1, 0, 1], [-4, 8, 10])
+  const rightEyeX = useTransform(smoothX, [-1, 0, 1], [-10, -8, 4])
 
   const s = size === 'small' ? 42 : 160
   const scale = s / 240
