@@ -416,38 +416,38 @@ export const CIE_O_CODES: Record<string, {
 }> = {
   'colon-resection': {
     topography: {
-      'Ciego': 'C18.0', 'Colon ascendente': 'C18.2', 'Ángulo hepático': 'C18.3',
-      'Colon transverso': 'C18.4', 'Ángulo esplénico': 'C18.5', 'Colon descendente': 'C18.6',
-      'Colon sigmoide': 'C18.7', 'Recto': 'C20.9',
+      'cecum': 'C18.0', 'ascending': 'C18.2', 'hepatic_flexure': 'C18.3',
+      'transverse': 'C18.4', 'splenic_flexure': 'C18.5', 'descending': 'C18.6',
+      'sigmoid': 'C18.7', 'rectum': 'C20.9',
     },
     morphology: {
-      'Adenocarcinoma NOS': 'M8140/3', 'Adenocarcinoma mucinoso': 'M8480/3',
-      'Adenocarcinoma serrado': 'M8213/3', 'Carcinoma de células en anillo de sello': 'M8490/3',
-      'Carcinoma medular': 'M8510/3',
+      'adeno_nos': 'M8140/3', 'mucinous': 'M8480/3',
+      'serrated': 'M8213/3', 'signet': 'M8490/3',
+      'medullary': 'M8510/3',
     },
   },
   melanoma: {
     topography: { '': 'C44.9' },
     morphology: {
-      'Extensión superficial': 'M8743/3', 'Nodular': 'M8721/3',
-      'Lentigo maligno': 'M8742/3', 'Acral lentiginoso': 'M8744/3', 'Desmoplásico': 'M8745/3',
+      'superficial': 'M8743/3', 'nodular': 'M8721/3',
+      'lentigo': 'M8742/3', 'acral': 'M8744/3', 'desmoplastic': 'M8745/3',
     },
   },
   'breast-biopsy': {
     topography: { '': 'C50.9' },
     morphology: {
-      'Carcinoma ductal infiltrante': 'M8500/3', 'Carcinoma lobulillar infiltrante': 'M8520/3',
-      'Carcinoma mucinoso': 'M8480/3', 'Carcinoma tubular': 'M8211/3',
+      'ductal': 'M8500/3', 'lobular': 'M8520/3',
+      'mucinous': 'M8480/3', 'tubular': 'M8211/3',
     },
   },
   gastric: {
     topography: {
-      'Cardias/UGE': 'C16.0', 'Fondo': 'C16.1', 'Cuerpo': 'C16.2',
-      'Antro': 'C16.3', 'Píloro': 'C16.4',
+      'cardia': 'C16.0', 'fundus': 'C16.1', 'body': 'C16.2',
+      'antrum': 'C16.3', 'pylorus': 'C16.4',
     },
     morphology: {
-      'Adenocarcinoma intestinal': 'M8144/3', 'Adenocarcinoma difuso': 'M8145/3',
-      'Adenocarcinoma mucinoso': 'M8480/3',
+      'intestinal': 'M8144/3', 'diffuse': 'M8145/3',
+      'mucinous': 'M8480/3',
     },
   },
 }

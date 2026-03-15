@@ -41,22 +41,25 @@ export const REPORT_STYLES: { value: ReportStyle; label_es: string; label_en: st
   { value: 'mixed', label_es: 'Mixto', label_en: 'Mixed' },
 ]
 
-function generateCodingSection(protocolId: string, values: FormValues, lang: Lang): string {
-  const codes = CIE_O_CODES[protocolId]
+function generateCodingSection(protocol: ProtocolDef, values: FormValues, lang: Lang): string {
+  const codes = CIE_O_CODES[protocol.id]
   if (!codes) return ''
 
-  const locationField = values['tumor_location'] || ''
-  const histField = values['histologic_type'] || ''
+  const locationVal = values['tumor_location'] || ''
+  const histVal = values['histologic_type'] || ''
 
-  const topo = codes.topography[locationField] || codes.topography[''] || null
-  const morph = codes.morphology[histField] || null
+  const topo = codes.topography[locationVal] || codes.topography[''] || null
+  const morph = codes.morphology[histVal] || null
 
   if (!topo && !morph) return ''
 
+  const locationLabel = protocol.fields.find(f => f.name === 'tumor_location')?.options?.find(o => o.value === locationVal)?.[lang === 'es' ? 'label_es' : 'label_en'] || locationVal
+  const histLabel = protocol.fields.find(f => f.name === 'histologic_type')?.options?.find(o => o.value === histVal)?.[lang === 'es' ? 'label_es' : 'label_en'] || histVal
+
   const header = lang === 'es' ? 'CODIFICACIÓN:' : 'CODING:'
   const lines = ['\n' + header]
-  if (topo) lines.push(`${lang === 'es' ? 'Topografía' : 'Topography'}: ${topo} (${locationField || protocolId})`)
-  if (morph) lines.push(`${lang === 'es' ? 'Morfología' : 'Morphology'}: ${morph} (${histField})`)
+  if (topo) lines.push(`${lang === 'es' ? 'Topografía' : 'Topography'}: ${topo} (${locationLabel})`)
+  if (morph) lines.push(`${lang === 'es' ? 'Morfología' : 'Morphology'}: ${morph} (${histLabel})`)
   return lines.join('\n')
 }
 
@@ -66,7 +69,7 @@ export function generateReport(protocol: ProtocolDef, values: FormValues, lang: 
   else if (style === 'mixed') report = generateMixed(protocol, values, lang)
   else report = generateProse(protocol, values, lang, includeMacro)
 
-  report += generateCodingSection(protocol.id, values, lang)
+  report += generateCodingSection(protocol, values, lang)
   return report
 }
 

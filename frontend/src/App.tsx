@@ -13,6 +13,7 @@ import { t } from './data/i18n'
 import type { ReportStyle } from './data/templates'
 import { MicroscopeMascot } from './components/MicroscopeMascot'
 import { BodySelector } from './components/BodySelector'
+import { highlightClinical } from './data/utils'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 

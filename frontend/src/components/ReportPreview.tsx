@@ -8,15 +8,9 @@ import { generateReport, REPORT_STYLES } from '../data/templates'
 import type { ReportStyle } from '../data/templates'
 import type { FieldDef } from '../data/protocols'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+import { highlightClinical } from '../data/utils'
 
-// Highlight clinical keywords in bold
-function highlightClinical(text: string): string {
-  return text.replace(
-    /(pT\w+|pN\w+|pM\w+|pTNM|MMR\/MSI|pMMR|dMMR|MSI-H|MSS|HER2|FISH|Ki-?67|BRCA\d?|PD-?L1|ganglios?\s*(?:linfáticos)?|metástasis|invasión\s+\w+|Breslow|Clark|Nottingham|Gleason|recurrencia|estadificación|\d+\/\d+\s*(?:ganglios|positivos)?|\d+\s*(?:mm|cm|mitosis))/gi,
-    '<strong>$1</strong>'
-  )
-}
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
 interface AIReviewResult {
   completeness_score: number
