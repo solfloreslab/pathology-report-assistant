@@ -92,8 +92,9 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
       )}
 
       {field.type === 'number' && (
-        <input type="number" min="0" value={value || ''} onChange={e => onChange(e.target.value)}
-          placeholder="—" className={`${inputBase} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`} />
+        <input type="text" inputMode="decimal" value={value || ''}
+          onChange={e => { if (/^\d*[.,]?\d*$/.test(e.target.value)) onChange(e.target.value) }}
+          placeholder="—" className={inputBase} />
       )}
     </div>
   )

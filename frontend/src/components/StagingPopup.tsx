@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { HelpCircle, X } from 'lucide-react'
 import type { StagingReference, StagingSuggestion } from '../data/staging'
 import type { Lang } from '../data/i18n'
@@ -15,7 +16,7 @@ export function StagingPopup({ reference, suggestion, lang, darkMode }: StagingP
   const matchStage = suggestion?.value?.split(' ')[0]
 
   return (
-    <div className="relative inline-block">
+    <>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-1 rounded-full transition-colors ${
@@ -26,35 +27,35 @@ export function StagingPopup({ reference, suggestion, lang, darkMode }: StagingP
         <HelpCircle className="w-4 h-4" />
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <>
           <div className="fixed inset-0 z-[100] bg-black/20" onClick={() => setIsOpen(false)} />
-          <div className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[101] w-96 rounded-xl shadow-2xl border ${
+          <div className={`fixed right-8 top-20 z-[101] w-[420px] rounded-xl shadow-2xl border ${
             darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-[var(--color-border)]'
           }`}>
-            <div className={`flex items-center justify-between px-3 py-2 border-b ${
+            <div className={`flex items-center justify-between px-4 py-3 border-b ${
               darkMode ? 'border-gray-700' : 'border-[var(--color-border)]'
             }`}>
               <div>
-                <h3 className={`text-xs font-semibold ${darkMode ? 'text-gray-200' : 'text-[var(--color-text)]'}`}>
+                <h3 className={`text-sm font-semibold ${darkMode ? 'text-gray-200' : 'text-[var(--color-text)]'}`}>
                   {lang === 'es' ? reference.title_es : reference.title_en}
                 </h3>
-                <span className={`text-[10px] ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>
+                <span className={`text-[11px] ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>
                   {reference.source}
                 </span>
               </div>
-              <button onClick={() => setIsOpen(false)} className="p-0.5">
-                <X className={`w-3.5 h-3.5 ${darkMode ? 'text-gray-400' : 'text-[var(--color-text-tertiary)]'}`} />
+              <button onClick={() => setIsOpen(false)} className="p-1 rounded-full hover:bg-black/10">
+                <X className={`w-4 h-4 ${darkMode ? 'text-gray-400' : 'text-[var(--color-text-tertiary)]'}`} />
               </button>
             </div>
 
-            <div className="max-h-60 overflow-y-auto">
+            <div className="max-h-96 overflow-y-auto">
               {reference.entries.map(entry => {
                 const isMatch = matchStage === entry.stage
                 return (
                   <div
                     key={entry.stage}
-                    className={`flex gap-2 px-3 py-1.5 text-xs border-l-[3px] ${
+                    className={`flex gap-3 px-4 py-2 text-sm border-l-[3px] ${
                       isMatch
                         ? 'border-l-[var(--color-primary)] bg-[var(--color-info-bg)]'
                         : darkMode
@@ -62,7 +63,7 @@ export function StagingPopup({ reference, suggestion, lang, darkMode }: StagingP
                           : 'border-l-transparent hover:bg-[var(--color-surface-alt)]'
                     }`}
                   >
-                    <span className={`font-mono font-bold w-12 flex-shrink-0 ${
+                    <span className={`font-mono font-bold w-14 flex-shrink-0 ${
                       isMatch ? 'text-[var(--color-primary)]' : darkMode ? 'text-gray-300' : 'text-[var(--color-text)]'
                     }`}>
                       {entry.stage}
@@ -84,8 +85,9 @@ export function StagingPopup({ reference, suggestion, lang, darkMode }: StagingP
               })}
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   )
 }

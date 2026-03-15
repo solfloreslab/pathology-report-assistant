@@ -88,7 +88,7 @@ export default function App() {
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[var(--color-primary)] text-xs font-medium mb-4">
                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                {lang === 'es' ? 'Asistido por IA · Open Source' : 'AI-Assisted · Open Source'}
+                {lang === 'es' ? 'Structured Reporting · Open Source' : 'Structured Reporting · Open Source'}
               </div>
               <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0a1628] via-[#0F62FE] to-[#6929C4] bg-clip-text text-transparent">
                 {t('protocol.select', lang)}

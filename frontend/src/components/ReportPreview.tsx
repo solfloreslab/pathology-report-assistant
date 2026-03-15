@@ -74,6 +74,7 @@ export function ReportPreview({
           report_text: reportText,
           access_code: accessCode,
           lang: lang,
+          protocol_id: protocol.id,
         }),
       })
       if (!res.ok) throw new Error('API error')
@@ -193,16 +194,13 @@ export function ReportPreview({
                         ? (lang === 'es' ? 'ERROR' : 'ERROR')
                         : (lang === 'es' ? 'AVISO' : 'WARNING')}
                     </span>
-                    {inc.description || inc.finding}
+                    <span dangerouslySetInnerHTML={{ __html: (inc.description || inc.finding || '')
+                      .replace(/(pT\w+|pN\w+|pM\w+|pTNM|MMR\/MSI|HER2|ganglios?\s*\w*|\d+\s*de\s*\d+|\d+\/\d+)/gi, '<strong>$1</strong>')
+                    }} />
                   </div>
                 </div>
               ))}
-              {reviewResult.quality_notes && (
-                <div className={`p-2 rounded-lg text-[13px] ${dm ? 'bg-blue-900/20 text-blue-300' : 'bg-[var(--color-info-bg)] text-[var(--color-info-text)]'}`}>
-                  <Sparkles className="w-3.5 h-3.5 inline mr-1" />
-                  {reviewResult.quality_notes}
-                </div>
-              )}
+              {/* quality_notes removed — too verbose, alerts above are sufficient */}
             </div>
           )}
         </div>
