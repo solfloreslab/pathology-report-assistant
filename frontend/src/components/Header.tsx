@@ -80,7 +80,7 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
           {onLogout && (
             <button onClick={onLogout} className="flex items-center gap-1 px-2 py-1 rounded-full border border-white/20 hover:bg-white/10 transition-colors text-white/70 hover:text-white text-[11px]">
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{lang === 'es' ? 'Salir' : 'Logout'}</span>
+              <span className="hidden sm:inline">{lang === 'es' ? 'Cerrar sesión' : 'Log out'}</span>
             </button>
           )}
         </div>
