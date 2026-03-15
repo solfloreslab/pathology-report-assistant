@@ -53,11 +53,11 @@ function generateCodingSection(protocol: ProtocolDef, values: FormValues, lang: 
 
   if (!topo && !morph) return ''
 
-  const locationLabel = protocol.fields.find(f => f.name === 'tumor_location')?.options?.find(o => o.value === locationVal)?.[lang === 'es' ? 'label_es' : 'label_en'] || locationVal
+  const locationLabel = protocol.fields.find(f => f.name === 'tumor_location')?.options?.find(o => o.value === locationVal)?.[lang === 'es' ? 'label_es' : 'label_en'] || locationVal || protocol.organ_es
   const histLabel = protocol.fields.find(f => f.name === 'histologic_type')?.options?.find(o => o.value === histVal)?.[lang === 'es' ? 'label_es' : 'label_en'] || histVal
 
   const header = lang === 'es' ? 'CODIFICACIÓN:' : 'CODING:'
-  const lines = ['\n' + header]
+  const lines = ['\n\n' + header]
   if (topo) lines.push(`${lang === 'es' ? 'Topografía' : 'Topography'}: ${topo} (${locationLabel})`)
   if (morph) lines.push(`${lang === 'es' ? 'Morfología' : 'Morphology'}: ${morph} (${histLabel})`)
   return lines.join('\n')
