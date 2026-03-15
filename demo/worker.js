@@ -315,6 +315,45 @@ function parseJSON(raw) {
   }
 }
 
+// --- Auditor validator prompt (full audit: completeness + inconsistencies + CIE-O) ---
+const AUDITOR_VALIDATOR_PROMPT = `You are a complete quality auditor for pathology reports.
+Analyze the extracted data against the protocol and provide a FULL audit report.
+IMPORTANT: Respond ENTIRELY in {LANG}. Every string value MUST be in {LANG}.
+Respond ONLY with a JSON object. No markdown fences.
+Output schema:
+{
+  "completeness_score": 0-100,
+  "total_required_fields": int,
+  "reported_fields": int,
+  "status": "complete"|"mostly_complete"|"incomplete"|"critically_incomplete",
+  "missing_required": [
+    {"field": "field_name", "label": "Human name in {LANG}", "severity": "critical"|"major"|"minor", "action": "What to do in {LANG}"}
+  ],
+  "inconsistencies": [
+    {"finding": "What is wrong in {LANG}", "severity": "warning"|"error", "suggestion": "How to fix in {LANG}"}
+  ],
+  "clinical_alerts": [
+    {"alert": "Clinical observation in {LANG}", "type": "info"|"warning"}
+  ],
+  "suggested_coding": {
+    "topography": "CIE-O topography code (e.g. C18.7) or null",
+    "topography_label": "Name in {LANG}",
+    "morphology": "CIE-O morphology code (e.g. M8140/3) or null",
+    "morphology_label": "Name in {LANG}"
+  }
+}
+Rules:
+- CRITICAL: prevents staging/treatment. MAJOR: required by protocol. MINOR: recommended.
+- Status: complete>=90, mostly_complete 70-89, incomplete 50-69, critically_incomplete<50.
+- "not_reported" or null = MISSING.
+- Each issue = SEPARATE object.
+- suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
+- Keep text SHORT and actionable.
+--- PROTOCOL FIELDS ---
+{FIELDS}
+--- PROTOCOL RULES ---
+{RULES}`;
+
 // --- Pipeline: Auditor mode ---
 async function runAuditor(env, reportText, protocol, protocolId, lang = 'es') {
   const fieldsText = protocol.fields.join(", ");
@@ -326,8 +365,8 @@ async function runAuditor(env, reportText, protocol, protocolId, lang = 'es') {
   const extractRaw = await callLLM(env, extractorPrompt, reportText);
   const extractedData = parseJSON(extractRaw);
 
-  // Validate
-  const validatorPrompt = VALIDATOR_PROMPT_TEMPLATE
+  // Full audit validation (completeness + inconsistencies + CIE-O)
+  const validatorPrompt = AUDITOR_VALIDATOR_PROMPT
     .replace("{FIELDS}", fieldsText)
     .replace("{RULES}", rulesText)
     .replace(/{LANG}/g, langFull);

@@ -148,34 +148,108 @@ export default function App() {
               <div>
                 {auditorResult ? (
                   <div className="space-y-3">
-                    <h3 className="text-lg font-bold">{lang === 'es' ? 'Resultado de la auditoría' : 'Audit result'}</h3>
+                    {/* Completeness score */}
                     {auditorResult.validation?.completeness_score !== undefined && (
-                      <div className={`p-3 rounded-lg ${auditorResult.validation.completeness_score >= 90 ? 'bg-green-50' : auditorResult.validation.completeness_score >= 70 ? 'bg-yellow-50' : 'bg-red-50'}`}>
-                        <span className="text-2xl font-bold">{auditorResult.validation.completeness_score}%</span>
-                        <span className="text-sm ml-2">{lang === 'es' ? 'completitud' : 'completeness'}</span>
+                      <div className={`p-4 rounded-xl border ${
+                        auditorResult.validation.completeness_score >= 90 ? 'bg-green-50 border-green-200' :
+                        auditorResult.validation.completeness_score >= 70 ? 'bg-yellow-50 border-yellow-200' :
+                        'bg-red-50 border-red-200'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-3xl font-bold">{auditorResult.validation.completeness_score}%</span>
+                            <span className="text-sm ml-2 text-gray-600">{lang === 'es' ? 'completitud' : 'completeness'}</span>
+                          </div>
+                          <span className={`text-xs font-bold uppercase px-2 py-1 rounded-full ${
+                            auditorResult.validation.completeness_score >= 90 ? 'bg-green-100 text-green-700' :
+                            auditorResult.validation.completeness_score >= 70 ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            {auditorResult.validation.reported_fields}/{auditorResult.validation.total_required_fields} {lang === 'es' ? 'campos' : 'fields'}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{
+                            width: `${auditorResult.validation.completeness_score}%`,
+                            backgroundColor: auditorResult.validation.completeness_score >= 90 ? '#22c55e' :
+                              auditorResult.validation.completeness_score >= 70 ? '#eab308' : '#ef4444'
+                          }} />
+                        </div>
                       </div>
                     )}
+
+                    {/* Missing fields */}
+                    {auditorResult.validation?.missing_required?.length > 0 && (
+                      <div className="rounded-xl border border-red-200 overflow-hidden">
+                        <div className="px-3 py-2 bg-red-50 border-b border-red-200">
+                          <span className="text-[11px] font-bold uppercase text-red-700">
+                            {lang === 'es' ? `Campos faltantes (${auditorResult.validation.missing_required.length})` : `Missing fields (${auditorResult.validation.missing_required.length})`}
+                          </span>
+                        </div>
+                        <div className="divide-y divide-red-100">
+                          {auditorResult.validation.missing_required.map((f: any, i: number) => (
+                            <div key={i} className="px-3 py-2 flex items-center gap-2 text-[13px]">
+                              <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                                f.severity === 'critical' ? 'bg-red-100 text-red-600' : f.severity === 'major' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500'
+                              }`}>{f.severity === 'critical' ? (lang === 'es' ? 'CRÍTICO' : 'CRITICAL') : f.severity === 'major' ? 'MAYOR' : 'MENOR'}</span>
+                              <span className="font-semibold text-gray-800">{f.label || f.field}</span>
+                              {f.action && <span className="text-gray-400 text-[12px]">— {f.action}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Inconsistencies */}
                     {auditorResult.validation?.inconsistencies?.map((inc: any, i: number) => (
-                      <div key={i} className={`p-2.5 rounded-lg border-l-3 text-[13px] ${inc.severity === 'error' ? 'bg-red-50 border-l-red-500' : 'bg-amber-50 border-l-amber-500'}`}>
+                      <div key={i} className={`p-2.5 rounded-xl border-l-3 text-[13px] ${inc.severity === 'error' ? 'bg-red-50 border-l-red-500' : 'bg-amber-50 border-l-amber-500'}`}>
                         <span className={`text-[10px] font-bold uppercase ${inc.severity === 'error' ? 'text-red-600' : 'text-amber-600'}`}>
                           {inc.severity === 'error' ? 'ERROR' : (lang === 'es' ? 'AVISO' : 'WARNING')}
                         </span>
                         <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(inc.finding || inc.description || '') }} />
-                        {inc.suggestion && <div className="text-gray-500 text-[12px] mt-0.5">→ {inc.suggestion}</div>}
+                        {inc.suggestion && <div className="text-gray-400 text-[12px] mt-0.5">→ {inc.suggestion}</div>}
                       </div>
                     ))}
+
+                    {/* Clinical alerts */}
                     {auditorResult.validation?.clinical_alerts?.map((alert: any, i: number) => (
-                      <div key={i} className="p-2.5 rounded-lg border-l-3 border-l-blue-400 bg-blue-50 text-[13px]">
+                      <div key={i} className="p-2.5 rounded-xl border-l-3 border-l-blue-400 bg-blue-50 text-[13px]">
                         <span className="text-[10px] font-bold uppercase text-blue-600">{lang === 'es' ? 'ALERTA CLÍNICA' : 'CLINICAL ALERT'}</span>
                         <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(alert.alert || '') }} />
                       </div>
                     ))}
-                    {auditorResult.validation?.missing_required?.map((f: any, i: number) => (
-                      <div key={i} className={`p-2 rounded-lg text-[12px] border-l-3 ${f.severity === 'critical' ? 'bg-red-50 border-l-red-400' : 'bg-amber-50 border-l-amber-400'}`}>
-                        <span className="font-bold">{f.label || f.field}</span>
-                        {f.action && <span className="text-gray-500"> — {f.action}</span>}
+
+                    {/* CIE-O coding */}
+                    {auditorResult.validation?.suggested_coding && (auditorResult.validation.suggested_coding.topography || auditorResult.validation.suggested_coding.morphology) && (
+                      <div className="p-3 rounded-xl border border-[var(--color-primary)]/20 bg-[var(--color-primary-light)]">
+                        <span className="text-[10px] font-bold uppercase text-[var(--color-primary)]">
+                          {lang === 'es' ? 'CODIFICACIÓN CIE-O SUGERIDA' : 'SUGGESTED ICD-O CODING'}
+                        </span>
+                        <div className="mt-1.5 space-y-1 text-[13px]">
+                          {auditorResult.validation.suggested_coding.topography && (
+                            <div>
+                              <span className="text-gray-500">{lang === 'es' ? 'Topografía' : 'Topography'}:</span>
+                              <span className="ml-1 font-mono font-bold text-[var(--color-primary)]">{auditorResult.validation.suggested_coding.topography}</span>
+                              <span className="ml-1 text-gray-500">({auditorResult.validation.suggested_coding.topography_label})</span>
+                            </div>
+                          )}
+                          {auditorResult.validation.suggested_coding.morphology && (
+                            <div>
+                              <span className="text-gray-500">{lang === 'es' ? 'Morfología' : 'Morphology'}:</span>
+                              <span className="ml-1 font-mono font-bold text-[var(--color-primary)]">{auditorResult.validation.suggested_coding.morphology}</span>
+                              <span className="ml-1 text-gray-500">({auditorResult.validation.suggested_coding.morphology_label})</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    ))}
+                    )}
+
+                    {/* No issues */}
+                    {(!auditorResult.validation?.missing_required?.length && !auditorResult.validation?.inconsistencies?.length && !auditorResult.validation?.clinical_alerts?.length) && (
+                      <div className="p-3 rounded-xl bg-green-50 border border-green-200 text-sm font-medium text-green-700">
+                        ✓ {lang === 'es' ? 'Sin problemas detectados' : 'No issues detected'}
+                      </div>
+                    )}
                   </div>
                 ) : !auditorReviewing && (
                   <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
