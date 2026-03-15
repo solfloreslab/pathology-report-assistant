@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { ChevronRight, Search } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import type { ProtocolDef } from '../data/protocols'
 import { protocols } from '../data/protocols'
@@ -9,211 +10,193 @@ interface BodySelectorProps {
   onSelect: (protocol: ProtocolDef) => void
 }
 
-const ORGANS = [
-  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', x: 160, y: 78, r: 18, color: '#8B5CF6' },
-  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', x: 160, y: 132, r: 10, color: '#06B6D4' },
-  { id: 'breast_l', label_es: 'Mama', label_en: 'Breast', x: 132, y: 174, r: 13, color: '#EC4899' },
-  { id: 'breast_r', label_es: 'Mama', label_en: 'Breast', x: 188, y: 174, r: 13, color: '#EC4899' },
-  { id: 'lung_l', label_es: 'Pulmón', label_en: 'Lung', x: 143, y: 192, r: 16, color: '#38BDF8' },
-  { id: 'lung_r', label_es: 'Pulmón', label_en: 'Lung', x: 177, y: 192, r: 16, color: '#38BDF8' },
-  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', x: 177, y: 240, r: 16, color: '#F59E0B' },
-  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', x: 142, y: 234, r: 18, color: '#B45309' },
-  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', x: 161, y: 258, r: 11, color: '#F97316' },
-  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', x: 160, y: 300, r: 22, color: '#10B981' },
-  { id: 'kidney_l', label_es: 'Riñón', label_en: 'Kidney', x: 132, y: 262, r: 11, color: '#6366F1' },
-  { id: 'kidney_r', label_es: 'Riñón', label_en: 'Kidney', x: 188, y: 262, r: 11, color: '#6366F1' },
-  { id: 'bladder', label_es: 'Vejiga', label_en: 'Bladder', x: 160, y: 338, r: 12, color: '#14B8A6' },
-  { id: 'uterus', label_es: 'Útero / Cérvix', label_en: 'Uterus / Cervix', x: 160, y: 352, r: 12, color: '#E11D48' },
-  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', x: 160, y: 356, r: 8, color: '#22C55E' },
-  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', x: 212, y: 118, r: 9, color: '#F43F5E' },
+const ORGAN_GROUPS = [
+  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', gradient: 'from-emerald-500 to-teal-600', spotColor: 'rgba(16,185,129,0.15)', protocols: ['colon-resection'] },
+  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', gradient: 'from-rose-500 to-pink-600', spotColor: 'rgba(244,63,94,0.15)', protocols: ['melanoma'] },
+  { id: 'breast', label_es: 'Mama', label_en: 'Breast', gradient: 'from-pink-500 to-fuchsia-600', spotColor: 'rgba(236,72,153,0.15)', protocols: ['breast-biopsy'] },
+  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', gradient: 'from-amber-500 to-orange-600', spotColor: 'rgba(245,158,11,0.15)', protocols: ['gastric'] },
+  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', gradient: 'from-red-500 to-rose-600', spotColor: 'rgba(225,29,72,0.15)', protocols: ['cytology-cervical'] },
+  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', gradient: 'from-violet-400 to-purple-500', spotColor: 'rgba(139,92,246,0.1)', protocols: [] },
+  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', gradient: 'from-sky-400 to-blue-500', spotColor: 'rgba(56,189,248,0.1)', protocols: [] },
+  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', gradient: 'from-cyan-400 to-teal-500', spotColor: 'rgba(6,182,212,0.1)', protocols: [] },
+  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', gradient: 'from-indigo-400 to-violet-500', spotColor: 'rgba(99,102,241,0.1)', protocols: [] },
+  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', gradient: 'from-green-400 to-emerald-500', spotColor: 'rgba(34,197,94,0.1)', protocols: [] },
+  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', gradient: 'from-amber-600 to-orange-700', spotColor: 'rgba(180,83,9,0.1)', protocols: [] },
+  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', gradient: 'from-orange-400 to-amber-500', spotColor: 'rgba(249,115,22,0.1)', protocols: [] },
 ]
 
-// Map protocol IDs to organ IDs
-const PROTOCOL_ORGANS: Record<string, string[]> = {
-  'colon-resection': ['colon'],
-  'melanoma': ['skin'],
-  'breast-biopsy': ['breast_l', 'breast_r'],
-  'gastric': ['stomach'],
-  'cytology-cervical': ['uterus'],
-}
+function OrganCard({ group, lang, onSelect }: {
+  group: typeof ORGAN_GROUPS[0], lang: Lang,
+  onSelect: (p: ProtocolDef) => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [spotPos, setSpotPos] = useState({ x: 0, y: 0 })
+  const [spotOpacity, setSpotOpacity] = useState(0)
+  const [expanded, setExpanded] = useState(false)
 
-// Map organ IDs to protocol IDs
-const ORGAN_PROTOCOLS: Record<string, string> = {
-  colon: 'colon-resection',
-  skin: 'melanoma',
-  breast_l: 'breast-biopsy',
-  breast_r: 'breast-biopsy',
-  stomach: 'gastric',
-  uterus: 'cytology-cervical',
-}
+  const hasProtocols = group.protocols.length > 0
+  const groupProtocols = group.protocols
+    .map(pid => protocols.find(p => p.id === pid))
+    .filter(Boolean) as ProtocolDef[]
 
-// Protocols shown as cards (including coming soon)
-const PROTOCOL_CARDS = [
-  { id: 'colon-resection', organs: ['colon'], available: true },
-  { id: 'melanoma', organs: ['skin'], available: true },
-  { id: 'breast-biopsy', organs: ['breast_l', 'breast_r'], available: true },
-  { id: 'gastric', organs: ['stomach'], available: true },
-  { id: 'cytology-cervical', organs: ['uterus'], available: true },
-  { id: 'brain', organs: ['brain'], available: false, label_es: 'Cerebro', label_en: 'Brain' },
-  { id: 'lung', organs: ['lung_l', 'lung_r'], available: false, label_es: 'Pulmón', label_en: 'Lung' },
-  { id: 'thyroid', organs: ['thyroid'], available: false, label_es: 'Tiroides', label_en: 'Thyroid' },
-  { id: 'kidney', organs: ['kidney_l', 'kidney_r'], available: false, label_es: 'Riñón', label_en: 'Kidney' },
-  { id: 'bladder', organs: ['bladder'], available: false, label_es: 'Vejiga', label_en: 'Bladder' },
-  { id: 'prostate', organs: ['prostate'], available: false, label_es: 'Próstata', label_en: 'Prostate' },
-  { id: 'pancreas', organs: ['pancreas'], available: false, label_es: 'Páncreas', label_en: 'Pancreas' },
-  { id: 'liver', organs: ['liver'], available: false, label_es: 'Hígado', label_en: 'Liver' },
-]
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = ref.current?.getBoundingClientRect()
+    if (!rect) return
+    setSpotPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+  }
 
-function BodyOutline() {
+  const handleClick = () => {
+    if (!hasProtocols) return
+    if (groupProtocols.length === 1) {
+      onSelect(groupProtocols[0])
+    } else {
+      setExpanded(!expanded)
+    }
+  }
+
   return (
-    <g stroke="#94A3B8" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.6">
-      <circle cx="160" cy="74" r="34" />
-      <path d="M133 112C126 124 122 139 122 154V214C122 224 128 232 138 235L146 238" />
-      <path d="M187 112C194 124 198 139 198 154V214C198 224 192 232 182 235L174 238" />
-      <path d="M146 238C142 266 142 298 145 332" />
-      <path d="M174 238C178 266 178 298 175 332" />
-      <path d="M145 332C145 352 143 372 138 400" />
-      <path d="M175 332C175 352 177 372 182 400" />
-      <path d="M121 158C100 173 92 196 94 220" />
-      <path d="M199 158C220 173 228 196 226 220" />
-      <path d="M94 220C92 244 101 262 113 277" />
-      <path d="M226 220C228 244 219 262 207 277" />
-      <path d="M122 146H198" />
-      <path d="M130 112C142 106 151 104 160 104C169 104 178 106 190 112" />
-      <path d="M145 332H175" />
-    </g>
+    <motion.div
+      ref={ref}
+      whileHover="hovered"
+      initial="idle"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setSpotOpacity(1)}
+      onMouseLeave={() => { setSpotOpacity(0); setExpanded(false) }}
+      onClick={handleClick}
+      className={`group relative overflow-hidden rounded-2xl ${
+        hasProtocols ? 'cursor-pointer' : 'cursor-default'
+      }`}
+      style={{ minHeight: hasProtocols ? '160px' : '120px' }}
+    >
+      {/* Background gradient with zoom on hover */}
+      <motion.div
+        variants={{
+          idle: { scale: 1 },
+          hovered: { scale: hasProtocols ? 1.08 : 1.02 },
+        }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className={`absolute inset-0 bg-gradient-to-br ${group.gradient} ${!hasProtocols ? 'opacity-30' : ''}`}
+      />
+
+      {/* Dark overlay — intensifies on hover */}
+      <motion.div
+        variants={{
+          idle: { background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)' },
+          hovered: { background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.2) 100%)' },
+        }}
+        transition={{ duration: 0.4 }}
+        className="absolute inset-0 z-10"
+      />
+
+      {/* Spotlight following cursor */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-2xl transition-opacity duration-500"
+        style={{
+          opacity: spotOpacity,
+          background: `radial-gradient(300px circle at ${spotPos.x}px ${spotPos.y}px, ${group.spotColor}, transparent 50%)`,
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative z-30 flex h-full flex-col justify-end p-4">
+        {/* Badge */}
+        <motion.div
+          variants={{
+            idle: { x: -15, opacity: 0 },
+            hovered: { x: 0, opacity: 1 },
+          }}
+          transition={{ duration: 0.3 }}
+        >
+          {hasProtocols ? (
+            <span className="inline-flex rounded-full bg-white/15 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/80 backdrop-blur-sm">
+              {groupProtocols.length} {groupProtocols.length === 1
+                ? (lang === 'es' ? 'protocolo' : 'protocol')
+                : (lang === 'es' ? 'protocolos' : 'protocols')}
+            </span>
+          ) : (
+            <span className="inline-flex rounded-full bg-white/10 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/50">
+              {lang === 'es' ? 'Próximamente' : 'Coming soon'}
+            </span>
+          )}
+        </motion.div>
+
+        {/* Name */}
+        <motion.h3
+          variants={{
+            idle: { y: 10, opacity: 0.9 },
+            hovered: { y: 0, opacity: 1 },
+          }}
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className="mt-1.5 text-base font-bold text-white"
+        >
+          {lang === 'es' ? group.label_es : group.label_en}
+        </motion.h3>
+
+        {/* Protocols list — revealed on hover */}
+        <AnimatePresence>
+          {hasProtocols && (
+            <motion.div
+              variants={{
+                idle: { y: 20, opacity: 0, height: 0 },
+                hovered: { y: 0, opacity: 1, height: 'auto' },
+              }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-2 space-y-1">
+                {groupProtocols.map(proto => (
+                  <button
+                    key={proto.id}
+                    onClick={(e) => { e.stopPropagation(); onSelect(proto) }}
+                    className="w-full flex items-center justify-between rounded-lg bg-white/10 px-3 py-1.5 text-left backdrop-blur-sm transition-colors hover:bg-white/20"
+                  >
+                    <div>
+                      <div className="text-xs font-medium text-white">
+                        {lang === 'es' ? proto.name_es : proto.name_en}
+                      </div>
+                      <div className="text-[9px] text-white/50">{proto.version}</div>
+                    </div>
+                    <ChevronRight className="w-3 h-3 text-white/50" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
   )
 }
 
 export function BodySelector({ lang, onSelect }: BodySelectorProps) {
-  const [activeCard, setActiveCard] = useState<string | null>(null)
-  const [hoveredOrgan, setHoveredOrgan] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
 
-  const activeOrgans = useMemo(() => {
-    if (hoveredOrgan) return [hoveredOrgan]
-    const card = PROTOCOL_CARDS.find(p => p.id === activeCard)
-    return card ? card.organs : []
-  }, [activeCard, hoveredOrgan])
-
-  const activeSet = new Set(activeOrgans)
-
-  const handleOrganClick = (organId: string) => {
-    const protocolId = ORGAN_PROTOCOLS[organId]
-    if (protocolId) {
-      const p = protocols.find(pr => pr.id === protocolId)
-      if (p && p.available) onSelect(p)
-    }
-  }
-
-  const handleCardClick = (cardId: string) => {
-    const p = protocols.find(pr => pr.id === cardId)
-    if (p && p.available) onSelect(p)
-  }
+  const filtered = query.trim()
+    ? ORGAN_GROUPS.filter(g =>
+        g.label_es.toLowerCase().includes(query.toLowerCase()) ||
+        g.label_en.toLowerCase().includes(query.toLowerCase())
+      )
+    : ORGAN_GROUPS
 
   return (
-    <div className="grid lg:grid-cols-[1fr_380px] gap-6 max-w-5xl mx-auto">
-      {/* Cards */}
-      <div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-          {PROTOCOL_CARDS.map(card => {
-            const isActive = activeCard === card.id
-            const proto = protocols.find(p => p.id === card.id)
-            const name = proto
-              ? (lang === 'es' ? proto.name_es : proto.name_en)
-              : (lang === 'es' ? (card as any).label_es : (card as any).label_en)
-
-            return (
-              <motion.button
-                key={card.id}
-                onMouseEnter={() => setActiveCard(card.id)}
-                onMouseLeave={() => setActiveCard(null)}
-                onClick={() => card.available && handleCardClick(card.id)}
-                whileHover={card.available ? { y: -2, scale: 1.02 } : {}}
-                whileTap={card.available ? { scale: 0.98 } : {}}
-                disabled={!card.available}
-                className={`rounded-xl border px-3 py-2.5 text-left transition-all ${
-                  isActive && card.available
-                    ? 'border-[var(--color-primary)] bg-[var(--color-primary-light)] shadow-sm'
-                    : card.available
-                      ? 'border-[var(--color-border)] bg-white hover:border-[var(--color-primary)]/50'
-                      : 'border-dashed border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                }`}
-              >
-                <div className="text-sm font-semibold text-[var(--color-text)]">{name}</div>
-                {proto && (
-                  <div className="text-[10px] text-[var(--color-text-tertiary)] mt-0.5">{proto.version}</div>
-                )}
-                {!card.available && (
-                  <div className="text-[9px] font-medium text-[var(--color-na)] mt-0.5 uppercase">
-                    {lang === 'es' ? 'Próximamente' : 'Coming soon'}
-                  </div>
-                )}
-              </motion.button>
-            )
-          })}
-        </div>
+    <div className="max-w-4xl mx-auto">
+      {/* Search */}
+      <div className="relative mb-6 max-w-md mx-auto">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
+        <input
+          type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder={lang === 'es' ? 'Buscar órgano o protocolo...' : 'Search organ or protocol...'}
+          className="w-full pl-9 pr-4 py-2.5 text-sm border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
+        />
       </div>
 
-      {/* Body */}
-      <div className="flex justify-center">
-        <div className="relative">
-          <svg viewBox="0 0 320 440" className="h-[420px] w-[300px]">
-            <BodyOutline />
-            {ORGANS.map(organ => {
-              const isActive = activeSet.has(organ.id)
-              const isDimmed = activeOrgans.length > 0 && !isActive
-              const hasProtocol = !!ORGAN_PROTOCOLS[organ.id]
-              return (
-                <g
-                  key={organ.id}
-                  onMouseEnter={() => setHoveredOrgan(organ.id)}
-                  onMouseLeave={() => setHoveredOrgan(null)}
-                  onClick={() => handleOrganClick(organ.id)}
-                  style={{ cursor: hasProtocol ? 'pointer' : 'default' }}
-                >
-                  <motion.circle
-                    cx={organ.x} cy={organ.y} r={organ.r}
-                    fill={organ.color}
-                    initial={false}
-                    animate={{
-                      opacity: isActive ? 0.9 : isDimmed ? 0.1 : 0.25,
-                      scale: isActive ? 1.08 : 1,
-                    }}
-                    transition={{ type: 'spring', stiffness: 240, damping: 18 }}
-                  />
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.circle
-                        cx={organ.x} cy={organ.y} r={organ.r + 6}
-                        fill={organ.color}
-                        initial={{ opacity: 0.3, scale: 0.9 }}
-                        animate={{ opacity: 0, scale: 1.5 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.9, repeat: Infinity, repeatType: 'loop' }}
-                      />
-                    )}
-                  </AnimatePresence>
-                </g>
-              )
-            })}
-          </svg>
-
-          {/* Label */}
-          <div className="absolute bottom-0 left-0 right-0 text-center text-xs text-[var(--color-text-tertiary)]">
-            {hoveredOrgan ? (
-              <span>{lang === 'es' ? ORGANS.find(o => o.id === hoveredOrgan)?.label_es : ORGANS.find(o => o.id === hoveredOrgan)?.label_en}</span>
-            ) : activeCard ? (
-              <span className="font-medium text-[var(--color-primary)]">
-                {protocols.find(p => p.id === activeCard)
-                  ? (lang === 'es' ? protocols.find(p => p.id === activeCard)?.name_es : protocols.find(p => p.id === activeCard)?.name_en)
-                  : PROTOCOL_CARDS.find(c => c.id === activeCard) && (lang === 'es' ? (PROTOCOL_CARDS.find(c => c.id === activeCard) as any)?.label_es : (PROTOCOL_CARDS.find(c => c.id === activeCard) as any)?.label_en)
-                }
-              </span>
-            ) : (
-              <span>{lang === 'es' ? 'Seleccione un órgano o protocolo' : 'Select an organ or protocol'}</span>
-            )}
-          </div>
-        </div>
+      {/* Grid of organ cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {filtered.map(group => (
+          <OrganCard key={group.id} group={group} lang={lang} onSelect={onSelect} />
+        ))}
       </div>
     </div>
   )
