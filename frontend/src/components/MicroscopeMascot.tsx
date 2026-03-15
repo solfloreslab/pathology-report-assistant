@@ -24,6 +24,17 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
       const rect = wrapRef.current.getBoundingClientRect()
       const cx = rect.left + rect.width / 2
       const cy = rect.top + rect.height / 2
+
+      // For small size (header): only react when mouse is nearby (within 150px)
+      if (size === 'small') {
+        const dist = Math.sqrt((e.clientX - cx) ** 2 + (e.clientY - cy) ** 2)
+        if (dist > 150) {
+          mouseX.set(0)
+          mouseY.set(0)
+          return
+        }
+      }
+
       const nx = (e.clientX - cx) / (rect.width / 2)
       const ny = (e.clientY - cy) / (rect.height / 2)
       mouseX.set(Math.max(-1, Math.min(1, nx)))
@@ -37,15 +48,15 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
       window.removeEventListener('mousemove', handleMove)
       window.removeEventListener('mouseleave', reset)
     }
-  }, [mouseX, mouseY])
+  }, [mouseX, mouseY, size])
 
   const eyeOffsetY = useTransform(smoothY, [-1, 1], [-5, 5])
   const ocularRotate = useTransform(smoothX, [-1, 1], [-6, 6])
 
-  // Left eye always biased RIGHT (toward center/nose), right eye always biased LEFT
-  // Creates permanent cross-eyed look — pupils pinned to inner edge of iris
-  const leftEyeX = useTransform(smoothX, [-1, 0, 1], [-4, 8, 10])
-  const rightEyeX = useTransform(smoothX, [-1, 0, 1], [-10, -8, 4])
+  // Normal: eyes follow mouse. Center (mouse between eyes): cross-eyed
+  // smoothX near 0 AND smoothY near 0 = mouse is between eyes = bizco
+  const leftEyeX = useTransform(smoothX, [-1, -0.2, 0, 0.2, 1], [-9, -5, 7, 8, 9])
+  const rightEyeX = useTransform(smoothX, [-1, -0.2, 0, 0.2, 1], [-9, -8, -7, 5, 9])
 
   const s = size === 'small' ? 42 : 160
   const scale = s / 240
