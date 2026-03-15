@@ -237,15 +237,31 @@ Respond ONLY with a JSON object:
 {"narrative": "The complete report text in formal Spanish...", "extracted_fields": {"field_name": "extracted value or null if not in the input"}}
 ONLY the JSON object. No explanation, no markdown fences.`;
 
-const VALIDATOR_PROMPT_TEMPLATE = `You are a quality control agent for pathology reports.
-Compare the extracted data against the protocol's REQUIRED fields and rules.
-IMPORTANT: Respond in {LANG}. All recommendations, quality_notes, and finding descriptions MUST be in {LANG}.
-Respond ONLY with a JSON object.
-Output: {"completeness_score":0-100,"total_required_fields":int,"reported_fields":int,"missing_fields":int,"status":"complete"|"mostly_complete"|"incomplete"|"critically_incomplete","missing_required":[{"field":"...","severity":"critical"|"major"|"minor","recommendation":"..."}],"inconsistencies":[{"finding":"...","severity":"warning"|"error"}],"quality_notes":"..."}
-Severity: CRITICAL=prevents staging/treatment, MAJOR=required by protocol, MINOR=recommended.
-Status: complete>=90, mostly_complete 70-89, incomplete 50-69, critically_incomplete<50.
-A field with value "not_reported" or null counts as MISSING.
-Each inconsistency must be a SEPARATE object in the array - never combine multiple issues in one finding.
+const VALIDATOR_PROMPT_TEMPLATE = `You are a clinical reasoning agent for pathology report quality control.
+Your role is NOT to count missing fields (the system already does that).
+Your role IS to detect CLINICAL INCONSISTENCIES and provide CLINICAL INSIGHTS that only a domain expert would notice.
+IMPORTANT: Respond ENTIRELY in {LANG}. Every string value MUST be in {LANG}.
+Respond ONLY with a JSON object. No markdown fences, no explanation.
+Output schema:
+{
+  "inconsistencies": [
+    {"finding": "What is clinically wrong", "severity": "warning"|"error", "suggestion": "How to fix it"}
+  ],
+  "clinical_alerts": [
+    {"alert": "Clinically relevant observation", "type": "info"|"warning"}
+  ]
+}
+Focus on:
+- Cross-field inconsistencies (e.g. pT3 but depth says submucosa, diffuse type but grade G1, HER2 2+ without FISH)
+- Unusual values (e.g. mitotic index > 20, lymph node count < 12 for colon, Breslow > 10mm)
+- Protocol-specific rules that require clinical knowledge
+- Staging coherence (does pTNM match the individual T, N, M values?)
+- Missing biomarkers that are required for treatment decisions (MMR/MSI in colon, HER2 in gastric/breast)
+DO NOT list missing fields — the system already shows those.
+DO NOT count completeness — the system already calculates that.
+If there are NO inconsistencies and NO alerts, return empty arrays.
+Each issue MUST be a SEPARATE object — never combine.
+Keep text SHORT (1-2 sentences max per item).
 --- PROTOCOL FIELDS ---
 {FIELDS}
 --- PROTOCOL RULES ---
@@ -264,7 +280,7 @@ async function callLLM(env, systemPrompt, userContent) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "z-ai/glm-5",
+        model: env.OPENROUTER_MODEL || "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent },
@@ -447,7 +463,7 @@ export default {
             timestamp: new Date().toISOString(),
             protocol_used: protocolId,
             completeness_score: copilot.validation ? copilot.validation.completeness_score : 0,
-            model_version: "z-ai/glm-5",
+            model_version: env.OPENROUTER_MODEL || "google/gemini-2.5-flash",
             provider: "openrouter",
             processing_time_ms: elapsedMs(),
             pipeline_version: "0.2.0",
@@ -472,7 +488,7 @@ export default {
             timestamp: new Date().toISOString(),
             protocol_used: protocolId,
             completeness_score: auditor.validation.completeness_score,
-            model_version: "z-ai/glm-5",
+            model_version: env.OPENROUTER_MODEL || "google/gemini-2.5-flash",
             provider: "openrouter",
             processing_time_ms: elapsedMs(),
             pipeline_version: "0.2.0",

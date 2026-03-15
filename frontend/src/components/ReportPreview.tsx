@@ -10,11 +10,19 @@ import type { FieldDef } from '../data/protocols'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
+// Highlight clinical keywords in bold
+function highlightClinical(text: string): string {
+  return text.replace(
+    /(pT\w+|pN\w+|pM\w+|pTNM|MMR\/MSI|pMMR|dMMR|MSI-H|MSS|HER2|FISH|Ki-?67|BRCA\d?|PD-?L1|ganglios?\s*(?:linfáticos)?|metástasis|invasión\s+\w+|Breslow|Clark|Nottingham|Gleason|recurrencia|estadificación|\d+\/\d+\s*(?:ganglios|positivos)?|\d+\s*(?:mm|cm|mitosis))/gi,
+    '<strong>$1</strong>'
+  )
+}
+
 interface AIReviewResult {
   completeness_score: number
-  missing_fields: { field: string; severity: string; recommendation: string }[]
-  inconsistencies: { description: string; severity: string }[]
-  quality_notes: string
+  missing_fields: { field: string; label?: string; severity: string; action?: string; recommendation?: string }[]
+  inconsistencies: { finding: string; description?: string; severity: string; suggestion?: string }[]
+  clinical_alerts?: { alert: string; type: string }[]
 }
 
 interface ReportPreviewProps {
@@ -181,26 +189,77 @@ export function ReportPreview({
 
           {reviewResult && !reviewing && (
             <div className="space-y-1.5">
+              {/* AI Review header */}
+              {(reviewResult.inconsistencies?.length === 0 && reviewResult.clinical_alerts?.length === 0) && (
+                <div className="p-2.5 rounded-lg text-[13px] border-l-3 bg-green-50 border-l-green-500 dark:bg-green-900/20">
+                  <span className="font-bold text-green-700 dark:text-green-300">
+                    ✓ {lang === 'es' ? 'Sin inconsistencias detectadas' : 'No inconsistencies detected'}
+                  </span>
+                </div>
+              )}
+              {/* Inconsistencies */}
               {reviewResult.inconsistencies?.map((inc, i) => (
-                <div key={i} className={`p-2 rounded-lg text-[13px] flex items-start gap-2 ${
+                <div key={`inc-${i}`} className={`p-2.5 rounded-lg text-[13px] border-l-3 ${
                   inc.severity === 'error'
-                    ? 'bg-[var(--color-critical-bg)] text-[var(--color-critical-text)]'
-                    : 'bg-[var(--color-warning-bg)] text-[var(--color-warning-text)]'
+                    ? 'bg-[var(--color-critical-bg)] border-l-red-500'
+                    : 'bg-[var(--color-warning-bg)] border-l-amber-500'
                 }`}>
-                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold text-[10px] uppercase mr-1">
-                      {inc.severity === 'error'
-                        ? (lang === 'es' ? 'ERROR' : 'ERROR')
-                        : (lang === 'es' ? 'AVISO' : 'WARNING')}
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span className={`font-bold text-[10px] uppercase ${
+                      inc.severity === 'error' ? 'text-red-600' : 'text-amber-600'
+                    }`}>
+                      {inc.severity === 'error' ? 'ERROR' : (lang === 'es' ? 'AVISO' : 'WARNING')}
                     </span>
-                    <span dangerouslySetInnerHTML={{ __html: (inc.description || inc.finding || '')
-                      .replace(/(pT\w+|pN\w+|pM\w+|pTNM|MMR\/MSI|HER2|ganglios?\s*\w*|\d+\s*de\s*\d+|\d+\/\d+)/gi, '<strong>$1</strong>')
-                    }} />
+                  </div>
+                  <div className={dm ? 'text-gray-200' : 'text-gray-800'}>
+                    <span dangerouslySetInnerHTML={{ __html: highlightClinical(inc.finding || inc.description || '') }} />
+                    {inc.suggestion && (
+                      <span className={dm ? 'text-gray-400' : 'text-gray-500'}> → <span dangerouslySetInnerHTML={{ __html: highlightClinical(inc.suggestion) }} /></span>
+                    )}
                   </div>
                 </div>
               ))}
-              {/* quality_notes removed — too verbose, alerts above are sufficient */}
+              {/* Clinical Alerts */}
+              {reviewResult.clinical_alerts?.map((alert, i) => (
+                <div key={`alert-${i}`} className={`p-2.5 rounded-lg text-[13px] border-l-3 ${
+                  alert.type === 'warning'
+                    ? 'bg-amber-50 border-l-amber-400 dark:bg-amber-900/20'
+                    : 'bg-blue-50 border-l-blue-400 dark:bg-blue-900/20'
+                }`}>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="text-[10px] font-bold uppercase text-blue-600">
+                      {lang === 'es' ? 'ALERTA CLÍNICA' : 'CLINICAL ALERT'}
+                    </span>
+                  </div>
+                  <div className={dm ? 'text-gray-200' : 'text-gray-800'}
+                    dangerouslySetInnerHTML={{ __html: highlightClinical(alert.alert) }}
+                  />
+                </div>
+              ))}
+              {/* Missing fields from AI (puntual) */}
+              {reviewResult.missing_fields?.length > 0 && (
+                <div className={`p-2.5 rounded-lg text-[13px] border-l-3 border-l-orange-400 ${dm ? 'bg-orange-900/20' : 'bg-orange-50'}`}>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-orange-500" />
+                    <span className="text-[10px] font-bold uppercase text-orange-600">
+                      {lang === 'es' ? 'CAMPOS FALTANTES (IA)' : 'MISSING FIELDS (AI)'}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {reviewResult.missing_fields.filter(f => f.severity === 'critical').map((f, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                        {f.label || f.field}{f.action ? ` → ${f.action}` : ''}
+                      </span>
+                    ))}
+                    {reviewResult.missing_fields.filter(f => f.severity === 'major').map((f, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                        {f.label || f.field}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -276,7 +335,7 @@ export function ReportPreview({
                 ref={reportRef}
                 contentEditable
                 suppressContentEditableWarning
-                className="outline-none leading-relaxed whitespace-pre-wrap break-words text-[var(--color-text)]"
+                className="outline-none leading-relaxed whitespace-pre-wrap break-words text-[var(--color-text)] max-h-[60vh] overflow-y-auto"
                 style={{ fontFamily: 'var(--font-sans)' }}
                 dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, '<br>') }}
               />
