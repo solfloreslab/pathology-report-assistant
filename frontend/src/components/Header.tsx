@@ -1,6 +1,7 @@
 import { t } from '../data/i18n'
 import type { Lang } from '../data/i18n'
-import { Microscope, Plus, Minus, Moon, Sun, LogOut } from 'lucide-react'
+import { Plus, Minus, Moon, Sun, LogOut } from 'lucide-react'
+import { AnimatedLogo } from './AnimatedLogo'
 
 interface HeaderProps {
   lang: Lang
@@ -18,9 +19,7 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0f2847] to-[#0F62FE] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-white/15 backdrop-blur rounded-lg flex items-center justify-center border border-white/20">
-            <Microscope className="w-4.5 h-4.5 text-white" />
-          </div>
+          <AnimatedLogo />
           <div>
             <h1 className="text-sm font-bold leading-tight text-white">
               {t('app.title', lang)}

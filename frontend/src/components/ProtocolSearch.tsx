@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Search, ChevronRight } from 'lucide-react'
 import { protocols } from '../data/protocols'
 import type { ProtocolDef } from '../data/protocols'

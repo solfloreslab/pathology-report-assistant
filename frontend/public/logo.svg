@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F62FE"/>
+      <stop offset="100%" style="stop-color:#4589FF"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square -->
+  <rect width="40" height="40" rx="10" fill="url(#bg)"/>
+  <!-- Cell nucleus (circle) -->
+  <circle cx="20" cy="18" r="8" stroke="white" stroke-width="1.8" fill="none" opacity="0.9"/>
+  <!-- Inner structure (nucleolus) -->
+  <circle cx="20" cy="18" r="3" fill="white" opacity="0.6"/>
+  <!-- Chromatin dots -->
+  <circle cx="17" cy="15" r="1.2" fill="white" opacity="0.4"/>
+  <circle cx="23" cy="21" r="1" fill="white" opacity="0.4"/>
+  <!-- Cell membrane suggestion -->
+  <path d="M10 18 Q10 10 20 8 Q30 10 30 18 Q30 26 20 28 Q10 26 10 18Z" stroke="white" stroke-width="1" fill="none" opacity="0.3"/>
+  <!-- Data lines (structured reporting) -->
+  <line x1="13" y1="31" x2="19" y2="31" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="21" y1="31" x2="27" y2="31" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="13" y1="34" x2="22" y2="34" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+</svg>

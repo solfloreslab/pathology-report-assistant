@@ -60,7 +60,7 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
           <div
             key={sectionId}
             id={`section-${sectionId}`}
-            className={`rounded-lg border overflow-hidden ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'}`}
+            className={`rounded-xl border overflow-hidden card-hover shadow-sm ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'}`}
           >
             <button
               onClick={() => toggleSection(sectionId)}

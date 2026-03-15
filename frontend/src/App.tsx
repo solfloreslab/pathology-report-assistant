@@ -11,6 +11,7 @@ import { useFormState } from './hooks/useFormState'
 import type { ProtocolDef } from './data/protocols'
 import { t } from './data/i18n'
 import type { ReportStyle } from './data/templates'
+import { FloatingMicroscope } from './components/FloatingMicroscope'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -82,10 +83,19 @@ export default function App() {
 
       <main className="mx-auto px-[10px] py-3" style={{ maxWidth: 'calc(100vw - 20px)' }}>
         {!protocol ? (
-          <div className="max-w-lg mx-auto mt-12">
-            <div className="text-center mb-6">
-              <h2 className="text-lg font-semibold">{t('protocol.select', lang)}</h2>
-              <p className="text-sm opacity-70 mt-1">{t('app.subtitle', lang)}</p>
+          <div className="max-w-2xl mx-auto mt-8 relative">
+            <FloatingMicroscope />
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[var(--color-primary)] text-xs font-medium mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
+                {lang === 'es' ? 'Asistido por IA · Open Source' : 'AI-Assisted · Open Source'}
+              </div>
+              <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0a1628] via-[#0F62FE] to-[#6929C4] bg-clip-text text-transparent">
+                {t('protocol.select', lang)}
+              </h2>
+              <p className="text-sm text-[var(--color-text-tertiary)] mt-2 max-w-md mx-auto">
+                {t('app.subtitle', lang)}
+              </p>
             </div>
             <ProtocolSearch lang={lang} onSelect={handleSelectProtocol} selected={null} />
           </div>
