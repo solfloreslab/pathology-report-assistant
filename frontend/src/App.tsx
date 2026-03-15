@@ -116,7 +116,7 @@ export default function App() {
         onHome={protocol ? () => { setProtocol(null); resetValues() } : undefined}
         onLogout={() => { localStorage.removeItem('patho-access'); localStorage.removeItem('patho-code'); window.location.reload() }}
         mode={mode}
-        onModeChange={(m) => { setMode(m); if (m === 'auditor') { setProtocol(null); resetValues() } }}
+        onModeChange={(m) => { setMode(m) }}
       />
 
       <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
