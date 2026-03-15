@@ -111,7 +111,7 @@ export default function App() {
         onLogout={() => { localStorage.removeItem('access_code'); window.location.reload() }}
       />
 
-      <main className="mx-auto px-[10px] py-3" style={{ maxWidth: 'calc(100vw - 20px)' }}>
+      <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
         {/* Mode tabs — only on home screen */}
         {!protocol && (
           <div className="max-w-2xl mx-auto mt-4 mb-2 flex gap-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800 w-fit">
