@@ -103,7 +103,7 @@ export function ReportPreview({
   return (
     <div className="space-y-2">
       {/* Row 1: 3 cuadros — Completitud | Crítico | Mayor */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {/* Completitud */}
         <div className={`rounded-lg border p-2.5 ${cardClass}`}>
           <div className="flex items-center justify-between mb-1">

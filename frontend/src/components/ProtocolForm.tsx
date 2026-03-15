@@ -79,7 +79,7 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
             </button>
 
             {!isCollapsed && (
-              <div className="px-3 pb-3 pt-0.5 grid grid-cols-2 gap-x-3 gap-y-2">
+              <div className="px-3 pb-3 pt-0.5 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2">
                 {fields.map(field => (
                   <FormField
                     key={field.name}

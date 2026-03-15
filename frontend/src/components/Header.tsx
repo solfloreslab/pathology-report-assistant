@@ -27,12 +27,12 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
             <h1 className="text-sm font-bold leading-tight text-white">
               {t('app.title', lang)}
             </h1>
-            <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-blue-300/70">
+            <span className="hidden sm:block text-[10px] uppercase tracking-[0.2em] font-medium text-blue-300/70">
               {lang === 'es' ? 'HUMANO EN CONTROL' : 'HUMAN-IN-THE-LOOP'}
             </span>
           </div>
           {mode && onModeChange && (
-            <div className="flex gap-0.5 p-0.5 rounded-lg bg-white/10 ml-4">
+            <div className="hidden sm:flex gap-0.5 p-0.5 rounded-lg bg-white/10 ml-4">
               <button onClick={() => onModeChange('copilot')}
                 className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${mode === 'copilot' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
                 {lang === 'es' ? 'Copiloto' : 'Copilot'}
