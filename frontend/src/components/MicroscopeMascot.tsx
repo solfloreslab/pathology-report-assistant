@@ -39,9 +39,9 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
     }
   }, [mouseX, mouseY])
 
-  const eyeOffsetX = useTransform(smoothX, [-1, 1], [-3, 3])
-  const eyeOffsetY = useTransform(smoothY, [-1, 1], [-2, 2])
-  const ocularRotate = useTransform(smoothX, [-1, 1], [-4, 4])
+  const eyeOffsetX = useTransform(smoothX, [-1, 1], [-7, 7])
+  const eyeOffsetY = useTransform(smoothY, [-1, 1], [-5, 5])
+  const ocularRotate = useTransform(smoothX, [-1, 1], [-8, 8])
 
   const s = size === 'small' ? 36 : 120
   const scale = s / 240
@@ -105,8 +105,19 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
           <g>
             <rect x="62" y="108" width="54" height="14" rx="7" fill="#0E6B5E" />
             <rect x="48" y="121" width="70" height="12" rx="6" fill="#065F46" />
-            <circle cx="64" cy="150" r="13" fill="#0E6B5E" />
-            <circle cx="64" cy="150" r="5" fill="#A7CBC6" />
+            {/* Micrometer knob - rotates on hover */}
+            <motion.g
+              animate={hovered ? { rotate: [0, 360] } : { rotate: 0 }}
+              transition={hovered ? { repeat: Infinity, duration: 3, ease: 'linear' } : { duration: 0.3 }}
+              style={{ originX: '64px', originY: '150px' }}
+            >
+              <circle cx="64" cy="150" r="13" fill="#0E6B5E" />
+              <circle cx="64" cy="150" r="5" fill="#A7CBC6" />
+              <line x1="64" y1="138" x2="64" y2="143" stroke="#A7CBC6" strokeWidth="2" />
+              <line x1="64" y1="157" x2="64" y2="162" stroke="#A7CBC6" strokeWidth="2" />
+              <line x1="52" y1="150" x2="57" y2="150" stroke="#A7CBC6" strokeWidth="2" />
+              <line x1="71" y1="150" x2="76" y2="150" stroke="#A7CBC6" strokeWidth="2" />
+            </motion.g>
           </g>
 
           {/* Smile */}
