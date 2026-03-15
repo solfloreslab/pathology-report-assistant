@@ -12,6 +12,7 @@ import type { ProtocolDef } from './data/protocols'
 import { t } from './data/i18n'
 import type { ReportStyle } from './data/templates'
 import { MicroscopeMascot } from './components/MicroscopeMascot'
+import { BodySelector } from './components/BodySelector'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -180,20 +181,16 @@ export default function App() {
             </div>
           </div>
         ) : !protocol ? (
-          <div className="max-w-2xl mx-auto mt-4 relative">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-[var(--color-primary)] text-xs font-medium mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary)] animate-pulse" />
-                {lang === 'es' ? 'Structured Reporting · Open Source' : 'Structured Reporting · Open Source'}
-              </div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0a1628] via-[#0F62FE] to-[#6929C4] bg-clip-text text-transparent">
+          <div className="mt-4">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-[var(--color-text)]">
                 {t('protocol.select', lang)}
               </h2>
-              <p className="text-sm text-[var(--color-text-tertiary)] mt-2 max-w-md mx-auto">
+              <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
                 {t('app.subtitle', lang)}
               </p>
             </div>
-            <ProtocolSearch lang={lang} onSelect={handleSelectProtocol} selected={null} />
+            <BodySelector lang={lang} onSelect={handleSelectProtocol} />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-3">
