@@ -17,7 +17,7 @@ Narrative pathology reports achieve only **77% completeness** of required fields
 
 This agent bridges that gap: it reads a free-text report, classifies the specimen, extracts structured fields per protocol, and validates completeness — flagging missing critical data before it reaches the clinician.
 
-No hospital in Spain had deployed genuinely agentic AI for pathology report structuring as of March 2026.
+Despite proven accuracy, automated structuring of pathology reports has seen limited real-world deployment — this prototype explores that gap.
 
 ---
 

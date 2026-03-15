@@ -29,6 +29,7 @@ desktop.ini
 
 # Cloudflare
 .wrangler/
+.dev.vars
 node_modules/
 
 # Clinical data (NEVER commit real patient data)

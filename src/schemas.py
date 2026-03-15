@@ -114,7 +114,7 @@ class AuditTrail(BaseModel):
 # --- Pipeline Result ---
 
 class PipelineResult(BaseModel):
-    """Combined output of the full classify -> extract -> validate pipeline."""
+    """Combined output of the full classify -> extract -> validate pipeline (auditor mode)."""
 
     classification: ClassificationResult
     extracted_data: dict[str, Any] = Field(
@@ -126,3 +126,25 @@ class PipelineResult(BaseModel):
         default=False,
         description="True when classifier confidence < 0.7"
     )
+
+
+# --- Copilot Result ---
+
+class CopilotResult(BaseModel):
+    """Output of the copilot mode: abbreviated notes -> draft report."""
+
+    classification: ClassificationResult
+    expanded_report: str = Field(
+        description="Complete draft report in formal medical Spanish"
+    )
+    filled_fields: list[str] = Field(
+        default_factory=list,
+        description="Protocol field names that were populated from the input"
+    )
+    pending_fields: list[str] = Field(
+        default_factory=list,
+        description="Protocol field names marked as [PENDIENTE] in the draft"
+    )
+    validation: ValidationResult
+    audit_trail: AuditTrail
+    source_mode: str = "copilot"

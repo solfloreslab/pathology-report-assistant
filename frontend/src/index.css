@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  /* Clinical color tokens (NHS + Carbon inspired) */
+  --color-primary: #0F62FE;
+  --color-primary-dark: #002D9C;
+  --color-primary-light: #D0E2FF;
+  --color-secondary: #0E6B5E;
+  --color-secondary-light: #DEFBE6;
+
+  /* Surfaces */
+  --color-page: #F0F4F5;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F4F4F4;
+
+  /* Text */
+  --color-text: #161616;
+  --color-text-secondary: #525252;
+  --color-text-tertiary: #6F6F6F;
+
+  /* Borders */
+  --color-border: #C6C6C6;
+  --color-border-input: #4C6272;
+
+  /* Severity system */
+  --color-critical: #DA1E28;
+  --color-critical-bg: #FFF1F1;
+  --color-critical-text: #A2191F;
+  --color-major: #FF832B;
+  --color-major-bg: #FFF2E8;
+  --color-major-text: #BA4E00;
+  --color-warning: #F1C21B;
+  --color-warning-bg: #FFF8E1;
+  --color-warning-text: #8E6A00;
+  --color-success: #24A148;
+  --color-success-bg: #DEFBE6;
+  --color-success-text: #0E6027;
+  --color-info: #0043CE;
+  --color-info-bg: #EDF5FF;
+  --color-info-text: #002D9C;
+  --color-na: #6F6F6F;
+  --color-na-bg: #F4F4F4;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    background: var(--color-page);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+}

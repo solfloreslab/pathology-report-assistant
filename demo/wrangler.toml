@@ -7,4 +7,8 @@ compatibility_date = "2024-01-01"
 # NEVER put actual keys here — use `wrangler secret put` only.
 
 [vars]
-ENVIRONMENT = "production"
+ENVIRONMENT = "development"
+
+# Dev-only: in production, use wrangler secret put
+[env.dev.vars]
+# Keys are loaded from .dev.vars file automatically

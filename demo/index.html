@@ -3,1487 +3,760 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pathology Report Structuring Agent</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Pathology Report Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f0f4f8;
-    --surface: #ffffff;
-    --surface-alt: #f8fafc;
-    --border: #e2e8f0;
-    --border-light: #f1f5f9;
-    --text: #1e293b;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
-    --primary: #3b82f6;
-    --primary-dark: #2563eb;
-    --primary-light: #dbeafe;
-    --primary-glow: rgba(59,130,246,0.15);
-    --accent: #6366f1;
-    --accent-light: #e0e7ff;
-    --green: #10b981;
-    --green-light: #d1fae5;
-    --green-dark: #059669;
-    --yellow: #f59e0b;
-    --yellow-light: #fef3c7;
-    --red: #ef4444;
-    --red-light: #fee2e2;
-    --red-dark: #dc2626;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --radius-lg: 16px;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
-    --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
-    --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* ===== HEADER ===== */
-  .header {
-    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 50%, #1e1b4b 100%);
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 600px 300px at 20% 50%, rgba(59,130,246,0.15), transparent),
-      radial-gradient(ellipse 400px 200px at 80% 30%, rgba(99,102,241,0.12), transparent);
-    pointer-events: none;
-  }
-
-  .header-inner {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 28px 32px 24px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-
-  .header-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(59,130,246,0.3);
-  }
-
-  .header-icon svg {
-    width: 26px;
-    height: 26px;
-    fill: none;
-    stroke: #fff;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .header-text h1 {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.025em;
-    line-height: 1.2;
-  }
-
-  .header-text p {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.6);
-    margin-top: 4px;
-    font-weight: 400;
-  }
-
-  .header-badges {
-    margin-left: auto;
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-
-  .header-badge {
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    border: 1px solid rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.7);
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(4px);
-  }
-
-  @media (max-width: 900px) {
-    .header-badges { display: none; }
-    .header-inner { padding: 20px 18px; }
-  }
-
-  /* ===== MAIN LAYOUT ===== */
-  .main {
-    flex: 1;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    gap: 24px;
-    padding: 24px 32px;
-    max-width: 1440px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  @media (max-width: 900px) {
-    .main {
-      grid-template-columns: 1fr;
-      padding: 16px;
-      gap: 16px;
-    }
-  }
-
-  /* ===== CARDS / PANELS ===== */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow var(--transition);
-  }
-
-  .card:hover {
-    box-shadow: var(--shadow-md);
-  }
-
-  .card-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .card-header-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 0.95rem;
-  }
-
-  .card-header-icon.input-icon {
-    background: var(--primary-light);
-    color: var(--primary);
-  }
-
-  .card-header-icon.output-icon {
-    background: var(--accent-light);
-    color: var(--accent);
-  }
-
-  .card-title {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.01em;
-  }
-
-  .card-subtitle {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 400;
-  }
-
-  .card-body {
-    padding: 20px 22px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  /* ===== FORM ELEMENTS ===== */
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .field-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  select, textarea {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.85rem;
-    color: var(--text);
-    background: var(--surface);
-    transition: border-color var(--transition), box-shadow var(--transition);
-    resize: vertical;
-  }
-
-  select:hover, textarea:hover {
-    border-color: #cbd5e1;
-  }
-
-  select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-glow);
-  }
-
-  textarea {
-    min-height: 280px;
-    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-    font-size: 0.78rem;
-    line-height: 1.7;
-    background: var(--surface-alt);
-  }
-
-  /* ===== BUTTON ===== */
-  .btn-analyze {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 13px 28px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all var(--transition);
-    box-shadow: 0 2px 8px rgba(59,130,246,0.25);
-    letter-spacing: -0.01em;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-analyze::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-    opacity: 0;
-    transition: opacity var(--transition);
-  }
-
-  .btn-analyze:hover::before { opacity: 1; }
-  .btn-analyze:hover {
-    box-shadow: 0 4px 14px rgba(59,130,246,0.35);
-    transform: translateY(-1px);
-  }
-
-  .btn-analyze:active { transform: translateY(0); }
-
-  .btn-analyze:disabled {
-    background: #94a3b8;
-    box-shadow: none;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .btn-analyze:disabled::before { display: none; }
-
-  .btn-icon {
-    display: flex;
-    align-items: center;
-  }
-
-  .btn-icon svg {
-    width: 18px;
-    height: 18px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  /* ===== PROGRESS STEPS ===== */
-  .pipeline-steps {
-    display: none;
-    padding: 16px 22px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-alt);
-    gap: 6px;
-    align-items: center;
-  }
-
-  .pipeline-steps.visible { display: flex; }
-
-  .pipeline-step {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    padding: 6px 14px;
-    border-radius: 20px;
-    background: transparent;
-    border: 1.5px solid var(--border);
-    transition: all 0.3s ease;
-  }
-
-  .pipeline-step .step-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border);
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-  }
-
-  .pipeline-step.active {
-    color: var(--primary);
-    background: var(--primary-light);
-    border-color: var(--primary);
-  }
-
-  .pipeline-step.active .step-dot {
-    background: var(--primary);
-    animation: dotPulse 1.2s ease-in-out infinite;
-  }
-
-  .pipeline-step.done {
-    color: var(--green-dark);
-    background: var(--green-light);
-    border-color: var(--green);
-  }
-
-  .pipeline-step.done .step-dot {
-    background: var(--green);
-  }
-
-  .step-connector {
-    width: 20px;
-    height: 1.5px;
-    background: var(--border);
-    flex-shrink: 0;
-  }
-
-  @keyframes dotPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.6); opacity: 0.6; }
-  }
-
-  /* ===== RESULTS AREA ===== */
-  .result-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    color: var(--text-muted);
-    font-size: 0.88rem;
-    text-align: center;
-    padding: 50px 30px;
-    gap: 16px;
-  }
-
-  .placeholder-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
-    background: var(--surface-alt);
-    border: 2px dashed var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    color: var(--text-muted);
-  }
-
-  .results { display: none; flex-direction: column; gap: 18px; }
-  .results.visible { display: flex; }
-
-  /* ===== COMPLETENESS SCORE ===== */
-  .score-card {
-    padding: 20px;
-    border-radius: var(--radius);
-    border: 1.5px solid var(--border);
-    background: var(--surface-alt);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .score-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-  }
-
-  .score-card.green::before { background: linear-gradient(90deg, var(--green), #34d399); }
-  .score-card.yellow::before { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
-  .score-card.red::before { background: linear-gradient(90deg, var(--red), #f87171); }
-
-  .score-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 12px;
-  }
-
-  .score-label {
-    font-weight: 600;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-
-  .score-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-  }
-
-  .score-number {
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1;
-  }
-
-  .score-status {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 2px 10px;
-    border-radius: 10px;
-  }
-
-  .score-status.green { background: var(--green-light); color: var(--green-dark); }
-  .score-status.yellow { background: var(--yellow-light); color: #92400e; }
-  .score-status.red { background: var(--red-light); color: var(--red-dark); }
-
-  .score-bar-track {
-    height: 8px;
-    background: var(--border-light);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .score-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-    position: relative;
-  }
-
-  .score-bar-fill.green { background: linear-gradient(90deg, var(--green), #34d399); }
-  .score-bar-fill.yellow { background: linear-gradient(90deg, var(--yellow), #fbbf24); }
-  .score-bar-fill.red { background: linear-gradient(90deg, var(--red), #f87171); }
-
-  .score-fields {
-    display: flex;
-    gap: 16px;
-    margin-top: 10px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-  }
-
-  .score-fields span { font-weight: 600; color: var(--text-secondary); }
-
-  /* ===== COLLAPSIBLE SECTIONS ===== */
-  .section {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    transition: box-shadow var(--transition);
-  }
-
-  .section:hover { box-shadow: var(--shadow-sm); }
-
-  .section-toggle {
-    width: 100%;
-    padding: 14px 18px;
-    background: var(--surface);
-    border: none;
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text);
-    cursor: pointer;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: background var(--transition);
-  }
-
-  .section-toggle:hover { background: var(--surface-alt); }
-
-  .section-icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    flex-shrink: 0;
-  }
-
-  .section-icon.classify { background: var(--primary-light); color: var(--primary); }
-  .section-icon.missing { background: var(--red-light); color: var(--red); }
-  .section-icon.incon { background: var(--yellow-light); color: #92400e; }
-  .section-icon.extract { background: var(--green-light); color: var(--green-dark); }
-
-  .section-toggle .count-badge {
-    margin-left: auto;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    background: var(--surface-alt);
-    color: var(--text-muted);
-    border: 1px solid var(--border);
-  }
-
-  .count-badge.alert {
-    background: var(--red-light);
-    color: var(--red-dark);
-    border-color: #fca5a5;
-  }
-
-  .section-toggle .arrow-icon {
-    margin-left: auto;
-    transition: transform 0.25s ease;
-    color: var(--text-muted);
-    font-size: 0.6rem;
-    flex-shrink: 0;
-  }
-
-  .section.open .arrow-icon { transform: rotate(90deg); }
-
-  .section-content {
-    display: none;
-    padding: 16px 18px;
-    border-top: 1px solid var(--border-light);
-    background: var(--surface-alt);
-  }
-
-  .section.open .section-content { display: block; }
-
-  /* ===== CLASSIFICATION CHIPS ===== */
-  .chip-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    background: var(--primary-light);
-    color: var(--primary-dark);
-    border: 1px solid #93c5fd;
-  }
-
-  .chip.confidence {
-    background: var(--green-light);
-    color: var(--green-dark);
-    border-color: #6ee7b7;
-  }
-
-  .chip.protocol {
-    background: var(--accent-light);
-    color: #4338ca;
-    border-color: #a5b4fc;
-  }
-
-  .chip.review {
-    background: var(--red-light);
-    color: var(--red-dark);
-    border-color: #fca5a5;
-  }
-
-  .chip-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ===== ALERT LIST ===== */
-  .alert-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .alert-item {
-    padding: 12px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    transition: transform var(--transition);
-  }
-
-  .alert-item:hover { transform: translateX(2px); }
-
-  .alert-item.critical {
-    background: var(--red-light);
-    border-left: 3px solid var(--red);
-  }
-
-  .alert-item.major, .alert-item.warning {
-    background: var(--yellow-light);
-    border-left: 3px solid var(--yellow);
-  }
-
-  .alert-item.minor {
-    background: var(--primary-light);
-    border-left: 3px solid var(--primary);
-  }
-
-  .alert-item.error {
-    background: var(--red-light);
-    border-left: 3px solid var(--red);
-  }
-
-  .alert-severity {
-    flex-shrink: 0;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 0.62rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .alert-severity.critical { background: var(--red); color: #fff; }
-  .alert-severity.major, .alert-severity.warning { background: var(--yellow); color: #fff; }
-  .alert-severity.minor { background: var(--primary); color: #fff; }
-  .alert-severity.error { background: var(--red); color: #fff; }
-
-  .alert-body { flex: 1; }
-  .alert-field { font-weight: 700; color: var(--text); }
-  .alert-rec { color: var(--text-secondary); font-size: 0.76rem; margin-top: 2px; display: block; }
-
-  .no-issues {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--green-dark);
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 8px 0;
-  }
-
-  /* ===== DATA TABLE ===== */
-  .data-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 0.8rem;
-  }
-
-  .data-table th {
-    padding: 8px 14px;
-    text-align: left;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    font-size: 0.68rem;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid var(--border);
-  }
-
-  .data-table td {
-    padding: 9px 14px;
-    border-bottom: 1px solid var(--border-light);
-    vertical-align: top;
-  }
-
-  .data-table tr:last-child td { border-bottom: none; }
-
-  .data-table tr:hover td { background: rgba(59,130,246,0.03); }
-
-  .data-table .field-name {
-    font-weight: 600;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-  }
-
-  .data-table .nr {
-    color: var(--red);
-    font-style: italic;
-    font-weight: 500;
-  }
-
-  /* ===== AUDIT TRAIL ===== */
-  .audit-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    padding: 14px 0 0;
-    border-top: 1px solid var(--border-light);
-    font-size: 0.72rem;
-    color: var(--text-muted);
-  }
-
-  .audit-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .audit-item strong {
-    color: var(--text-secondary);
-    font-weight: 600;
-  }
-
-  /* ===== FOOTER ===== */
-  footer {
-    padding: 18px 32px;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-align: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 6px 20px;
-  }
-
-  footer a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color var(--transition);
-  }
-
-  footer a:hover { color: var(--primary-dark); }
-
-  .footer-sep {
-    width: 3px;
-    height: 3px;
-    border-radius: 50%;
-    background: var(--border);
-  }
-
-  /* ===== ACCESS CODE ===== */
-  .access-code-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .access-code-row input {
-    flex: 1;
-    padding: 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.88rem;
-    color: var(--text);
-    background: var(--surface);
-    transition: border-color var(--transition), box-shadow var(--transition);
-    letter-spacing: 2px;
-  }
-
-  .access-code-row input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-glow);
-  }
-
-  .access-code-row input::placeholder {
-    letter-spacing: normal;
-    color: var(--text-muted);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.82rem;
-  }
-
-  .toggle-visibility {
-    background: var(--surface-alt);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 9px 10px;
-    cursor: pointer;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition);
-  }
-
-  .toggle-visibility:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-
-  /* ===== ERROR MSG ===== */
-  .error-msg {
-    display: none;
-    padding: 14px 16px;
-    background: var(--red-light);
-    border: 1.5px solid #fca5a5;
-    border-radius: var(--radius-sm);
-    color: var(--red-dark);
-    font-size: 0.84rem;
-    font-weight: 500;
-  }
-
-  .error-msg.visible { display: block; }
-
-  /* ===== ANIMATIONS ===== */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .results.visible { animation: fadeInUp 0.4s ease-out; }
-
-  /* ===== SPINNER ===== */
-  .spinner {
-    display: none;
-    width: 20px;
-    height: 20px;
-    border: 2.5px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
-  .spinner.visible { display: block; }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  :root{--bg:#f4f6f9;--s:#fff;--b:#e5e7eb;--bl:#f3f4f6;--t:#111827;--t2:#4b5563;--t3:#9ca3af;--blue:#1e40af;--bluel:#dbeafe;--bluebg:#eff6ff;--green:#047857;--greenl:#d1fae5;--yellow:#b45309;--yellowl:#fef3c7;--red:#b91c1c;--redl:#fee2e2;--orange:#c2410c;--orangel:#ffedd5;--r:8px;--rl:12px;--sh:0 1px 3px rgba(0,0,0,0.05);--shm:0 4px 12px rgba(0,0,0,0.06)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+  /* LOGIN */
+  .login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+  .login.hid{display:none}
+  .lbox{background:var(--s);border-radius:var(--rl);box-shadow:var(--shm);padding:40px 32px;max-width:380px;width:100%;text-align:center}
+  .licon{width:48px;height:48px;background:var(--blue);border-radius:10px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px}
+  .licon svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .lbox h1{font-size:1.15rem;font-weight:700;margin-bottom:4px}
+  .lbox p{font-size:0.8rem;color:var(--t2);margin-bottom:24px}
+  .lfld{position:relative;margin-bottom:14px}
+  .lfld input{width:100%;padding:11px 40px 11px 14px;border:1.5px solid var(--b);border-radius:var(--r);font-family:'JetBrains Mono',monospace;font-size:0.9rem;letter-spacing:2px;text-align:center}
+  .lfld input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,64,175,0.1)}
+  .lfld input::placeholder{letter-spacing:normal;font-family:'Inter',sans-serif;font-size:0.8rem;color:var(--t3)}
+  .lfld button{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t3);padding:4px}
+  .lbtn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer}
+  .lbtn:hover{background:#1e3a8a}
+  .lerr{display:none;margin-top:10px;padding:8px;background:var(--redl);border-radius:var(--r);color:var(--red);font-size:0.78rem}
+  .lerr.show{display:block}
+  .lfoot{margin-top:20px;font-size:0.68rem;color:var(--t3)}
+
+  /* APP */
+  .app{display:none;flex-direction:column;min-height:100vh}
+  .app.show{display:flex}
+
+  /* TOPBAR */
+  .top{background:var(--s);border-bottom:1px solid var(--b);padding:0 20px;display:flex;align-items:center;height:50px;gap:12px}
+  .tlogo{width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tlogo svg{width:14px;height:14px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .tname{font-size:0.82rem;font-weight:700}
+  .tsp{flex:1}
+  .tabs{display:flex;gap:1px;background:var(--bl);border-radius:6px;padding:2px}
+  .tab{padding:5px 16px;border:none;border-radius:5px;font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;color:var(--t3);transition:all 0.15s}
+  .tab.on{background:var(--s);color:var(--blue);box-shadow:var(--sh)}
+  .lng{padding:3px 8px;border:1.5px solid var(--b);border-radius:5px;background:var(--s);font-size:0.68rem;font-weight:700;color:var(--t3);cursor:pointer;letter-spacing:0.5px}
+  .lng:hover{border-color:var(--blue);color:var(--blue)}
+
+  /* CONTENT */
+  .cnt{flex:1;padding:8px 16px;max-width:1400px;margin:0 auto;width:100%}
+  .pnl{display:none}
+  .pnl.on{display:block}
+
+  /* CARD */
+  .cd{background:var(--s);border-radius:var(--rl);box-shadow:var(--sh);padding:12px 14px;margin-bottom:8px}
+  .cd-t{font-size:0.72rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px}
+
+  /* COPILOT LAYOUT */
+  .cop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:900px){.cop-grid{grid-template-columns:1fr}}
+  #cop-fields{max-height:calc(100vh - 140px);overflow-y:auto;padding-right:4px}
+  .frow-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  @media(max-width:600px){.frow-pair{grid-template-columns:1fr}}
+  .report-row{display:grid;grid-template-columns:1fr 280px;gap:14px}
+  @media(max-width:800px){.report-row{grid-template-columns:1fr}}
+
+  /* FORM */
+  .frow{display:flex;gap:6px;margin-bottom:5px;align-items:center}
+  .frow label{font-size:0.73rem;font-weight:600;color:var(--t2);min-width:140px;flex-shrink:0}
+  .frow select,.frow input[type=text],.frow input[type=number]{flex:1;padding:5px 8px;border:1.5px solid var(--b);border-radius:var(--r);font-size:0.78rem;color:var(--t);background:var(--s)}
+  .frow select:focus,.frow input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,64,175,0.08)}
+  .radio-group{display:flex;gap:12px;flex:1}
+  .radio-group label{min-width:auto;font-weight:500;font-size:0.8rem;display:flex;align-items:center;gap:4px;cursor:pointer}
+  .radio-group input{accent-color:var(--blue)}
+  .chk{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:0.8rem;color:var(--t2)}
+  .chk input{width:16px;height:16px;accent-color:var(--blue)}
+  textarea{width:100%;padding:10px;border:1.5px solid var(--b);border-radius:var(--r);font-size:0.84rem;line-height:1.6;resize:vertical;color:var(--t)}
+  textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(30,64,175,0.08)}
+  .mono{font-family:'JetBrains Mono',monospace;font-size:0.82rem}
+  .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+  .chip{padding:3px 10px;background:var(--bluel);border:none;border-radius:12px;font-size:0.68rem;font-weight:600;color:var(--blue);cursor:pointer}
+  .chip:hover{background:var(--blue);color:#fff}
+  .sep{border:none;border-top:1px solid var(--bl);margin:8px 0}
+
+  /* REPORT PREVIEW */
+  .report-card{background:var(--s);border-radius:var(--rl);box-shadow:var(--sh);overflow:hidden;position:sticky;top:16px}
+  .report-head{padding:8px 16px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
+  .report-head-t{font-size:0.72rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.3px}
+  .report-toolbar{display:flex;gap:2px}
+  .report-toolbar button{width:28px;height:28px;border:1px solid var(--b);border-radius:4px;background:var(--s);cursor:pointer;font-size:0.75rem;font-weight:700;color:var(--t2);display:flex;align-items:center;justify-content:center}
+  .report-toolbar button:hover{background:var(--bluel);border-color:var(--blue);color:var(--blue)}
+  .copy-b{padding:4px 12px;background:var(--bluel);border:1px solid var(--blue);border-radius:var(--r);font-size:0.68rem;font-weight:600;color:var(--blue);cursor:pointer}
+  .copy-b:hover{background:var(--blue);color:#fff}
+  .report-body{padding:16px;font-size:0.82rem;line-height:1.8;min-height:200px;color:var(--t2);max-height:70vh;overflow-y:auto;outline:none}
+  .report-body .section-title{font-weight:700;color:var(--t);text-transform:uppercase;margin-top:12px}
+  .report-body .section-title:first-child{margin-top:0}
+  .report-empty{color:var(--t3);font-style:italic;text-align:center;padding:40px 20px}
+  .report-foot{padding:10px 16px;border-top:1px solid var(--bl);display:flex;justify-content:space-between;font-size:0.7rem;color:var(--t3)}
+  .report-foot .ok{color:var(--green);font-weight:600}
+  .report-foot .pend{color:var(--yellow);font-weight:600}
+
+  /* SIDEBAR MISSING */
+  .missing-card{background:var(--s);border-radius:var(--rl);box-shadow:var(--sh);padding:14px;margin-top:14px}
+  .missing-t{font-size:0.72rem;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:8px}
+  .missing-item{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:0.75rem;color:var(--t2)}
+  .missing-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .missing-dot.req{background:var(--orange)}
+  .missing-dot.rec{background:var(--t3)}
+  .missing-item.filled{color:var(--green);text-decoration:line-through;opacity:0.5}
+  .missing-item.filled .missing-dot{background:var(--green)}
+
+  /* AI REVIEW */
+  .ai-bar{margin-top:14px;display:flex;gap:8px}
+  .ai-btn{flex:1;padding:10px;background:var(--s);border:1.5px solid var(--blue);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+  .ai-btn:hover{background:var(--bluebg)}
+  .ai-btn:disabled{border-color:var(--t3);color:var(--t3);cursor:not-allowed}
+  .ai-btn .spinner{display:none;width:14px;height:14px;border:2px solid var(--t3);border-top-color:var(--blue);border-radius:50%;animation:spin 0.6s linear infinite}
+  .ai-btn .spinner.on{display:block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spin-dots{display:inline-block;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  /* AI RESULTS */
+  .ai-results{display:none;margin-top:14px}
+  .ai-results.show{display:block}
+  .alert{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--r);margin-bottom:4px;font-size:0.76rem}
+  .alert.critical{background:var(--redl);border-left:3px solid var(--red)}
+  .alert.major,.alert.warning{background:var(--yellowl);border-left:3px solid var(--yellow)}
+  .alert.minor{background:var(--bluel);border-left:3px solid var(--blue)}
+  .atag{padding:1px 5px;border-radius:3px;font-size:0.58rem;font-weight:800;text-transform:uppercase;color:#fff;flex-shrink:0}
+  .atag.critical{background:var(--red)}
+  .atag.major,.atag.warning{background:var(--yellow)}
+  .atag.minor{background:var(--blue)}
+  .abody{flex:1}
+  .afld{font-weight:700}
+  .arec{display:block;font-size:0.7rem;color:var(--t2);margin-top:2px}
+
+  /* AUDITOR */
+  .sec{background:var(--s);border-radius:var(--rl);box-shadow:var(--sh);margin-bottom:8px;overflow:hidden}
+  .sec-h{display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;font-size:0.8rem;font-weight:700;border:none;background:none;width:100%;text-align:left;color:var(--t)}
+  .sec-h:hover{background:var(--bg)}
+  .sec-badge{padding:1px 7px;border-radius:8px;font-size:0.62rem;font-weight:800;background:var(--redl);color:var(--red)}
+  .sec-arr{margin-left:auto;font-size:0.6rem;color:var(--t3);transition:transform 0.15s}
+  .sec.open .sec-arr{transform:rotate(90deg)}
+  .sec-b{display:none;padding:0 16px 14px}
+  .sec.open .sec-b{display:block}
+  .score-big{font-size:1.8rem;font-weight:800;line-height:1}
+  .score-big.green{color:var(--green)}.score-big.yellow{color:var(--yellow)}.score-big.red{color:var(--red)}
+  .sbar{height:5px;background:var(--bl);border-radius:3px;overflow:hidden}
+  .sfill{height:100%;border-radius:3px;transition:width 0.5s}
+  .sfill.green{background:var(--green)}.sfill.yellow{background:var(--yellow)}.sfill.red{background:var(--red)}
+  .sst{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;padding:2px 7px;border-radius:6px}
+  .sst.green{background:var(--greenl);color:var(--green)}.sst.yellow{background:var(--yellowl);color:var(--yellow)}.sst.red{background:var(--redl);color:var(--red)}
+  .dtable{width:100%;border-collapse:collapse;font-size:0.78rem}
+  .dtable th{padding:6px 12px;text-align:left;font-weight:700;color:var(--t3);text-transform:uppercase;font-size:0.65rem;border-bottom:2px solid var(--b)}
+  .dtable td{padding:7px 12px;border-bottom:1px solid var(--bl)}
+  .fn{font-weight:600}.nr{color:var(--red);font-style:italic}
+  .noiss{color:var(--green);font-size:0.8rem;font-weight:600;padding:6px 0}
+  .audit{display:flex;flex-wrap:wrap;gap:3px 12px;padding:10px 16px;font-size:0.68rem;color:var(--t3);border-top:1px solid var(--bl)}
+  .audit strong{color:var(--t2)}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer}
+  .btn:hover{background:#1e3a8a}.btn:disabled{background:var(--t3);cursor:not-allowed}
+  .btn .spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite}
+  .btn .spinner.on{display:block}
+  .err{display:none;margin-top:10px;padding:10px;background:var(--redl);border-radius:var(--r);color:var(--red);font-size:0.8rem}
+  .err.show{display:block}
+
+  /* FOOTER */
+  .foot{padding:12px 20px;border-top:1px solid var(--b);background:var(--s);font-size:0.68rem;color:var(--t3);text-align:center;display:flex;flex-wrap:wrap;justify-content:center;gap:5px 14px}
+  .foot a{color:var(--blue);text-decoration:none;font-weight:600}
+
+  @media(max-width:600px){.top{padding:0 12px}.tname{display:none}.cnt{padding:12px}.cd{padding:14px}.frow{flex-direction:column;align-items:stretch}.frow label{min-width:auto}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-inner">
-    <div class="header-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-        <rect x="9" y="3" width="6" height="4" rx="1"/>
-        <path d="M9 14l2 2 4-4"/>
-      </svg>
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="lbox">
+    <div class="licon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+    <h1 data-i18n="lt">Pathology Report Assistant</h1>
+    <p data-i18n="ls">AI-assisted structured reporting following CAP/ICCR protocols.</p>
+    <div class="lfld">
+      <input type="password" id="lcode" data-ph="lph" placeholder="Access code" autocomplete="off">
+      <button type="button" id="ltog"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
-    <div class="header-text">
-      <h1>Pathology Report Structuring Agent</h1>
-      <p>AI-powered structured data extraction and quality control following CAP/ICCR protocols</p>
-    </div>
-    <div class="header-badges">
-      <span class="header-badge">CAP / ICCR</span>
-      <span class="header-badge">5 Protocols</span>
-      <span class="header-badge">Synthetic Data Only</span>
-    </div>
+    <button class="lbtn" id="lgo" type="button" data-i18n="lbtn">Enter</button>
+    <div class="lerr" id="lerr" data-i18n="lerr">Invalid access code.</div>
+    <div class="lfoot" data-i18n="lft">Not a medical device. For demonstration only. All data is synthetic.</div>
   </div>
 </div>
 
-<!-- MAIN -->
-<div class="main">
-  <!-- LEFT: Input -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-header-icon input-icon">&#9997;</div>
-      <div>
-        <div class="card-title">Input Report</div>
-        <div class="card-subtitle">Paste a pathology report or select a sample case</div>
-      </div>
+<!-- APP -->
+<div class="app" id="app">
+  <div class="top">
+    <div class="tlogo"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+    <span class="tname" data-i18n="an">Pathology Report Assistant</span>
+    <div class="tabs">
+      <button class="tab on" data-m="copilot" type="button" data-i18n="tc">Copilot</button>
+      <button class="tab" data-m="auditor" type="button" data-i18n="ta">Auditor</button>
     </div>
-    <div class="card-body">
-      <div class="field-group">
-        <label class="field-label" for="sample-select">Sample Cases</label>
-        <select id="sample-select">
-          <option value="">-- Select a sample report --</option>
-          <option value="colon">Colon adenocarcinoma (complete resection)</option>
-          <option value="breast">Breast ductal carcinoma (BAG biopsy)</option>
-          <option value="melanoma">Cutaneous melanoma (excisional biopsy)</option>
-          <option value="cytology">Cervical cytology HSIL (Bethesda)</option>
-          <option value="gastric">Gastric carcinoma (INCOMPLETE &mdash; designed to fail)</option>
-        </select>
-      </div>
-      <div class="field-group" style="flex:1;display:flex;flex-direction:column">
-        <label class="field-label" for="report-input">Report Text</label>
-        <textarea id="report-input" placeholder="Paste a pathology report in Spanish here, or select a sample case above..."></textarea>
-      </div>
-      <div class="field-group">
-        <label class="field-label" for="access-code">Access Code</label>
-        <div class="access-code-row">
-          <input type="password" id="access-code" placeholder="Enter access code to analyze" autocomplete="off" spellcheck="false">
-          <button type="button" class="toggle-visibility" id="toggle-code" title="Show/hide code">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </button>
-        </div>
-      </div>
-      <button class="btn-analyze" id="analyze-btn" type="button">
-        <span class="btn-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-        <span id="btn-label">Analyze Report</span>
-        <div class="spinner" id="btn-spinner"></div>
-      </button>
-      <div class="error-msg" id="error-msg"></div>
-    </div>
+    <div class="tsp"></div>
+    <button class="lng" id="lbtn2" type="button">ES</button>
   </div>
 
-  <!-- RIGHT: Results -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-header-icon output-icon">&#128202;</div>
-      <div>
-        <div class="card-title">Analysis Results</div>
-        <div class="card-subtitle">Classification, extraction, and quality validation</div>
-      </div>
-    </div>
-
-    <div class="pipeline-steps" id="steps">
-      <div class="pipeline-step" id="step-classify"><span class="step-dot"></span> Classifying</div>
-      <div class="step-connector"></div>
-      <div class="pipeline-step" id="step-extract"><span class="step-dot"></span> Extracting</div>
-      <div class="step-connector"></div>
-      <div class="pipeline-step" id="step-validate"><span class="step-dot"></span> Validating</div>
-    </div>
-
-    <div class="card-body">
-      <div class="result-placeholder" id="placeholder">
-        <div class="placeholder-icon">&#128300;</div>
+  <div class="cnt">
+    <!-- COPILOT -->
+    <div class="pnl on" id="p-cop">
+      <div class="cop-grid">
+        <!-- LEFT: Protocol + Notes -->
         <div>
-          <div style="font-weight:600;color:var(--text-secondary);margin-bottom:4px">Ready to analyze</div>
-          Select a sample report or paste your own, then click <strong>Analyze Report</strong>
+          <div class="cd">
+            <div class="cd-t" data-i18n="ct">Copilot — Build your report</div>
+            <div class="frow">
+              <label data-i18n="lp">Protocol</label>
+              <select id="cop-proto">
+                <option value="colon-resection">Colon resection</option>
+                <option value="breast-biopsy">Breast biopsy (BAG)</option>
+                <option value="melanoma">Cutaneous melanoma</option>
+                <option value="gastric">Gastric resection</option>
+                <option value="cytology-cervical">Cervical cytology</option>
+              </select>
+            </div>
+            <div class="chk">
+              <input type="checkbox" id="cop-macro">
+              <label for="cop-macro" data-i18n="lm">Include macroscopic description</label>
+            </div>
+
+            <hr class="sep">
+            <div class="cd-t" data-i18n="nq">Quick notes (optional)</div>
+            <div class="chips" id="cop-chips"></div>
+            <textarea id="cop-notes" class="mono" rows="5" data-ph="cph" placeholder="e.g.: sigmoide adeno mod G2 s/perineural 2/18 gang marg 3cm ILV+ MMR conservado"></textarea>
+            <div style="height:6px"></div>
+            <button class="btn" id="cop-parse" type="button" style="background:var(--t2);font-size:0.78rem;padding:8px" data-i18n="cpb">Pre-fill from notes</button>
+          </div>
+
+          <!-- AI Review -->
+          <div class="ai-bar">
+            <button class="ai-btn" id="ai-review" type="button">
+              <span data-i18n="arb">Review with AI</span>
+              <div class="spinner" id="ai-spin"></div>
+            </button>
+          </div>
+          <div class="ai-results" id="ai-results">
+            <div class="cd" id="ai-alerts"></div>
+          </div>
         </div>
+
+        <!-- RIGHT: Protocol fields -->
+        <div>
+          <div class="cd">
+            <div class="cd-t" data-i18n="ff">Protocol fields</div>
+            <div id="cop-fields"></div>
+          </div>
+        </div>
+
       </div>
 
-      <div class="results" id="results">
-        <!-- Completeness Score -->
-        <div class="score-card" id="score-card">
-          <div class="score-header">
-            <div>
-              <div class="score-label">Report Completeness</div>
-              <div class="score-fields" id="score-fields"></div>
+      <!-- REPORT + MISSING below form -->
+      <div class="report-row">
+        <div class="report-card">
+          <div class="report-head">
+            <span class="report-head-t" data-i18n="rpt">Report Preview</span>
+            <div class="report-toolbar">
+              <button type="button" onclick="document.execCommand('bold')" title="Bold"><b>B</b></button>
+              <button type="button" onclick="document.execCommand('italic')" title="Italic"><i>I</i></button>
+              <button type="button" onclick="document.execCommand('underline')" title="Underline"><u>U</u></button>
+              <button type="button" onclick="document.execCommand('insertUnorderedList')" title="List">•</button>
+              <button type="button" onclick="document.execCommand('formatBlock',false,'H3')" title="Heading" style="font-size:0.65rem">H</button>
             </div>
-            <div class="score-meta">
-              <div class="score-number" id="score-number">--</div>
-              <div class="score-status" id="score-status"></div>
-            </div>
+            <button class="copy-b" id="cop-copy" type="button" data-i18n="cpb2">Copy</button>
           </div>
-          <div class="score-bar-track">
-            <div class="score-bar-fill" id="score-bar" style="width:0%"></div>
+          <div class="report-body" id="cop-report" contenteditable="true">
+            <div class="report-empty" data-i18n="re">Fill in fields to generate the report</div>
           </div>
-        </div>
-
-        <!-- Classification -->
-        <div class="section open" id="sec-classification">
-          <button class="section-toggle" type="button" onclick="toggleSection('sec-classification')">
-            <span class="section-icon classify">&#128301;</span>
-            Classification
-            <span class="arrow-icon">&#9654;</span>
-          </button>
-          <div class="section-content">
-            <div class="chip-grid" id="classification-chips"></div>
+          <div class="report-foot">
+            <span id="cop-stats"></span>
           </div>
         </div>
 
-        <!-- Missing Fields -->
-        <div class="section open" id="sec-missing">
-          <button class="section-toggle" type="button" onclick="toggleSection('sec-missing')">
-            <span class="section-icon missing">&#9888;</span>
-            Missing / Incomplete Fields
-            <span class="count-badge" id="missing-count" style="display:none"></span>
-            <span class="arrow-icon">&#9654;</span>
-          </button>
-          <div class="section-content">
-            <div class="alert-list" id="missing-list"></div>
-          </div>
+        <div class="missing-card" style="position:sticky;top:60px;align-self:start">
+          <div class="missing-t" data-i18n="mt">Missing fields</div>
+          <div id="cop-missing"></div>
         </div>
+      </div>
+    </div>
 
-        <!-- Inconsistencies -->
-        <div class="section" id="sec-inconsistencies">
-          <button class="section-toggle" type="button" onclick="toggleSection('sec-inconsistencies')">
-            <span class="section-icon incon">&#128269;</span>
-            Inconsistencies
-            <span class="count-badge" id="incon-count" style="display:none"></span>
-            <span class="arrow-icon">&#9654;</span>
-          </button>
-          <div class="section-content">
-            <div class="alert-list" id="inconsistency-list"></div>
+    <!-- AUDITOR -->
+    <div class="pnl" id="p-aud">
+      <div class="cd">
+        <div class="cd-t" data-i18n="at">Auditor — Check report completeness</div>
+        <div class="chips" id="aud-chips"></div>
+        <textarea id="aud-input" rows="10" data-ph="aph" placeholder="Paste a complete pathology report here..."></textarea>
+        <div style="height:10px"></div>
+        <button class="btn" id="aud-go" type="button">
+          <span id="aud-go-t" data-i18n="ab">Audit Report</span>
+          <div class="spinner" id="aud-spin"></div>
+        </button>
+        <div class="err" id="aud-err"></div>
+      </div>
+      <div id="aud-res" style="display:none">
+        <div class="cd" id="aud-score-cd">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px">
+            <div><div class="cd-t" data-i18n="sl">Report Completeness</div><div id="aud-det" style="font-size:0.75rem;color:var(--t2)"></div></div>
+            <div style="text-align:right"><div class="score-big" id="aud-sn">--</div><span class="sst" id="aud-ss"></span></div>
           </div>
+          <div class="sbar"><div class="sfill" id="aud-sb" style="width:0"></div></div>
         </div>
-
-        <!-- Extracted Data -->
-        <div class="section" id="sec-extraction">
-          <button class="section-toggle" type="button" onclick="toggleSection('sec-extraction')">
-            <span class="section-icon extract">&#128203;</span>
-            Extracted Data
-            <span class="count-badge" id="fields-count" style="display:none"></span>
-            <span class="arrow-icon">&#9654;</span>
-          </button>
-          <div class="section-content">
-            <table class="data-table" id="extraction-table">
-              <thead><tr><th>Field</th><th>Value</th></tr></thead>
-              <tbody id="extraction-body"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Audit Trail -->
-        <div class="audit-bar" id="audit-trail"></div>
+        <div class="sec open" id="as-miss"><button class="sec-h" type="button" onclick="togSec('as-miss')"><span data-i18n="sm">Missing Fields</span><span class="sec-badge" id="aud-mn" style="display:none"></span><span class="sec-arr">&#9654;</span></button><div class="sec-b" id="aud-ml"></div></div>
+        <div class="sec" id="as-inc"><button class="sec-h" type="button" onclick="togSec('as-inc')"><span data-i18n="si">Inconsistencies</span><span class="sec-badge" id="aud-in" style="display:none"></span><span class="sec-arr">&#9654;</span></button><div class="sec-b" id="aud-il"></div></div>
+        <div class="sec" id="as-data"><button class="sec-h" type="button" onclick="togSec('as-data')"><span data-i18n="sd">Extracted Data</span><span class="sec-badge" id="aud-dn" style="display:none"></span><span class="sec-arr">&#9654;</span></button><div class="sec-b"><table class="dtable"><thead><tr><th data-i18n="tf">Field</th><th data-i18n="tv">Value</th></tr></thead><tbody id="aud-tb"></tbody></table></div></div>
+        <div class="audit" id="aud-audit"></div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- FOOTER -->
-<footer>
-  <span>Not a medical device &mdash; for demonstration purposes only</span>
-  <span class="footer-sep"></span>
-  <span>All data is synthetic</span>
-  <span class="footer-sep"></span>
-  <a href="https://github.com/solfloreslab/pathology-report-agent" target="_blank" rel="noopener">GitHub</a>
-  <span class="footer-sep"></span>
-  <span>Built by a pathologist &amp; AI engineer</span>
-</footer>
+  <div class="foot">
+    <span data-i18n="f1">Not a medical device — for demonstration only</span><span>·</span>
+    <span data-i18n="f2">All data is synthetic</span><span>·</span>
+    <a href="https://github.com/solfloreslab/pathology-report-agent" target="_blank">GitHub</a>
+  </div>
+</div>
 
 <script>
-// --- Sample reports (embedded) ---
-const SAMPLES = {
-  colon: `INFORME DE ANATOMÍA PATOLÓGICA
+// === I18N ===
+const T={en:{lt:"Pathology Report Assistant",ls:"AI-assisted structured reporting following CAP/ICCR protocols.",lph:"Access code",lbtn:"Enter",lerr:"Invalid access code.",lft:"Not a medical device. For demonstration only. All data is synthetic.",an:"Pathology Report Assistant",tc:"Copilot",ta:"Auditor",ct:"Copilot — Build your report",lp:"Protocol",lm:"Include macroscopic description",nq:"Quick notes (optional)",cph:"e.g.: sigmoide adeno mod G2 s/perineural 2/18 gang marg 3cm ILV+ MMR conservado",cpb:"Pre-fill from notes",ff:"Protocol fields",arb:"Review with AI",arbl:"Reviewing...",rpt:"Report Preview",cpb2:"Copy",copied:"Copied!",re:"Fill in fields to generate the report",mt:"Missing fields",at:"Auditor — Check report completeness",aph:"Paste a complete pathology report here...",ab:"Audit Report",abl:"Auditing...",sl:"Report Completeness",sm:"Missing Fields",si:"Inconsistencies",sd:"Extracted Data",tf:"Field",tv:"Value",f1:"Not a medical device — for demonstration only",f2:"All data is synthetic",nm:"No missing required fields",ni:"No inconsistencies detected",nr:"Not reported",ee:"Please enter text.",en2:"Connection error.",ex1:"Colon",ex2:"Breast",ex3:"Melanoma",ex4:"Gastric (inc.)",exf1:"Colon (complete)",exf2:"Breast (BAG)",exf3:"Gastric (inc.)",present:"Present",absent:"Absent",yes:"Yes",no:"No",completed:"completed",pending:"pending",missing:"missing"},es:{lt:"Asistente de Informes de Patología",ls:"Informes estructurados asistidos por IA según protocolos CAP/ICCR.",lph:"Código de acceso",lbtn:"Entrar",lerr:"Código de acceso incorrecto.",lft:"No es un dispositivo médico. Solo para demostración. Datos sintéticos.",an:"Asistente de Informes de Patología",tc:"Copiloto",ta:"Auditor",ct:"Copiloto — Construye tu informe",lp:"Protocolo",lm:"Incluir descripción macroscópica",nq:"Notas rápidas (opcional)",cph:"ej.: sigmoide adeno mod G2 s/perineural 2/18 gang marg 3cm ILV+ MMR conservado",cpb:"Pre-llenar desde notas",ff:"Campos del protocolo",arb:"Revisar con IA",arbl:"Revisando...",rpt:"Vista previa del informe",cpb2:"Copiar",copied:"¡Copiado!",re:"Rellena campos para generar el informe",mt:"Campos faltantes",at:"Auditor — Verificar completitud del informe",aph:"Pegue un informe de patología completo aquí...",ab:"Auditar informe",abl:"Auditando...",sl:"Completitud del informe",sm:"Campos faltantes",si:"Inconsistencias",sd:"Datos extraídos",tf:"Campo",tv:"Valor",f1:"No es un dispositivo médico — solo para demostración",f2:"Todos los datos son sintéticos",nm:"No faltan campos obligatorios",ni:"No se detectaron inconsistencias",nr:"No reportado",ee:"Introduzca texto.",en2:"Error de conexión.",ex1:"Colon",ex2:"Mama",ex3:"Melanoma",ex4:"Gástrico (inc.)",exf1:"Colon (completo)",exf2:"Mama (BAG)",exf3:"Gástrico (inc.)",present:"Presente",absent:"Ausente",yes:"Sí",no:"No",completed:"completados",pending:"pendientes",missing:"faltantes"}};
+let lang="en";
+function setLang(l){lang=l;document.getElementById("lbtn2").textContent=l==="en"?"ES":"EN";document.querySelectorAll("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");if(T[l][k])e.textContent=T[l][k]});document.querySelectorAll("[data-ph]").forEach(e=>{const k=e.getAttribute("data-ph");if(T[l][k])e.placeholder=T[l][k]});buildChips();buildForm(document.getElementById("cop-proto").value)}
+function t(k){return T[lang][k]||k}
 
-Nº Biopsia: AP-2026-00341
-Paciente: Martínez Ruiz, Carmen (ID: 00101)
-Fecha recepción: 2026-03-10
-Médico solicitante: Dr. García López (Cirugía General)
-Tipo de muestra: Hemicolectomía derecha
-
-DESCRIPCIÓN MACROSCÓPICA:
-Segmento de colon derecho de 22 cm de longitud que incluye 8 cm de íleon terminal y apéndice cecal. A 6 cm del margen de resección distal se identifica una lesión exofítica de 4,5 x 3,2 cm que ocupa el 60% de la circunferencia. La lesión infiltra hasta la grasa pericolónica. Se aíslan 18 ganglios linfáticos.
-
-DESCRIPCIÓN MICROSCÓPICA:
-Adenocarcinoma de tipo intestinal moderadamente diferenciado (G2) que infiltra a través de la muscular propia hasta la subserosa (tejido adiposo pericolónico) sin alcanzar la superficie serosa. Se identifica invasión linfovascular. No se observa invasión perineural. Márgenes de resección proximal y distal libres de tumor (margen más cercano a 4,2 cm). Margen radial libre (>1 mm).
-De los 18 ganglios aislados, 3 presentan metástasis de adenocarcinoma (3/18), sin extensión extranodal.
-Apéndice cecal sin alteraciones significativas.
-Mucosa adyacente con adenoma tubular con displasia de bajo grado.
-
-DIAGNÓSTICO:
-Adenocarcinoma de colon derecho (ciego), tipo intestinal, moderadamente diferenciado (G2).
-Estadificación patológica: pT3 N1a (3/18) M0 — Estadio IIIB (AJCC 8ª ed.)
-Márgenes libres. Invasión linfovascular presente. Invasión perineural ausente.
-
-INMUNOHISTOQUÍMICA:
-- MLH1: Expresión conservada
-- MSH2: Expresión conservada
-- MSH6: Expresión conservada
-- PMS2: Expresión conservada
-Conclusión: Sin pérdida de expresión de proteínas reparadoras (no sugestivo de inestabilidad de microsatélites).
-
-Firmado: Dra. [Patóloga responsable]
-Fecha informe: 2026-03-14`,
-
-  breast: `INFORME DE ANATOMÍA PATOLÓGICA
-
-Nº Biopsia: AP-2026-00342
-Paciente: López Fernández, María (ID: 00102)
-Fecha recepción: 2026-03-11
-Médico solicitante: Dra. Sánchez Vega (Ginecología)
-Tipo de muestra: BAG mama izquierda (CSE), 4 cilindros
-
-DESCRIPCIÓN MICROSCÓPICA:
-Los cuatro cilindros muestran infiltración por carcinoma ductal infiltrante de tipo no especial (NOS), grado histológico 2 (formación tubular: 3, pleomorfismo nuclear: 2, índice mitótico: 1; score de Nottingham 6/9).
-Se observa componente de carcinoma ductal in situ asociado, patrón cribiforme, grado nuclear intermedio, sin necrosis.
-
-DIAGNÓSTICO:
-Carcinoma ductal infiltrante, tipo NOS, grado histológico 2 (Nottingham).
-Componente in situ asociado (CDIS cribiforme, grado intermedio).
-
-INMUNOHISTOQUÍMICA / BIOMARCADORES:
-- Receptores de estrógeno (RE): Positivo, 90% de células tumorales, intensidad fuerte (Allred 8/8)
-- Receptores de progesterona (RP): Positivo, 70%, intensidad moderada (Allred 7/8)
-- HER2/neu: Negativo (score 1+)
-- Ki-67: 15%
-Perfil molecular subrogado: Luminal A-like
-
-Firmado: Dra. [Patóloga responsable]
-Fecha informe: 2026-03-14`,
-
-  melanoma: `INFORME DE ANATOMÍA PATOLÓGICA
-
-Nº Biopsia: AP-2026-00343
-Paciente: Navarro Blanco, Pedro (ID: 00103)
-Fecha recepción: 2026-03-09
-Médico solicitante: Dr. Rodríguez Pérez (Dermatología)
-Tipo de muestra: Biopsia escisional lesión pigmentada espalda
-
-DESCRIPCIÓN MACROSCÓPICA:
-Elipse cutánea de 2,5 x 1,8 x 0,6 cm con lesión pigmentada asimétrica de 1,2 cm de diámetro mayor, coloración heterogénea marrón-negra.
-
-DESCRIPCIÓN MICROSCÓPICA:
-Melanoma de extensión superficial con componente invasivo.
-Espesor de Breslow: 1,8 mm. Nivel de Clark: IV (infiltra dermis reticular).
-Índice mitótico: 3 mitosis/mm². Ulceración: Presente.
-Invasión linfovascular: No identificada. Neurotropismo: No identificado.
-Satelitosis microscópica: No identificada. Regresión: Ausente.
-Bordes laterales: Libres (margen más cercano 3 mm). Borde profundo: Libre (margen 2 mm).
-Infiltrado linfocitario tumoral: No intenso (non-brisk).
-
-DIAGNÓSTICO:
-Melanoma cutáneo de extensión superficial, espalda.
-Breslow 1,8 mm, Clark IV, ulcerado, 3 mitosis/mm².
-pT2b (AJCC 8ª edición). Márgenes libres (recomendable ampliación a 1-2 cm según protocolo).
-
-Firmado: Dra. [Patóloga responsable]
-Fecha informe: 2026-03-13`,
-
-  cytology: `INFORME DE CITOLOGÍA
-
-Nº Citología: CIT-2026-01587
-Paciente: Torres Moreno, Laura (ID: 00104)
-Fecha recepción: 2026-03-12
-Médico solicitante: Dra. Díaz García (Ginecología)
-Tipo de muestra: Citología cérvico-vaginal (medio líquido)
-
-IDONEIDAD DE LA MUESTRA:
-Satisfactoria para evaluación. Presencia de componente endocervical/zona de transformación.
-
-RESULTADO (Sistema Bethesda 2014):
-Lesión intraepitelial escamosa de alto grado (HSIL).
-Se observan células escamosas con aumento de relación núcleo-citoplasma, hipercromasia nuclear e irregularidad de la membrana nuclear, compatibles con CIN 2-3.
-No se identifican células glandulares atípicas.
-
-OBSERVACIONES:
-Se recomienda colposcopia con biopsia dirigida según protocolo.
-Correlacionar con resultado de test VPH si disponible.
-
-Firmado: Dra. [Patóloga responsable]
-Fecha informe: 2026-03-13`,
-
-  gastric: `INFORME DE ANATOMÍA PATOLÓGICA
-
-Nº Biopsia: AP-2026-00345
-Paciente: Gómez Herrera, José (ID: 00105)
-Fecha recepción: 2026-03-08
-Médico solicitante: Dr. Muñoz Serrano (Cirugía General)
-Tipo de muestra: Gastrectomía subtotal
-
-DESCRIPCIÓN MACROSCÓPICA:
-Pieza de gastrectomía subtotal de 14 cm de curvatura mayor. Lesión ulcerada de 3,8 cm en antro gástrico.
-
-DESCRIPCIÓN MICROSCÓPICA:
-Adenocarcinoma gástrico de tipo difuso con células en anillo de sello que infiltra toda la pared gástrica alcanzando la serosa. Márgenes de resección libres.
-
-DIAGNÓSTICO:
-Adenocarcinoma gástrico, tipo difuso (Lauren), células en anillo de sello. Infiltra hasta serosa.
-
-Firmado: Dra. [Patóloga responsable]
-Fecha informe: 2026-03-12`,
+// === PROTOCOL DEFINITIONS (for templates) ===
+const PROTOS={
+  "colon-resection":{
+    name_es:"Resección de colon",name_en:"Colon resection",
+    fields:[
+      {n:"procedure_type",les:"Tipo de procedimiento",len:"Procedure type",type:"text",sev:"required"},
+      {n:"tumor_location",les:"Localización del tumor",len:"Tumor location",type:"text",sev:"required"},
+      {n:"histologic_type",les:"Tipo histológico",len:"Histologic type",type:"select",vals:["Adenocarcinoma NOS","Adenocarcinoma mucinoso","Carcinoma en anillo de sello","Carcinoma medular","Otro"],sev:"required"},
+      {n:"histologic_grade",les:"Grado histológico",len:"Histologic grade",type:"select",vals:["G1","G2","G3"],sev:"required"},
+      {n:"depth_of_invasion",les:"Profundidad de invasión",len:"Depth of invasion",type:"select",vals:["Submucosa","Muscular propia","Subserosa","Serosa","Tejido pericolónico"],sev:"required"},
+      {n:"pTNM",les:"Estadificación pTNM",len:"pTNM staging",type:"text",sev:"required"},
+      {n:"lymph_nodes_examined",les:"Ganglios examinados",len:"Lymph nodes examined",type:"number",sev:"required"},
+      {n:"lymph_nodes_positive",les:"Ganglios positivos",len:"Lymph nodes positive",type:"number",sev:"required"},
+      {n:"margins_proximal",les:"Margen proximal",len:"Proximal margin",type:"text",sev:"required"},
+      {n:"margins_distal",les:"Margen distal",len:"Distal margin",type:"text",sev:"required"},
+      {n:"margins_radial",les:"Margen radial",len:"Radial margin",type:"text",sev:"required"},
+      {n:"lymphovascular_invasion",les:"Invasión linfovascular",len:"Lymphovascular invasion",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"perineural_invasion",les:"Invasión perineural",len:"Perineural invasion",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"mmr_msi",les:"MMR/MSI",len:"MMR/MSI status",type:"text",sev:"required"},
+      {n:"tumor_size",les:"Tamaño tumoral",len:"Tumor size",type:"text",sev:"recommended"},
+      {n:"tumor_perforation",les:"Perforación tumoral",len:"Tumor perforation",type:"radio",vals:["present","absent"],sev:"recommended"},
+      {n:"extranodal_extension",les:"Extensión extranodal",len:"Extranodal extension",type:"radio",vals:["present","absent"],sev:"recommended"},
+      {n:"tumor_deposits",les:"Depósitos tumorales",len:"Tumor deposits",type:"text",sev:"recommended"},
+      {n:"associated_findings",les:"Hallazgos asociados",len:"Associated findings",type:"text",sev:"recommended"},
+    ],
+    template:(d)=>{
+      let r="DESCRIPCIÓN MICROSCÓPICA:\n";
+      if(d.histologic_type)r+=`${d.histologic_type} de ${d.tumor_location||"colon"}`;
+      if(d.histologic_grade)r+=`, ${d.histologic_grade==="G1"?"bien diferenciado":d.histologic_grade==="G2"?"moderadamente diferenciado":"pobremente diferenciado"} (${d.histologic_grade})`;
+      r+=".\n";
+      if(d.depth_of_invasion)r+=`Infiltra hasta ${d.depth_of_invasion.toLowerCase()}.\n`;
+      if(d.lymphovascular_invasion)r+=`Invasión linfovascular: ${d.lymphovascular_invasion==="present"?"presente":"ausente"}.\n`;
+      if(d.perineural_invasion)r+=`Invasión perineural: ${d.perineural_invasion==="present"?"presente":"ausente"}.\n`;
+      if(d.margins_proximal||d.margins_distal||d.margins_radial){r+="Márgenes de resección: ";const m=[];if(d.margins_proximal)m.push(`proximal ${d.margins_proximal}`);if(d.margins_distal)m.push(`distal ${d.margins_distal}`);if(d.margins_radial)m.push(`radial ${d.margins_radial}`);r+=m.join(", ")+".\n"}
+      if(d.lymph_nodes_examined){r+=`Se examinan ${d.lymph_nodes_examined} ganglios linfáticos`;if(d.lymph_nodes_positive)r+=`, ${d.lymph_nodes_positive} con metástasis (${d.lymph_nodes_positive}/${d.lymph_nodes_examined})`;r+=".\n"}
+      if(d.extranodal_extension)r+=`Extensión extranodal: ${d.extranodal_extension==="present"?"presente":"no identificada"}.\n`;
+      if(d.tumor_deposits)r+=`Depósitos tumorales: ${d.tumor_deposits}.\n`;
+      if(d.tumor_perforation)r+=`Perforación tumoral: ${d.tumor_perforation==="present"?"presente":"ausente"}.\n`;
+      if(d.mmr_msi)r+=`\nMMR/MSI: ${d.mmr_msi}.\n`;
+      if(d.associated_findings)r+=`\nHallazgos asociados: ${d.associated_findings}.\n`;
+      r+="\nDIAGNÓSTICO:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}`;
+      if(d.tumor_location)r+=` de ${d.tumor_location}`;
+      if(d.histologic_grade)r+=`, ${d.histologic_grade}`;
+      r+=".\n";
+      if(d.pTNM)r+=`Estadificación patológica: ${d.pTNM}.\n`;
+      if(d.tumor_size)r+=`Tamaño tumoral: ${d.tumor_size}.\n`;
+      return r.trim();
+    }
+  },
+  "breast-biopsy":{
+    name_es:"Biopsia de mama (BAG)",name_en:"Breast biopsy (BAG)",
+    fields:[
+      {n:"histologic_type",les:"Tipo histológico",len:"Histologic type",type:"text",sev:"required"},
+      {n:"histologic_grade",les:"Grado (Nottingham)",len:"Grade (Nottingham)",type:"text",sev:"required"},
+      {n:"tubule_formation",les:"Formación tubular",len:"Tubule formation",type:"select",vals:["1","2","3"],sev:"required"},
+      {n:"nuclear_pleomorphism",les:"Pleomorfismo nuclear",len:"Nuclear pleomorphism",type:"select",vals:["1","2","3"],sev:"required"},
+      {n:"mitotic_count",les:"Índice mitótico",len:"Mitotic count",type:"select",vals:["1","2","3"],sev:"required"},
+      {n:"estrogen_receptor",les:"Receptores de estrógeno (RE)",len:"Estrogen receptor (ER)",type:"text",sev:"required"},
+      {n:"progesterone_receptor",les:"Receptores de progesterona (RP)",len:"Progesterone receptor (PR)",type:"text",sev:"required"},
+      {n:"her2_status",les:"HER2",len:"HER2 status",type:"text",sev:"required"},
+      {n:"ki67",les:"Ki-67",len:"Ki-67",type:"text",sev:"required"},
+      {n:"in_situ_component",les:"Componente in situ",len:"In situ component",type:"text",sev:"required"},
+      {n:"molecular_subtype",les:"Subtipo molecular",len:"Molecular subtype",type:"select",vals:["Luminal A","Luminal B","HER2+","Triple negativo"],sev:"recommended"},
+      {n:"tumor_size",les:"Tamaño tumoral",len:"Tumor size",type:"text",sev:"recommended"},
+    ],
+    template:(d)=>{
+      let r="DESCRIPCIÓN MICROSCÓPICA:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}`;
+      if(d.histologic_grade)r+=`, grado histológico ${d.histologic_grade}`;
+      if(d.tubule_formation&&d.nuclear_pleomorphism&&d.mitotic_count)r+=` (formación tubular: ${d.tubule_formation}, pleomorfismo nuclear: ${d.nuclear_pleomorphism}, índice mitótico: ${d.mitotic_count}; score Nottingham ${Number(d.tubule_formation)+Number(d.nuclear_pleomorphism)+Number(d.mitotic_count)}/9)`;
+      r+=".\n";
+      if(d.in_situ_component)r+=`Componente in situ asociado: ${d.in_situ_component}.\n`;
+      if(d.tumor_size)r+=`Tamaño tumoral: ${d.tumor_size}.\n`;
+      r+="\nBIOMARCADORES:\n";
+      if(d.estrogen_receptor)r+=`RE: ${d.estrogen_receptor}\n`;
+      if(d.progesterone_receptor)r+=`RP: ${d.progesterone_receptor}\n`;
+      if(d.her2_status)r+=`HER2: ${d.her2_status}\n`;
+      if(d.ki67)r+=`Ki-67: ${d.ki67}\n`;
+      if(d.molecular_subtype)r+=`Perfil molecular subrogado: ${d.molecular_subtype}\n`;
+      r+="\nDIAGNÓSTICO:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}`;
+      if(d.histologic_grade)r+=`, ${d.histologic_grade}`;
+      r+=".\n";
+      return r.trim();
+    }
+  },
+  melanoma:{
+    name_es:"Melanoma cutáneo",name_en:"Cutaneous melanoma",
+    fields:[
+      {n:"histologic_type",les:"Tipo histológico",len:"Histologic type",type:"text",sev:"required"},
+      {n:"breslow_thickness",les:"Espesor de Breslow (mm)",len:"Breslow thickness (mm)",type:"text",sev:"required"},
+      {n:"ulceration",les:"Ulceración",len:"Ulceration",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"mitotic_index",les:"Índice mitótico (mit/mm²)",len:"Mitotic index (mit/mm²)",type:"text",sev:"required"},
+      {n:"clark_level",les:"Nivel de Clark",len:"Clark level",type:"select",vals:["I","II","III","IV","V"],sev:"required"},
+      {n:"margins_lateral",les:"Margen lateral",len:"Lateral margin",type:"text",sev:"required"},
+      {n:"margins_deep",les:"Margen profundo",len:"Deep margin",type:"text",sev:"required"},
+      {n:"lymphovascular_invasion",les:"Invasión linfovascular",len:"Lymphovascular invasion",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"neurotropism",les:"Neurotropismo",len:"Neurotropism",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"microsatellitosis",les:"Satelitosis microscópica",len:"Microsatellitosis",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"pT_stage",les:"Estadio pT",len:"pT stage",type:"text",sev:"required"},
+      {n:"regression",les:"Regresión",len:"Regression",type:"radio",vals:["present","absent"],sev:"recommended"},
+      {n:"til_status",les:"TILs",len:"TIL status",type:"select",vals:["brisk","non-brisk","absent"],sev:"recommended"},
+      {n:"growth_phase",les:"Fase de crecimiento",len:"Growth phase",type:"select",vals:["radial","vertical"],sev:"recommended"},
+    ],
+    template:(d)=>{
+      let r="DESCRIPCIÓN MICROSCÓPICA:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}.\n`;
+      if(d.breslow_thickness)r+=`Espesor de Breslow: ${d.breslow_thickness} mm.\n`;
+      if(d.clark_level)r+=`Nivel de Clark: ${d.clark_level}.\n`;
+      if(d.ulceration)r+=`Ulceración: ${d.ulceration==="present"?"presente":"ausente"}.\n`;
+      if(d.mitotic_index)r+=`Índice mitótico: ${d.mitotic_index}.\n`;
+      if(d.lymphovascular_invasion)r+=`Invasión linfovascular: ${d.lymphovascular_invasion==="present"?"identificada":"no identificada"}.\n`;
+      if(d.neurotropism)r+=`Neurotropismo: ${d.neurotropism==="present"?"identificado":"no identificado"}.\n`;
+      if(d.microsatellitosis)r+=`Satelitosis microscópica: ${d.microsatellitosis==="present"?"identificada":"no identificada"}.\n`;
+      if(d.regression)r+=`Regresión: ${d.regression==="present"?"presente":"ausente"}.\n`;
+      if(d.margins_lateral||d.margins_deep){r+="Márgenes: ";const m=[];if(d.margins_lateral)m.push(`lateral ${d.margins_lateral}`);if(d.margins_deep)m.push(`profundo ${d.margins_deep}`);r+=m.join(", ")+".\n"}
+      if(d.til_status)r+=`Infiltrado linfocitario tumoral: ${d.til_status}.\n`;
+      if(d.growth_phase)r+=`Fase de crecimiento: ${d.growth_phase}.\n`;
+      r+="\nDIAGNÓSTICO:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}`;
+      if(d.breslow_thickness)r+=`, Breslow ${d.breslow_thickness} mm`;
+      if(d.clark_level)r+=`, Clark ${d.clark_level}`;
+      if(d.ulceration)r+=`, ${d.ulceration==="present"?"ulcerado":"no ulcerado"}`;
+      r+=".\n";
+      if(d.pT_stage)r+=`${d.pT_stage} (AJCC 8ª edición).\n`;
+      return r.trim();
+    }
+  },
+  gastric:{
+    name_es:"Resección gástrica",name_en:"Gastric resection",
+    fields:[
+      {n:"histologic_type",les:"Tipo histológico",len:"Histologic type",type:"text",sev:"required"},
+      {n:"histologic_grade",les:"Grado histológico",len:"Histologic grade",type:"select",vals:["G1","G2","G3"],sev:"required"},
+      {n:"tumor_location",les:"Localización",len:"Tumor location",type:"text",sev:"required"},
+      {n:"depth_of_invasion",les:"Profundidad de invasión",len:"Depth of invasion",type:"select",vals:["Mucosa","Submucosa","Muscular","Subserosa","Serosa"],sev:"required"},
+      {n:"pT_stage",les:"Estadio pT",len:"pT stage",type:"text",sev:"required"},
+      {n:"pN_stage",les:"Estadio pN",len:"pN stage",type:"text",sev:"required"},
+      {n:"lymph_nodes_examined",les:"Ganglios examinados",len:"Lymph nodes examined",type:"number",sev:"required"},
+      {n:"lymph_nodes_positive",les:"Ganglios positivos",len:"Lymph nodes positive",type:"number",sev:"required"},
+      {n:"margins_proximal",les:"Margen proximal",len:"Proximal margin",type:"text",sev:"required"},
+      {n:"margins_distal",les:"Margen distal",len:"Distal margin",type:"text",sev:"required"},
+      {n:"lymphovascular_invasion",les:"Invasión linfovascular",len:"Lymphovascular invasion",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"perineural_invasion",les:"Invasión perineural",len:"Perineural invasion",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"her2_status",les:"HER2",len:"HER2 status",type:"text",sev:"required"},
+      {n:"tumor_size",les:"Tamaño tumoral",len:"Tumor size",type:"text",sev:"recommended"},
+      {n:"extranodal_extension",les:"Extensión extranodal",len:"Extranodal extension",type:"radio",vals:["present","absent"],sev:"recommended"},
+      {n:"pdl1_cps",les:"PD-L1 CPS",len:"PD-L1 CPS",type:"text",sev:"recommended"},
+      {n:"msi_mmr",les:"MSI/MMR",len:"MSI/MMR status",type:"text",sev:"recommended"},
+    ],
+    template:(d)=>{
+      let r="DESCRIPCIÓN MICROSCÓPICA:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}`;
+      if(d.tumor_location)r+=` en ${d.tumor_location}`;
+      if(d.histologic_grade)r+=`, ${d.histologic_grade==="G1"?"bien diferenciado":d.histologic_grade==="G2"?"moderadamente diferenciado":"pobremente diferenciado"}`;
+      r+=".\n";
+      if(d.depth_of_invasion)r+=`Infiltra hasta ${d.depth_of_invasion.toLowerCase()}.\n`;
+      if(d.lymphovascular_invasion)r+=`Invasión linfovascular: ${d.lymphovascular_invasion==="present"?"presente":"ausente"}.\n`;
+      if(d.perineural_invasion)r+=`Invasión perineural: ${d.perineural_invasion==="present"?"presente":"ausente"}.\n`;
+      if(d.margins_proximal||d.margins_distal){r+="Márgenes: ";const m=[];if(d.margins_proximal)m.push(`proximal ${d.margins_proximal}`);if(d.margins_distal)m.push(`distal ${d.margins_distal}`);r+=m.join(", ")+".\n"}
+      if(d.lymph_nodes_examined){r+=`Ganglios: ${d.lymph_nodes_examined} examinados`;if(d.lymph_nodes_positive)r+=`, ${d.lymph_nodes_positive} positivos`;r+=".\n"}
+      if(d.her2_status)r+=`HER2: ${d.her2_status}.\n`;
+      if(d.pdl1_cps)r+=`PD-L1 CPS: ${d.pdl1_cps}.\n`;
+      if(d.msi_mmr)r+=`MSI/MMR: ${d.msi_mmr}.\n`;
+      r+="\nDIAGNÓSTICO:\n";
+      if(d.histologic_type)r+=`${d.histologic_type}`;
+      if(d.tumor_location)r+=` de ${d.tumor_location}`;
+      r+=".\n";
+      if(d.pT_stage)r+=`${d.pT_stage}`;
+      if(d.pN_stage)r+=` ${d.pN_stage}`;
+      if(d.pT_stage||d.pN_stage)r+=".\n";
+      return r.trim();
+    }
+  },
+  "cytology-cervical":{
+    name_es:"Citología cervical",name_en:"Cervical cytology",
+    fields:[
+      {n:"sample_type",les:"Tipo de muestra",len:"Sample type",type:"select",vals:["Medio líquido","Convencional"],sev:"required"},
+      {n:"adequacy",les:"Idoneidad",len:"Adequacy",type:"select",vals:["Satisfactoria","Insatisfactoria"],sev:"required"},
+      {n:"endocervical_component",les:"Componente endocervical",len:"Endocervical component",type:"radio",vals:["present","absent"],sev:"required"},
+      {n:"bethesda_category",les:"Categoría Bethesda",len:"Bethesda category",type:"select",vals:["NILM","ASC-US","ASC-H","LSIL","HSIL","SCC","AGC","AIS","Adenocarcinoma"],sev:"required"},
+      {n:"organisms",les:"Organismos",len:"Organisms",type:"text",sev:"required"},
+      {n:"cytologic_description",les:"Descripción citológica",len:"Cytologic description",type:"text",sev:"recommended"},
+      {n:"recommendations",les:"Recomendaciones",len:"Recommendations",type:"text",sev:"recommended"},
+      {n:"hpv_correlation",les:"Correlación VPH",len:"HPV correlation",type:"text",sev:"recommended"},
+    ],
+    template:(d)=>{
+      let r="IDONEIDAD DE LA MUESTRA:\n";
+      if(d.adequacy)r+=`${d.adequacy}.`;
+      if(d.endocervical_component)r+=` Componente endocervical: ${d.endocervical_component==="present"?"presente":"ausente"}.`;
+      if(d.sample_type)r+=` Tipo: ${d.sample_type}.`;
+      r+="\n\nRESULTADO (Sistema Bethesda):\n";
+      if(d.bethesda_category)r+=`${d.bethesda_category}.\n`;
+      if(d.cytologic_description)r+=`${d.cytologic_description}\n`;
+      if(d.organisms)r+=`Organismos: ${d.organisms}.\n`;
+      if(d.recommendations)r+=`\nRecomendaciones: ${d.recommendations}.\n`;
+      if(d.hpv_correlation)r+=`Correlación VPH: ${d.hpv_correlation}.\n`;
+      return r.trim();
+    }
+  }
 };
 
-// --- Worker API URL ---
-const API_URL = "https://pathology-agent-api.solfloreslab.workers.dev/api/analyze";
+// === SAMPLES ===
+const COP_EX={colon:"sigmoide adeno mod G2 infilt subserosa ILV+ s/perineural 2/18 gang marg libres 4cm MMR conservado",breast:"BAG mama izq CDI NOS G2 Nott 6/9 tubulos 3 pleomorf 2 mitosis 1 RE 90% RP 70% HER2 1+ Ki67 15% CDIS cribiforme",melanoma:"espalda MES Breslow 1.8 Clark IV ulcerado 3 mit/mm2 s/ILV s/neurotropismo s/satelitosis borde lat 3mm prof 2mm",gastric:"gastrectomia subtotal adeno difuso anillo sello infilt serosa marg libres"};
+const AUD_EX={colon:"INFORME DE ANATOMÍA PATOLÓGICA\n\nTipo de muestra: Hemicolectomía derecha\n\nDESCRIPCIÓN MICROSCÓPICA:\nAdenocarcinoma de tipo intestinal moderadamente diferenciado (G2) que infiltra hasta la subserosa. Invasión linfovascular presente. Sin invasión perineural. Márgenes libres (4,2 cm). Margen radial libre (>1 mm). 3/18 ganglios con metástasis.\n\nDIAGNÓSTICO:\nAdenocarcinoma de colon derecho, G2. pT3 N1a (3/18) M0 — Estadio IIIB (AJCC 8ª ed.)\n\nINMUNOHISTOQUÍMICA:\nMLH1, MSH2, MSH6, PMS2: Expresión conservada (pMMR).",breast:"INFORME DE ANATOMÍA PATOLÓGICA\n\nTipo de muestra: BAG mama izquierda, 4 cilindros\n\nDESCRIPCIÓN MICROSCÓPICA:\nCarcinoma ductal infiltrante NOS, grado 2 (Nottingham 6/9). CDIS asociado cribiforme.\n\nBIOMARCADORES:\nRE: Positivo, 90%, Allred 8/8\nRP: Positivo, 70%, Allred 7/8\nHER2: Negativo (1+)\nKi-67: 15%\nPerfil molecular: Luminal A-like",gastric:"INFORME DE ANATOMÍA PATOLÓGICA\n\nTipo de muestra: Gastrectomía subtotal\n\nDESCRIPCIÓN MICROSCÓPICA:\nAdenocarcinoma gástrico de tipo difuso con células en anillo de sello que infiltra serosa. Márgenes libres.\n\nDIAGNÓSTICO:\nAdenocarcinoma gástrico, tipo difuso (Lauren), anillo de sello. Infiltra serosa."};
 
-// --- UI helpers ---
-function toggleSection(id) {
-  document.getElementById(id).classList.toggle("open");
+const API="http://localhost:8787/api/analyze";
+let accessCode=sessionStorage.getItem("pac")||"";
+
+// === LOGIN (con cache de sesión) ===
+if(accessCode){document.getElementById("login").classList.add("hid");document.getElementById("app").classList.add("show")}
+document.getElementById("lgo").onclick=()=>{const c=document.getElementById("lcode").value.trim();if(!c){document.getElementById("lerr").classList.add("show");return}accessCode=c;sessionStorage.setItem("pac",c);document.getElementById("login").classList.add("hid");document.getElementById("app").classList.add("show")};
+document.getElementById("lcode").onkeydown=e=>{if(e.key==="Enter")document.getElementById("lgo").click()};
+document.getElementById("ltog").onclick=()=>{const i=document.getElementById("lcode");i.type=i.type==="password"?"text":"password"};
+// Prevent back button from logging out
+window.addEventListener("popstate",e=>{if(accessCode){e.preventDefault();history.pushState(null,null,location.href)}});
+
+// === TABS ===
+document.querySelectorAll(".tab").forEach(t=>{t.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));t.classList.add("on");document.querySelectorAll(".pnl").forEach(p=>p.classList.remove("on"));document.getElementById("p-"+t.dataset.m).classList.add("on")}});
+document.getElementById("lbtn2").onclick=()=>setLang(lang==="en"?"es":"en");
+
+// === CHIPS ===
+function buildChips(){
+  const ce=document.getElementById("cop-chips");ce.innerHTML="";
+  [["colon","ex1"],["breast","ex2"],["melanoma","ex3"],["gastric","ex4"]].forEach(([k,i])=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t(i);b.onclick=()=>{document.getElementById("cop-notes").value=COP_EX[k];const s=document.getElementById("cop-proto");if(k==="colon")s.value="colon-resection";else if(k==="breast")s.value="breast-biopsy";else if(k==="melanoma")s.value="melanoma";else s.value="gastric";buildForm(s.value)};ce.appendChild(b)});
+  const ae=document.getElementById("aud-chips");ae.innerHTML="";
+  [["colon","exf1"],["breast","exf2"],["gastric","exf3"]].forEach(([k,i])=>{const b=document.createElement("button");b.className="chip";b.type="button";b.textContent=t(i);b.onclick=()=>document.getElementById("aud-input").value=AUD_EX[k];ae.appendChild(b)});
 }
+buildChips();
 
-function showError(msg) {
-  const el = document.getElementById("error-msg");
-  el.textContent = msg;
-  el.classList.add("visible");
-}
+// === FORM BUILDER ===
+function buildForm(protoId){
+  const proto=PROTOS[protoId];if(!proto)return;
+  const container=document.getElementById("cop-fields");
+  container.innerHTML="";
+  proto.fields.forEach(f=>{
+    const label=lang==="es"?f.les:f.len;
+    const row=document.createElement("div");
+    row.className="frow";
+    const lbl=document.createElement("label");
+    lbl.textContent=label;
+    if(f.sev==="recommended")lbl.style.color="var(--t3)";
+    row.appendChild(lbl);
 
-function hideError() {
-  document.getElementById("error-msg").classList.remove("visible");
-}
-
-function setStep(stepId) {
-  document.querySelectorAll(".pipeline-step").forEach((s) => {
-    if (s.id === stepId) {
-      s.classList.add("active");
-      s.classList.remove("done");
-    } else if (s.classList.contains("active")) {
-      s.classList.remove("active");
-      s.classList.add("done");
+    if(f.type==="select"){
+      const sel=document.createElement("select");
+      sel.dataset.field=f.n;
+      sel.innerHTML=`<option value="">—</option>`+f.vals.map(v=>`<option value="${v}">${v}</option>`).join("");
+      sel.onchange=updateReport;
+      row.appendChild(sel);
+    } else if(f.type==="radio"){
+      const grp=document.createElement("div");
+      grp.className="radio-group";
+      (f.vals||["present","absent"]).forEach(v=>{
+        const id=f.n+"_"+v;
+        const inp=document.createElement("input");inp.type="radio";inp.name=f.n;inp.value=v;inp.id=id;inp.onchange=updateReport;
+        const lb=document.createElement("label");lb.htmlFor=id;lb.textContent=v==="present"?t("present"):v==="absent"?t("absent"):v;
+        lb.prepend(inp);
+        grp.appendChild(lb);
+      });
+      row.appendChild(grp);
+    } else if(f.type==="number"){
+      const inp=document.createElement("input");inp.type="number";inp.dataset.field=f.n;inp.min="0";inp.placeholder="—";inp.oninput=updateReport;
+      row.appendChild(inp);
+    } else {
+      const inp=document.createElement("input");inp.type="text";inp.dataset.field=f.n;inp.placeholder="—";inp.oninput=updateReport;
+      row.appendChild(inp);
     }
+    container.appendChild(row);
   });
+  updateReport();
 }
 
-function completeAllSteps() {
-  document.querySelectorAll(".pipeline-step").forEach((s) => {
-    s.classList.remove("active");
-    s.classList.add("done");
+// === PROTOCOL CHANGE ===
+document.getElementById("cop-proto").onchange=e=>buildForm(e.target.value);
+buildForm("colon-resection");
+
+// === COLLECT FORM DATA ===
+function collectData(){
+  const data={};
+  document.querySelectorAll("#cop-fields [data-field]").forEach(el=>{
+    const v=el.value.trim();if(v)data[el.dataset.field]=v;
   });
+  document.querySelectorAll("#cop-fields input[type=radio]:checked").forEach(el=>{
+    data[el.name]=el.value;
+  });
+  return data;
 }
 
-function getScoreClass(score) {
-  if (score >= 80) return "green";
-  if (score >= 50) return "yellow";
-  return "red";
-}
+// === UPDATE REPORT (instant, no AI) ===
+function updateReport(){
+  const protoId=document.getElementById("cop-proto").value;
+  const proto=PROTOS[protoId];if(!proto)return;
+  const data=collectData();
+  const filled=Object.keys(data);
+  const allFields=proto.fields.map(f=>f.n);
+  const missing=allFields.filter(f=>!filled.includes(f));
+  const reqFields=proto.fields.filter(f=>f.sev==="required").map(f=>f.n);
+  const filledReq=reqFields.filter(f=>filled.includes(f));
 
-// --- Render results ---
-function renderResults(data) {
-  const results = document.getElementById("results");
-  results.classList.add("visible");
-  document.getElementById("placeholder").style.display = "none";
-
-  // Completeness score
-  const score = data.validation.completeness_score;
-  const cls = getScoreClass(score);
-
-  const scoreCard = document.getElementById("score-card");
-  scoreCard.className = "score-card " + cls;
-
-  document.getElementById("score-number").textContent = score + "%";
-  document.getElementById("score-number").style.color =
-    cls === "green" ? "var(--green-dark)" :
-    cls === "yellow" ? "#92400e" : "var(--red-dark)";
-
-  const bar = document.getElementById("score-bar");
-  bar.className = "score-bar-fill " + cls;
-  bar.style.width = score + "%";
-
-  const statusText = (data.validation.status || "").replace(/_/g, " ");
-  const statusEl = document.getElementById("score-status");
-  statusEl.textContent = statusText;
-  statusEl.className = "score-status " + cls;
-
-  const fields = document.getElementById("score-fields");
-  fields.innerHTML = `<span>${data.validation.reported_fields || 0}</span> reported / <span>${data.validation.total_required_fields || 0}</span> required &mdash; <span>${data.validation.missing_fields || 0}</span> missing`;
-
-  // Classification chips
-  const chips = document.getElementById("classification-chips");
-  chips.innerHTML = "";
-  const c = data.classification;
-  const chipData = [
-    { label: c.specimen_type, cls: "" },
-    { label: c.organ_system, cls: "" },
-    { label: c.tumor_type_suspected, cls: "" },
-    { label: c.protocol_to_apply, cls: "protocol" },
-    { label: (c.confidence * 100).toFixed(0) + "% confidence", cls: "confidence" },
-  ];
-  chipData.forEach((ch) => {
-    const span = document.createElement("span");
-    span.className = "chip " + ch.cls;
-    span.textContent = ch.label;
-    chips.appendChild(span);
-  });
-
-  if (data.needs_human_review) {
-    const span = document.createElement("span");
-    span.className = "chip review";
-    span.textContent = "Needs human review";
-    chips.appendChild(span);
-  }
-
-  // Missing fields
-  const missingList = document.getElementById("missing-list");
-  missingList.innerHTML = "";
-  const missing = data.validation.missing_required || [];
-  const missingBadge = document.getElementById("missing-count");
-
-  if (missing.length === 0) {
-    missingList.innerHTML = '<div class="no-issues">&#10003; No missing required fields</div>';
-    missingBadge.style.display = "none";
+  // Report
+  const reportEl=document.getElementById("cop-report");
+  if(filled.length===0){
+    reportEl.innerHTML=`<div class="report-empty">${t("re")}</div>`;
   } else {
-    missingBadge.style.display = "";
-    missingBadge.textContent = missing.length;
-    missingBadge.className = "count-badge alert";
-    missing.forEach((m) => {
-      const div = document.createElement("div");
-      div.className = "alert-item " + m.severity;
-      div.innerHTML = `<span class="alert-severity ${m.severity}">${m.severity}</span>
-        <div class="alert-body"><span class="alert-field">${m.field}</span><span class="alert-rec">${m.recommendation || ""}</span></div>`;
-      missingList.appendChild(div);
-    });
+    reportEl.textContent=proto.template(data);
   }
 
-  // Inconsistencies
-  const inconList = document.getElementById("inconsistency-list");
-  inconList.innerHTML = "";
-  const incons = data.validation.inconsistencies || [];
-  const inconBadge = document.getElementById("incon-count");
+  // Stats
+  document.getElementById("cop-stats").innerHTML=`<span class="ok">${filledReq.length}/${reqFields.length} ${t("completed")}</span>${missing.length?` <span class="pend">${missing.length} ${t("pending")}</span>`:""}`;
 
-  if (incons.length === 0) {
-    inconList.innerHTML = '<div class="no-issues">&#10003; No inconsistencies detected</div>';
-    inconBadge.style.display = "none";
-  } else {
-    document.getElementById("sec-inconsistencies").classList.add("open");
-    inconBadge.style.display = "";
-    inconBadge.textContent = incons.length;
-    inconBadge.className = "count-badge alert";
-    incons.forEach((i) => {
-      const div = document.createElement("div");
-      div.className = "alert-item " + i.severity;
-      div.innerHTML = `<span class="alert-severity ${i.severity}">${i.severity}</span>
-        <div class="alert-body">${i.finding}</div>`;
-      inconList.appendChild(div);
-    });
-  }
-
-  // Extracted data table
-  const tbody = document.getElementById("extraction-body");
-  tbody.innerHTML = "";
-  const extracted = data.extracted_data || {};
-  const fieldKeys = Object.keys(extracted);
-  const fieldsBadge = document.getElementById("fields-count");
-  fieldsBadge.style.display = "";
-  fieldsBadge.textContent = fieldKeys.length + " fields";
-
-  fieldKeys.forEach((key) => {
-    const val = extracted[key];
-    const tr = document.createElement("tr");
-    const valStr = typeof val === "object" ? JSON.stringify(val) : String(val);
-    const isNR = valStr === "not_reported";
-    tr.innerHTML = `<td class="field-name">${key}</td><td class="${isNR ? "nr" : ""}">${isNR ? "Not reported" : valStr}</td>`;
-    tbody.appendChild(tr);
+  // Missing panel
+  const mEl=document.getElementById("cop-missing");
+  mEl.innerHTML="";
+  proto.fields.forEach(f=>{
+    const isFilled=filled.includes(f.n);
+    const label=lang==="es"?f.les:f.len;
+    mEl.innerHTML+=`<div class="missing-item${isFilled?" filled":""}"><span class="missing-dot ${f.sev==="required"?"req":"rec"}"></span>${label}</div>`;
   });
-
-  // Audit trail
-  const audit = document.getElementById("audit-trail");
-  audit.innerHTML = "";
-  if (data.audit_trail) {
-    const a = data.audit_trail;
-    const items = [
-      ["Model", a.model_version],
-      ["Protocol", a.protocol_used],
-      ["Time", (a.processing_time_ms || 0) + "ms"],
-      ["Pipeline", a.pipeline_version],
-    ];
-    items.forEach(([label, value]) => {
-      const span = document.createElement("span");
-      span.className = "audit-item";
-      span.innerHTML = `<strong>${label}:</strong> ${value || "—"}`;
-      audit.appendChild(span);
-    });
-  }
 }
 
-// --- Event listeners ---
-document.getElementById("sample-select").addEventListener("change", (e) => {
-  const key = e.target.value;
-  if (key && SAMPLES[key]) {
-    document.getElementById("report-input").value = SAMPLES[key];
-  }
-});
-
-// Toggle access code visibility
-document.getElementById("toggle-code").addEventListener("click", () => {
-  const input = document.getElementById("access-code");
-  input.type = input.type === "password" ? "text" : "password";
-});
-
-document.getElementById("analyze-btn").addEventListener("click", async () => {
-  const reportText = document.getElementById("report-input").value.trim();
-  const accessCode = document.getElementById("access-code").value.trim();
-
-  if (!accessCode) {
-    showError("Please enter the access code.");
-    document.getElementById("access-code").focus();
-    return;
-  }
-
-  if (!reportText) {
-    showError("Please enter or select a pathology report.");
-    return;
-  }
-
-  hideError();
-  const btn = document.getElementById("analyze-btn");
-  const btnLabel = document.getElementById("btn-label");
-  const spinner = document.getElementById("btn-spinner");
-  btn.disabled = true;
-  btnLabel.textContent = "Analyzing...";
-  spinner.classList.add("visible");
-
-  // Reset results
-  document.getElementById("results").classList.remove("visible");
-  document.getElementById("placeholder").style.display = "none";
-  document.querySelectorAll(".pipeline-step").forEach((s) => {
-    s.classList.remove("active", "done");
-  });
-
-  const steps = document.getElementById("steps");
-  steps.classList.add("visible");
-  setStep("step-classify");
-
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ report_text: reportText, access_code: accessCode }),
+// === PRE-FILL FROM NOTES (AI) ===
+document.getElementById("cop-parse").onclick=async()=>{
+  const notes=document.getElementById("cop-notes").value.trim();
+  if(!notes)return;
+  const btn=document.getElementById("cop-parse");
+  btn.disabled=true;btn.style.background="#b45309";btn.innerHTML='<span class="spin-dots">⏳</span> Procesando con IA... (~30s)';
+  try{
+    const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"copilot",report_text:notes,access_code:accessCode,protocol_id:document.getElementById("cop-proto").value})});
+    if(res.status===401){document.getElementById("app").classList.remove("show");document.getElementById("login").classList.remove("hid");document.getElementById("lerr").classList.add("show");return}
+    if(!res.ok)throw new Error("API error");
+    const data=await res.json();
+    // Fill form fields from extracted_fields
+    const ext=data.extracted_fields||{};
+    Object.entries(ext).forEach(([k,v])=>{
+      if(v===null||v==="not_reported")return;
+      const el=document.querySelector(`#cop-fields [data-field="${k}"]`);
+      if(el){el.value=String(v);return}
+      // Radio
+      const radio=document.querySelector(`#cop-fields input[name="${k}"][value="${v}"]`);
+      if(radio)radio.checked=true;
     });
+    updateReport();
+  }catch(e){console.error(e)}
+  finally{btn.disabled=false;btn.style.background="var(--t2)";btn.textContent=t("cpb")}
+};
 
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.user_message || err.error || `HTTP ${response.status}`);
-    }
+// === AI REVIEW ===
+document.getElementById("ai-review").onclick=async()=>{
+  const protoId=document.getElementById("cop-proto").value;
+  const data=collectData();
+  if(Object.keys(data).length===0)return;
+  const btn=document.getElementById("ai-review");
+  btn.disabled=true;
+  document.getElementById("ai-spin").classList.add("on");
+  document.getElementById("ai-results").classList.remove("show");
+  try{
+    const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"auditor",report_text:document.getElementById("cop-report").textContent,access_code:accessCode,protocol_id:protoId})});
+    if(!res.ok)throw new Error("API error");
+    const result=await res.json();
+    renderAIResults(result);
+  }catch(e){console.error(e)}
+  finally{btn.disabled=false;document.getElementById("ai-spin").classList.remove("on")}
+};
 
-    // Animate steps
-    setStep("step-extract");
-    await new Promise((r) => setTimeout(r, 400));
-    setStep("step-validate");
-    await new Promise((r) => setTimeout(r, 400));
-    completeAllSteps();
+function renderAIResults(data){
+  const container=document.getElementById("ai-alerts");
+  container.innerHTML="";
+  const v=data.validation||{};
+  const missing=v.missing_required||[];
+  const incons=v.inconsistencies||[];
+  const labels=data.labels||{};const labelsEn=data.labels_en||{};
+  if(!missing.length&&!incons.length){container.innerHTML=`<div class="noiss">${t("ni")}</div>`;document.getElementById("ai-results").classList.add("show");return}
+  missing.forEach(m=>{container.innerHTML+=`<div class="alert ${m.severity}"><span class="atag ${m.severity}">${m.severity}</span><div class="abody"><span class="afld">${lang==="es"&&labels[m.field]?labels[m.field]:labelsEn[m.field]||m.field}</span><span class="arec">${m.recommendation||""}</span></div></div>`});
+  incons.forEach(i=>{container.innerHTML+=`<div class="alert ${i.severity}"><span class="atag ${i.severity}">${i.severity}</span><div class="abody">${i.finding}</div></div>`});
+  document.getElementById("ai-results").classList.add("show");
+}
 
-    const data = await response.json();
-    renderResults(data);
-  } catch (err) {
-    showError(err.message || "Error connecting to the analysis service.");
-    document.getElementById("placeholder").style.display = "flex";
-    steps.classList.remove("visible");
-  } finally {
-    btn.disabled = false;
-    btnLabel.textContent = "Analyze Report";
-    spinner.classList.remove("visible");
-  }
-});
+// === COPY ===
+document.getElementById("cop-copy").onclick=async()=>{
+  const text=document.getElementById("cop-report").textContent;
+  try{await navigator.clipboard.writeText(text);const b=document.getElementById("cop-copy");b.textContent=t("copied");setTimeout(()=>b.textContent=t("cpb2"),2000)}catch{}
+};
+
+// === AUDITOR ===
+function togSec(id){document.getElementById(id).classList.toggle("open")}
+function scoreCls(s){return s>=80?"green":s>=50?"yellow":"red"}
+
+document.getElementById("aud-go").onclick=async()=>{
+  const input=document.getElementById("aud-input").value.trim();
+  if(!input){const e=document.getElementById("aud-err");e.textContent=t("ee");e.classList.add("show");return}
+  document.getElementById("aud-err").classList.remove("show");
+  const btn=document.getElementById("aud-go");btn.disabled=true;
+  document.getElementById("aud-go-t").textContent=t("abl");
+  document.getElementById("aud-spin").classList.add("on");
+  document.getElementById("aud-res").style.display="none";
+  try{
+    const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"auditor",report_text:input,access_code:accessCode})});
+    if(res.status===401){document.getElementById("app").classList.remove("show");document.getElementById("login").classList.remove("hid");document.getElementById("lerr").classList.add("show");return}
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.user_message||"Error")}
+    const data=await res.json();
+    renderAuditor(data);
+  }catch(e){const el=document.getElementById("aud-err");el.textContent=e.message||t("en2");el.classList.add("show")}
+  finally{btn.disabled=false;document.getElementById("aud-go-t").textContent=t("ab");document.getElementById("aud-spin").classList.remove("on")}
+};
+
+function renderAuditor(data){
+  document.getElementById("aud-res").style.display="block";
+  const labels=data.labels||{};const labelsEn=data.labels_en||{};
+  const v=data.validation||{};const score=v.completeness_score||0;const cls=scoreCls(score);
+  document.getElementById("aud-sn").textContent=score+"%";document.getElementById("aud-sn").className="score-big "+cls;
+  const bar=document.getElementById("aud-sb");bar.className="sfill "+cls;bar.style.width=score+"%";
+  const st=document.getElementById("aud-ss");st.textContent=(v.status||"").replace(/_/g," ");st.className="sst "+cls;
+  document.getElementById("aud-det").textContent=`${v.reported_fields||0} / ${v.total_required_fields||0} — ${v.missing_fields||0} ${t("missing")}`;
+  const miss=v.missing_required||[];const ml=document.getElementById("aud-ml");ml.innerHTML="";
+  const mn=document.getElementById("aud-mn");
+  if(!miss.length){ml.innerHTML=`<div class="noiss">${t("nm")}</div>`;mn.style.display="none"}
+  else{mn.style.display="";mn.textContent=miss.length;miss.forEach(m=>{ml.innerHTML+=`<div class="alert ${m.severity}"><span class="atag ${m.severity}">${m.severity}</span><div class="abody"><span class="afld">${lang==="es"&&labels[m.field]?labels[m.field]:labelsEn[m.field]||m.field}</span><span class="arec">${m.recommendation||""}</span></div></div>`})}
+  const inc=v.inconsistencies||[];const il=document.getElementById("aud-il");il.innerHTML="";
+  const inn=document.getElementById("aud-in");
+  if(!inc.length){il.innerHTML=`<div class="noiss">${t("ni")}</div>`;inn.style.display="none"}
+  else{document.getElementById("as-inc").classList.add("open");inn.style.display="";inn.textContent=inc.length;inc.forEach(i=>{il.innerHTML+=`<div class="alert ${i.severity}"><span class="atag ${i.severity}">${i.severity}</span><div class="abody">${i.finding}</div></div>`})}
+  const ext=data.extracted_data||{};const keys=Object.keys(ext);
+  const tb=document.getElementById("aud-tb");tb.innerHTML="";
+  const dn=document.getElementById("aud-dn");dn.style.display="";dn.textContent=keys.length;dn.style.background="var(--bluel)";dn.style.color="var(--blue)";
+  keys.forEach(k=>{const v2=ext[k];const vs=typeof v2==="object"?JSON.stringify(v2):String(v2);const nr=vs==="not_reported";
+    tb.innerHTML+=`<tr><td class="fn">${lang==="es"&&labels[k]?labels[k]:labelsEn[k]||k}</td><td class="${nr?"nr":""}">${nr?t("nr"):vs}</td></tr>`});
+  const aud=document.getElementById("aud-audit");
+  if(data.audit_trail)aud.innerHTML=[["Model",data.audit_trail.model_version],["Protocol",data.audit_trail.protocol_used],["Time",(data.audit_trail.processing_time_ms||0)+"ms"]].map(([l,v])=>`<span><strong>${l}:</strong> ${v||"—"}</span>`).join("");
+}
 </script>
 </body>
 </html>

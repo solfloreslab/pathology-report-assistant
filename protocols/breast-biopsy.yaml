@@ -8,64 +8,88 @@ protocol:
 
 fields:
   - name: histologic_type
+    label_es: "Tipo histológico"
+    label_en: "Histologic type"
     severity: required
     type: string
     description: "Tipo histologico (ductal NOS, lobular, etc.)"
 
   - name: histologic_grade
+    label_es: "Grado histológico (Nottingham)"
+    label_en: "Histologic grade (Nottingham)"
     severity: required
     type: string
     description: "Grado de Nottingham (score 3 componentes + total /9)"
 
   - name: tubule_formation
+    label_es: "Formación tubular"
+    label_en: "Tubule formation"
     severity: required
     type: integer
     values: [1, 2, 3]
     description: "Score formacion tubular (Nottingham)"
 
   - name: nuclear_pleomorphism
+    label_es: "Pleomorfismo nuclear"
+    label_en: "Nuclear pleomorphism"
     severity: required
     type: integer
     values: [1, 2, 3]
     description: "Score pleomorfismo nuclear (Nottingham)"
 
   - name: mitotic_count
+    label_es: "Índice mitótico"
+    label_en: "Mitotic count"
     severity: required
     type: integer
     values: [1, 2, 3]
     description: "Score indice mitotico (Nottingham)"
 
   - name: estrogen_receptor
+    label_es: "Receptores de estrógeno (RE)"
+    label_en: "Estrogen receptor (ER)"
     severity: required
     type: string
     description: "RE: porcentaje y/o score Allred"
 
   - name: progesterone_receptor
+    label_es: "Receptores de progesterona (RP)"
+    label_en: "Progesterone receptor (PR)"
     severity: required
     type: string
     description: "RP: porcentaje y/o score Allred"
 
   - name: her2_status
+    label_es: "HER2"
+    label_en: "HER2 status"
     severity: required
     type: string
     description: "HER2/neu: score IHQ (0, 1+, 2+, 3+) + FISH si 2+"
 
   - name: ki67
+    label_es: "Ki-67"
+    label_en: "Ki-67"
     severity: required
     type: string
     description: "Indice de proliferacion Ki-67 (%)"
 
   - name: in_situ_component
+    label_es: "Componente in situ"
+    label_en: "In situ component"
     severity: required
     type: string
     description: "Componente in situ asociado (tipo, patron, grado)"
 
   - name: molecular_subtype
+    label_es: "Subtipo molecular"
+    label_en: "Molecular subtype"
     severity: recommended
     type: string
     description: "Perfil molecular subrogado (Luminal A/B, HER2+, Triple neg)"
 
   - name: tumor_size
+    label_es: "Tamaño tumoral"
+    label_en: "Tumor size"
     severity: recommended
     type: string
     description: "Tamano del tumor si valorable en biopsia"

@@ -8,91 +8,125 @@ protocol:
 
 fields:
   - name: histologic_type
+    label_es: "Tipo histológico"
+    label_en: "Histologic type"
     severity: required
     type: string
     description: "Tipo histologico OMS + clasificacion Lauren (intestinal/difuso/mixto)"
 
   - name: histologic_grade
+    label_es: "Grado histológico"
+    label_en: "Histologic grade"
     severity: required
     type: string
     values: ["G1", "G2", "G3"]
     description: "Grado de diferenciacion (G3 por definicion en tipo difuso)"
 
   - name: tumor_location
+    label_es: "Localización del tumor"
+    label_en: "Tumor location"
     severity: required
     type: string
     description: "Localizacion anatomica (cardias, fundus, cuerpo, antro, piloro)"
 
   - name: depth_of_invasion
+    label_es: "Profundidad de invasión"
+    label_en: "Depth of invasion"
     severity: required
     type: string
     description: "Profundidad de invasion (mucosa, submucosa, muscular, subserosa, serosa)"
 
   - name: pT_stage
+    label_es: "Estadio pT"
+    label_en: "pT stage"
     severity: required
     type: string
     description: "Estadificacion pT segun AJCC"
 
   - name: pN_stage
+    label_es: "Estadio pN"
+    label_en: "pN stage"
     severity: required
     type: string
     description: "Estadificacion pN (ganglios afectos/total)"
 
   - name: lymph_nodes_examined
+    label_es: "Ganglios examinados"
+    label_en: "Lymph nodes examined"
     severity: required
     type: integer
     minimum: 0
     description: "Numero total de ganglios aislados (minimo recomendado: 16)"
 
   - name: lymph_nodes_positive
+    label_es: "Ganglios positivos"
+    label_en: "Lymph nodes positive"
     severity: required
     type: integer
     minimum: 0
     description: "Numero de ganglios con metastasis"
 
   - name: margins_proximal
+    label_es: "Margen proximal"
+    label_en: "Proximal margin"
     severity: required
     type: string
     description: "Estado del margen proximal (libre/afecto + distancia)"
 
   - name: margins_distal
+    label_es: "Margen distal"
+    label_en: "Distal margin"
     severity: required
     type: string
     description: "Estado del margen distal (libre/afecto + distancia)"
 
   - name: lymphovascular_invasion
+    label_es: "Invasión linfovascular"
+    label_en: "Lymphovascular invasion"
     severity: required
     type: string
     values: ["present", "absent", "not_reported"]
     description: "Invasion linfovascular"
 
   - name: perineural_invasion
+    label_es: "Invasión perineural"
+    label_en: "Perineural invasion"
     severity: required
     type: string
     values: ["present", "absent", "not_reported"]
     description: "Invasion perineural"
 
   - name: her2_status
+    label_es: "HER2"
+    label_en: "HER2 status"
     severity: required
     type: string
     description: "HER2 — obligatorio en gastrico avanzado (NCCN, ESMO)"
 
   - name: tumor_size
+    label_es: "Tamaño tumoral"
+    label_en: "Tumor size"
     severity: recommended
     type: string
     description: "Tamano del tumor (cm)"
 
   - name: extranodal_extension
+    label_es: "Extensión extranodal"
+    label_en: "Extranodal extension"
     severity: recommended
     type: string
     description: "Extension extranodal"
 
   - name: pdl1_cps
+    label_es: "PD-L1 CPS"
+    label_en: "PD-L1 CPS"
     severity: recommended
     type: string
     description: "PD-L1 CPS score"
 
   - name: msi_mmr
+    label_es: "MSI/MMR"
+    label_en: "MSI/MMR status"
     severity: recommended
     type: string
     description: "Estado MSI/MMR"

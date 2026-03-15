@@ -16,6 +16,8 @@ class FieldDef(BaseModel):
     severity: str  # required, recommended
     type: str
     description: str = ""
+    label_es: str = ""
+    label_en: str = ""
     values: list[str | int] | None = None
     reference: str | None = None
     unit: str | None = None
@@ -102,6 +104,19 @@ class ProtocolRegistry:
     def list_protocols(self) -> list[str]:
         """List all available protocol IDs."""
         return sorted(self._protocols.keys())
+
+    def get_field_labels(self, protocol_id: str, lang: str = "es") -> dict[str, str]:
+        """Get field name → human label mapping for a protocol."""
+        protocol = self.get(protocol_id)
+        labels = {}
+        for f in protocol.fields:
+            if lang == "es" and f.label_es:
+                labels[f.name] = f.label_es
+            elif lang == "en" and f.label_en:
+                labels[f.name] = f.label_en
+            else:
+                labels[f.name] = f.description or f.name
+        return labels
 
     def format_fields_for_prompt(self, protocol_id: str) -> str:
         """Format protocol fields as text for LLM prompt injection."""

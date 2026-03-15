@@ -8,44 +8,60 @@ protocol:
 
 fields:
   - name: sample_type
+    label_es: "Tipo de muestra"
+    label_en: "Sample type"
     severity: required
     type: string
     description: "Tipo de muestra (convencional, medio liquido)"
 
   - name: adequacy
+    label_es: "Idoneidad de la muestra"
+    label_en: "Sample adequacy"
     severity: required
     type: string
     values: ["satisfactory", "unsatisfactory"]
     description: "Idoneidad de la muestra"
 
   - name: endocervical_component
+    label_es: "Componente endocervical"
+    label_en: "Endocervical component"
     severity: required
     type: string
     values: ["present", "absent"]
     description: "Presencia de componente endocervical/zona de transformacion"
 
   - name: bethesda_category
+    label_es: "Categoría Bethesda"
+    label_en: "Bethesda category"
     severity: required
     type: string
     values: ["NILM", "ASC-US", "ASC-H", "LSIL", "HSIL", "SCC", "AGC", "AIS", "adenocarcinoma"]
     description: "Categorizacion segun Sistema Bethesda"
 
   - name: organisms
+    label_es: "Organismos"
+    label_en: "Organisms"
     severity: required
     type: string
     description: "Organismos identificados (Candida, Trichomonas, etc.) o ninguno"
 
   - name: cytologic_description
+    label_es: "Descripción citológica"
+    label_en: "Cytologic description"
     severity: recommended
     type: string
     description: "Descripcion citologica detallada"
 
   - name: recommendations
+    label_es: "Recomendaciones"
+    label_en: "Recommendations"
     severity: recommended
     type: string
     description: "Recomendaciones de seguimiento"
 
   - name: hpv_correlation
+    label_es: "Correlación VPH"
+    label_en: "HPV correlation"
     severity: recommended
     type: string
     description: "Correlacion con test VPH si disponible"

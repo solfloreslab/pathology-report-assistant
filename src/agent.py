@@ -26,6 +26,7 @@ from src.protocols import ProtocolRegistry
 from src.schemas import (
     AuditTrail,
     ClassificationResult,
+    CopilotResult,
     PipelineResult,
     ProtocolId,
     ValidationResult,
@@ -126,6 +127,104 @@ class PathologyAgent:
             needs_human_review=needs_human_review,
         )
 
+    def expand(self, abbreviated_notes: str) -> CopilotResult:
+        """Run the copilot pipeline: abbreviated notes -> draft report.
+
+        Steps:
+            1. Sanitize input
+            2. Classify to select protocol
+            3. Expand notes into full narrative + extracted fields
+            4. Validate completeness
+            5. Build audit trail
+        """
+        start_time = time.monotonic()
+
+        # 1. Sanitize
+        text = self._sanitize_input(abbreviated_notes)
+
+        # 2. Classify
+        classification = self._classify(text)
+        logger.info(
+            f"Classification: {classification.organ_system.value} / "
+            f"{classification.protocol_to_apply.value} "
+            f"(confidence: {classification.confidence:.2f})"
+        )
+
+        protocol_id = classification.protocol_to_apply
+        if classification.confidence < CONFIDENCE_THRESHOLD:
+            logger.warning(
+                f"Low confidence ({classification.confidence:.2f}), "
+                f"using generic protocol"
+            )
+            protocol_id = ProtocolId.GENERIC
+
+        # 3. Expand
+        if protocol_id == ProtocolId.GENERIC:
+            # Can't expand without a specific protocol
+            expanded = {
+                "narrative": text,
+                "extracted_fields": {},
+            }
+        else:
+            expanded = self._expand(text, protocol_id)
+
+        narrative = expanded.get("narrative", text)
+        extracted_fields = expanded.get("extracted_fields", {})
+
+        filled = [
+            k for k, v in extracted_fields.items()
+            if v is not None and v != "not_reported"
+        ]
+        pending = [
+            k for k, v in extracted_fields.items()
+            if v is None or v == "not_reported"
+        ]
+
+        logger.info(f"Expanded: {len(filled)} filled, {len(pending)} pending")
+
+        # 4. Validate
+        validation = self._validate(extracted_fields, protocol_id)
+        logger.info(
+            f"Validation: {validation.status.value} "
+            f"({validation.completeness_score}%)"
+        )
+
+        # 5. Audit trail
+        elapsed_ms = int((time.monotonic() - start_time) * 1000)
+        audit_trail = AuditTrail(
+            timestamp=datetime.now(timezone.utc),
+            input_hash=hashlib.sha256(text.encode()).hexdigest(),
+            classification_confidence=classification.confidence,
+            protocol_used=protocol_id.value,
+            completeness_score=validation.completeness_score,
+            model_version=self.llm.model,
+            provider=self.llm.provider,
+            processing_time_ms=elapsed_ms,
+        )
+
+        return CopilotResult(
+            classification=classification,
+            expanded_report=narrative,
+            filled_fields=filled,
+            pending_fields=pending,
+            validation=validation,
+            audit_trail=audit_trail,
+        )
+
+    def _expand(
+        self, abbreviated_text: str, protocol_id: ProtocolId
+    ) -> dict[str, Any]:
+        """Expand abbreviated notes into a full report using the expander prompt."""
+        system_prompt = self._load_prompt("expander.md")
+
+        try:
+            fields_text = self.protocols.format_fields_for_prompt(protocol_id.value)
+            system_prompt = system_prompt.replace("{PROTOCOL_FIELDS}", fields_text)
+        except KeyError:
+            logger.warning(f"Protocol {protocol_id.value} not found in registry")
+
+        return self.llm.complete_json(system_prompt, abbreviated_text)
+
     def _sanitize_input(self, text: str) -> str:
         """Sanitize input: enforce max size, strip control characters."""
         # Strip control characters (keep newlines and tabs)
@@ -223,9 +322,15 @@ def main():
         description="Pathology Report Structuring Agent"
     )
     parser.add_argument(
-        "report_file",
+        "input",
         type=str,
-        help="Path to the pathology report text file",
+        help="Path to report file (auditor) or abbreviated notes in quotes (copilot)",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=["auditor", "copilot"],
+        default="auditor",
+        help="Pipeline mode (default: auditor)",
     )
     parser.add_argument(
         "--provider",
@@ -269,13 +374,21 @@ def main():
     # Load environment
     load_dotenv()
 
-    # Read report
-    report_path = Path(args.report_file)
-    if not report_path.exists():
-        print(f"Error: File not found: {report_path}", file=sys.stderr)
-        sys.exit(1)
-
-    report_text = report_path.read_text(encoding="utf-8")
+    # Read input
+    if args.mode == "copilot":
+        # Copilot: input can be a string or a file
+        input_path = Path(args.input)
+        if input_path.exists():
+            report_text = input_path.read_text(encoding="utf-8")
+        else:
+            report_text = args.input
+    else:
+        # Auditor: input must be a file
+        input_path = Path(args.input)
+        if not input_path.exists():
+            print(f"Error: File not found: {input_path}", file=sys.stderr)
+            sys.exit(1)
+        report_text = input_path.read_text(encoding="utf-8")
 
     # Resolve provider settings
     provider = args.provider
@@ -315,10 +428,13 @@ def main():
             prompts_dir=Path("src/prompts"),
         )
 
-        print(f"Analyzing: {report_path.name}", file=sys.stderr)
+        print(f"Mode: {args.mode}", file=sys.stderr)
         print(f"Provider: {provider} / Model: {model}", file=sys.stderr)
 
-        result = agent.analyze(report_text)
+        if args.mode == "copilot":
+            result = agent.expand(report_text)
+        else:
+            result = agent.analyze(report_text)
 
     # Output
     output_json = result.model_dump_json(indent=2)
