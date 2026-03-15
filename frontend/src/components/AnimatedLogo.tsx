@@ -2,30 +2,34 @@ import { useState, useCallback } from 'react'
 import { Microscope } from 'lucide-react'
 
 export function AnimatedLogo() {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const [hovering, setHovering] = useState(false)
+  const [look, setLook] = useState({ x: 0, y: 0 })
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 20
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 20
-    setTilt({ x, y })
-  }, [])
-
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 })
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+    setLook({ x, y })
   }, [])
 
   return (
     <div
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => { setHovering(false); setLook({ x: 0, y: 0 }) }}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="w-9 h-9 bg-gradient-to-br from-[#0F62FE] to-[#6929C4] rounded-xl flex items-center justify-center cursor-pointer shadow-lg shadow-blue-500/20"
+      className="w-9 h-9 bg-gradient-to-br from-[var(--color-primary)] to-[#065F46] rounded-xl flex items-center justify-center cursor-pointer shadow-lg relative"
       style={{
-        transform: `perspective(100px) rotateX(${-tilt.y}deg) rotateY(${tilt.x}deg)`,
-        transition: 'transform 0.15s ease-out',
+        transform: `perspective(200px) rotateX(${-look.y * 8}deg) rotateY(${look.x * 8}deg) scale(${hovering ? 1.1 : 1})`,
+        transition: 'transform 0.2s ease-out',
       }}
     >
-      <Microscope className="w-5 h-5 text-white drop-shadow-sm" />
+      <Microscope
+        className="w-5 h-5 text-white drop-shadow-sm"
+        style={{
+          transform: `translate(${look.x * 2}px, ${look.y * 2}px)`,
+          transition: 'transform 0.15s ease-out',
+        }}
+      />
     </div>
   )
 }
