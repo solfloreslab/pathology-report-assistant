@@ -93,6 +93,7 @@ export function ReportPreview({
 
   const criticalPending = pendingFields.filter(f => f.severity === 'critical')
   const majorPending = pendingFields.filter(f => f.severity === 'major')
+  const hasAnyData = completionPercent > 0
 
   const dm = darkMode
   const cardClass = dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'
@@ -137,11 +138,11 @@ export function ReportPreview({
         </div>
 
         {/* Crítico */}
-        <div className={`rounded-lg border p-2.5 ${criticalPending.length > 0 ? 'bg-[var(--color-critical-bg)] border-red-200' : cardClass}`}>
+        <div className={`rounded-lg border p-2.5 ${hasAnyData && criticalPending.length > 0 ? 'bg-[var(--color-critical-bg)] border-red-200' : cardClass}`}>
           <div className="flex items-center gap-1 mb-1">
-            {criticalPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-critical)]" />}
-            <span className={`text-[11px] font-bold uppercase ${criticalPending.length > 0 ? 'text-[var(--color-critical-text)]' : textSec}`}>
-              {t('severity.critical', lang)} ({criticalPending.length})
+            {hasAnyData && criticalPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-critical)]" />}
+            <span className={`text-[11px] font-bold uppercase ${hasAnyData && criticalPending.length > 0 ? 'text-[var(--color-critical-text)]' : textSec}`}>
+              {lang === 'es' ? 'Faltantes críticos' : 'Critical missing'} ({criticalPending.length})
             </span>
           </div>
           {criticalPending.length > 0 ? (
@@ -160,11 +161,11 @@ export function ReportPreview({
         </div>
 
         {/* Mayor */}
-        <div className={`rounded-lg border p-2.5 ${majorPending.length > 0 ? 'bg-[var(--color-major-bg)] border-orange-200' : cardClass}`}>
+        <div className={`rounded-lg border p-2.5 ${hasAnyData && majorPending.length > 0 ? 'bg-[var(--color-major-bg)] border-orange-200' : cardClass}`}>
           <div className="flex items-center gap-1 mb-1">
-            {majorPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-major)]" />}
-            <span className={`text-[11px] font-bold uppercase ${majorPending.length > 0 ? 'text-[var(--color-major-text)]' : textSec}`}>
-              {t('severity.major', lang)} ({majorPending.length})
+            {hasAnyData && majorPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-major)]" />}
+            <span className={`text-[11px] font-bold uppercase ${hasAnyData && majorPending.length > 0 ? 'text-[var(--color-major-text)]' : textSec}`}>
+              {lang === 'es' ? 'Faltantes recomendados' : 'Recommended missing'} ({majorPending.length})
             </span>
           </div>
           {majorPending.length > 0 ? (
