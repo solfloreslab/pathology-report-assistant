@@ -46,7 +46,6 @@ export function ReportPreview({
   const [reviewing, setReviewing] = useState(false)
   const [reviewResult, setReviewResult] = useState<AIReviewResult | null>(null)
   const [formatVersion, setFormatVersion] = useState(0)
-  const [manuallyEdited, setManuallyEdited] = useState(false)
   const reportRef = useRef<HTMLDivElement>(null)
 
   // Listen for format config changes (localStorage)
@@ -116,7 +115,8 @@ export function ReportPreview({
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
-  }
+    }
+  }, [protocol.id])
 
   const applyFormat = useCallback((command: string, value?: string) => {
     document.execCommand(command, false, value)
@@ -502,21 +502,11 @@ export function ReportPreview({
                 suppressContentEditableWarning
                 className="outline-none whitespace-pre-wrap break-words text-[var(--color-text)] report-text min-h-[200px] p-1"
                 style={{ fontFamily: 'var(--font-sans)' }}
-                onInput={() => { if (!manuallyEdited) setManuallyEdited(true) }}
-                {...(!manuallyEdited ? { dangerouslySetInnerHTML: { __html: report.replace(/\n/g, '<br>') } } : {})}
+                dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, '<br>') }}
               />
-              {manuallyEdited && (
-                <div className="flex items-center gap-2 mt-2 text-[11px] flex-wrap">
-                  <span className="text-amber-600">
-                    {lang === 'es' ? '✏️ Texto editado — el formulario no sobreescribe. La IA revisará este texto.' : '✏️ Text edited — form won\'t overwrite. AI will review this text.'}
-                  </span>
-                  <button onClick={() => setManuallyEdited(false)}
-                    className="text-[var(--color-primary)] hover:underline font-medium">
-                    {lang === 'es' ? '↺ Regenerar desde formulario' : '↺ Regenerate from form'}
-                  </button>
-                </div>
-              )}
-
+              <div className="text-[10px] text-[var(--color-text-tertiary)] mt-1 italic">
+                {lang === 'es' ? 'Puede editar este texto libremente. "Revisar con IA" leerá lo que esté aquí.' : 'You can edit this text freely. "Review with AI" will read whatever is here.'}
+              </div>
               {/* AI Review results are shown in the alert panel above */}
             </>
           ) : (
