@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { X, BookOpen, Save, RotateCcw, Info, Check, AlertTriangle } from 'lucide-react'
+import { X, BookOpen, Save, RotateCcw, Info, Check, AlertTriangle, ChevronDown } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import { protocols } from '../data/protocols'
-import type { FieldDef, DropdownOption } from '../data/protocols'
+import type { FieldDef } from '../data/protocols'
 
 // ─── Types ───
 
@@ -12,14 +12,15 @@ interface CustomRule {
   abbreviation: string
   field: string
   value: string
+  expansion?: string   // Original user text (kept for display when manually mapped)
 }
 
 interface ParsedLine {
   abbreviation: string
   expansion: string
   matched: boolean
-  fieldLabel: string       // Human-readable field name (or "" if unmatched)
-  optionLabel: string      // Human-readable option label (or expansion if unmatched)
+  fieldLabel: string
+  optionLabel: string
   rule: CustomRule
 }
 
@@ -33,48 +34,37 @@ export function getCustomRules(): CustomRule[] {
 
 // ─── Fuzzy matching engine ───
 
-/** Normalize text for comparison: lowercase, strip accents, trim */
 function normalize(s: string): string {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
 }
 
-/** Score how well `input` matches `candidate`. Higher = better. 0 = no match. */
 function matchScore(input: string, candidate: string): number {
   const a = normalize(input)
   const b = normalize(candidate)
-  if (a === b) return 100                     // Exact
-  if (b.startsWith(a)) return 90              // Input is prefix of candidate
-  if (a.startsWith(b)) return 85              // Candidate is prefix of input
-  if (b.includes(a)) return 70                // Input found inside candidate
-  if (a.includes(b) && b.length > 4) return 65 // Candidate found inside input (min length to avoid false positives)
-  if (a.length > 3 && b.includes(a.slice(0, -1))) return 50  // Fuzzy (1 char off)
+  if (a === b) return 100
+  if (b.startsWith(a)) return 90
+  if (a.startsWith(b)) return 85
+  if (b.includes(a)) return 70
+  if (a.includes(b) && b.length > 4) return 65
+  if (a.length > 3 && b.includes(a.slice(0, -1))) return 50
   return 0
 }
 
-/** Word-boundary check: ensures we match whole words, not substrings like "no" in "carcinoma" */
 function hasWord(text: string, word: string): boolean {
   const re = new RegExp(`(?:^|\\s|[/\\-])${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|\\s|[/\\-])`)
   return re.test(text)
 }
 
-/** Tristate field matching: detect present/absent/not_evaluated from natural text */
 function matchTristate(expansion: string): string | null {
   const n = normalize(expansion)
-
-  // Not evaluated (check first — most specific)
   const nePatterns = ['no evaluad', 'not evaluated', 'n/e', 'indeterminad', 'cannot be determined']
   for (const w of nePatterns) if (n.includes(w)) return 'not_evaluated'
-
-  // Absent — use word boundaries for short words to avoid false positives
   const absentExact = ['ausente', 'absent', 'negativo', 'negative', 'not identified', 'no identificad']
   for (const w of absentExact) if (n.includes(w)) return 'absent'
   if (hasWord(n, 'no') || hasWord(n, 'sin')) return 'absent'
-
-  // Present — use word boundaries for short words
   const presentExact = ['presente', 'present', 'positivo', 'positive', 'identified', 'identificad']
   for (const w of presentExact) if (n.includes(w)) return 'present'
   if (hasWord(n, 'si') || hasWord(n, 'yes')) return 'present'
-
   return null
 }
 
@@ -85,14 +75,12 @@ interface FuzzyResult {
   optionLabel: string
 }
 
-/** Find the best matching field+value for a user expansion text */
 function fuzzyMatch(expansion: string, fields: FieldDef[], lang: Lang): FuzzyResult | null {
   const labelKey = lang === 'es' ? 'label_es' : 'label_en'
   let bestScore = 0
   let bestResult: FuzzyResult | null = null
 
   for (const field of fields) {
-    // Dropdown fields: match against option labels
     if (field.type === 'dropdown' && field.options) {
       for (const opt of field.options) {
         const score = Math.max(
@@ -112,18 +100,14 @@ function fuzzyMatch(expansion: string, fields: FieldDef[], lang: Lang): FuzzyRes
       }
     }
 
-    // Tristate fields: match present/absent/NE
     if (field.type === 'tristate') {
       const tsValue = matchTristate(expansion)
       if (tsValue) {
-        // Also check if the expansion mentions this field's name
         const fieldScore = Math.max(
           matchScore(expansion, field.label_es),
           matchScore(expansion, field.label_en),
           matchScore(expansion, field.name.replace(/_/g, ' '))
         )
-        // Tristate gets a base score of 40 (lower than dropdown exact matches)
-        // but boosted if the expansion mentions the field name
         const score = 40 + fieldScore
         if (score > bestScore) {
           bestScore = score
@@ -143,7 +127,6 @@ function fuzzyMatch(expansion: string, fields: FieldDef[], lang: Lang): FuzzyRes
     }
   }
 
-  // Only return if score is meaningful
   return bestScore >= 40 ? bestResult : null
 }
 
@@ -161,9 +144,7 @@ function parseLine(line: string): { abbreviation: string; expansion: string } | 
 }
 
 function rulesToText(rules: CustomRule[]): string {
-  // Reconstruct from stored rules — show abbreviation + the original expansion
-  // We store field+value internally, but display the user-friendly text
-  return rules.map(r => `${r.abbreviation}\t${r.value}`).join('\n')
+  return rules.map(r => `${r.abbreviation}\t${r.expansion || r.value}`).join('\n')
 }
 
 // ─── Component ───
@@ -178,6 +159,11 @@ interface DictionaryEditorProps {
 export function DictionaryEditor({ lang, open, onClose, protocolId }: DictionaryEditorProps) {
   const [text, setText] = useState('')
   const [saved, setSaved] = useState(false)
+  // Manual overrides: abbreviation → field name (for entries the user maps by hand)
+  const [manualOverrides, setManualOverrides] = useState<Record<string, string>>({})
+
+  const es = lang === 'es'
+  const labelKey = es ? 'label_es' : 'label_en'
 
   // Get fields for active protocol
   const fields = useMemo(() => {
@@ -186,13 +172,35 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
     return proto?.fields || []
   }, [protocolId])
 
-  // Parse all lines with fuzzy matching
+  // Parse all lines with fuzzy matching + manual overrides
   const parsed = useMemo((): ParsedLine[] => {
     const results: ParsedLine[] = []
     for (const line of text.split('\n')) {
       const p = parseLine(line)
       if (!p) continue
 
+      // Check manual override first
+      const overrideField = manualOverrides[p.abbreviation]
+      if (overrideField) {
+        const field = fields.find(f => f.name === overrideField)
+        results.push({
+          abbreviation: p.abbreviation,
+          expansion: p.expansion,
+          matched: true,
+          fieldLabel: field?.[labelKey] || overrideField,
+          optionLabel: p.expansion,
+          rule: {
+            id: `custom-${p.abbreviation}-${results.length}`,
+            abbreviation: p.abbreviation,
+            field: overrideField,
+            value: p.expansion,
+            expansion: p.expansion,
+          },
+        })
+        continue
+      }
+
+      // Try fuzzy match
       const match = fields.length > 0 ? fuzzyMatch(p.expansion, fields, lang) : null
       results.push({
         abbreviation: p.abbreviation,
@@ -205,11 +213,12 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
           abbreviation: p.abbreviation,
           field: match?.field || 'custom',
           value: match?.value || p.expansion,
+          expansion: p.expansion,
         },
       })
     }
     return results
-  }, [text, fields, lang])
+  }, [text, fields, lang, manualOverrides, labelKey])
 
   const matchedCount = parsed.filter(p => p.matched).length
   const unmatchedCount = parsed.filter(p => !p.matched).length
@@ -219,9 +228,21 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
     if (open) {
       const rules = getCustomRules()
       setText(rules.length > 0 ? rulesToText(rules) : '')
+      // Restore manual overrides from previously saved rules
+      const overrides: Record<string, string> = {}
+      for (const r of rules) {
+        if (r.field !== 'custom' && r.expansion) {
+          // This was manually mapped before — check if fuzzy wouldn't match it
+          const autoMatch = fields.length > 0 ? fuzzyMatch(r.expansion, fields, lang) : null
+          if (!autoMatch || autoMatch.field !== r.field) {
+            overrides[r.abbreviation] = r.field
+          }
+        }
+      }
+      setManualOverrides(overrides)
       setSaved(false)
     }
-  }, [open])
+  }, [open, fields, lang])
 
   const handleSave = useCallback(() => {
     const rules = parsed.map(p => p.rule)
@@ -232,9 +253,13 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
 
   const handleReset = useCallback(() => {
     setText('')
+    setManualOverrides({})
   }, [])
 
-  /** Intercept Tab key to insert a tab character instead of changing focus */
+  const handleManualField = useCallback((abbreviation: string, fieldName: string) => {
+    setManualOverrides(prev => ({ ...prev, [abbreviation]: fieldName }))
+  }, [])
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault()
@@ -243,7 +268,6 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
       const end = ta.selectionEnd
       const newText = text.slice(0, start) + '\t' + text.slice(end)
       setText(newText)
-      // Restore cursor position after React re-render
       requestAnimationFrame(() => {
         ta.selectionStart = ta.selectionEnd = start + 1
       })
@@ -251,8 +275,6 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
   }, [text])
 
   if (!open) return null
-
-  const es = lang === 'es'
 
   return (
     <AnimatePresence>
@@ -300,8 +322,8 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
                 </p>
                 <p>
                   {es
-                    ? 'Use tabulación para separar la abreviación del significado. El sistema detecta automáticamente a qué campo del formulario corresponde cada entrada.'
-                    : 'Use tab to separate the abbreviation from its meaning. The system automatically detects which form field each entry corresponds to.'}
+                    ? 'Use tabulación para separar la abreviación del significado. El sistema detecta automáticamente a qué campo corresponde. Si no lo reconoce, puede asignarlo manualmente.'
+                    : 'Use tab to separate the abbreviation from its meaning. The system auto-detects the form field. If unrecognized, you can assign it manually.'}
                 </p>
               </div>
             </div>
@@ -329,7 +351,7 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
             </div>
 
             {/* Preview panel */}
-            <div className="w-[280px] shrink-0 border border-l-0 border-[var(--color-border)] rounded-r-xl bg-[var(--color-surface-alt)] overflow-y-auto">
+            <div className="w-[300px] shrink-0 border border-l-0 border-[var(--color-border)] rounded-r-xl bg-[var(--color-surface-alt)] overflow-y-auto">
               {parsed.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-xs text-[var(--color-text-tertiary)] p-4 text-center">
                   {es
@@ -341,32 +363,51 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
                   {parsed.map((p, i) => (
                     <div
                       key={i}
-                      className={`flex items-start gap-2 p-2 rounded-lg text-xs ${
+                      className={`p-2 rounded-lg text-xs ${
                         p.matched
                           ? 'bg-[var(--color-severity-green)]/8 border border-[var(--color-severity-green)]/20'
                           : 'bg-[var(--color-severity-orange)]/8 border border-[var(--color-severity-orange)]/20'
                       }`}
                     >
-                      {p.matched ? (
-                        <Check className="w-3.5 h-3.5 text-[var(--color-severity-green)] shrink-0 mt-0.5" />
-                      ) : (
-                        <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-severity-orange)] shrink-0 mt-0.5" />
-                      )}
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <code className="font-mono font-bold text-[var(--color-primary)]">{p.abbreviation}</code>
-                          <span className="text-[var(--color-text-tertiary)]">→</span>
-                          <span className="font-medium text-[var(--color-text)] truncate">{p.optionLabel}</span>
-                        </div>
+                      <div className="flex items-start gap-2">
                         {p.matched ? (
-                          <span className="text-[10px] text-[var(--color-severity-green)]">
-                            {p.fieldLabel}
-                          </span>
+                          <Check className="w-3.5 h-3.5 text-[var(--color-severity-green)] shrink-0 mt-0.5" />
                         ) : (
-                          <span className="text-[10px] text-[var(--color-severity-orange)]">
-                            {es ? 'Sin mapeo — solo texto' : 'No mapping — text only'}
-                          </span>
+                          <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-severity-orange)] shrink-0 mt-0.5" />
                         )}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <code className="font-mono font-bold text-[var(--color-primary)]">{p.abbreviation}</code>
+                            <span className="text-[var(--color-text-tertiary)]">→</span>
+                            <span className="font-medium text-[var(--color-text)] truncate">{p.optionLabel}</span>
+                          </div>
+                          {p.matched ? (
+                            <span className="text-[10px] text-[var(--color-severity-green)]">
+                              {p.fieldLabel}
+                            </span>
+                          ) : (
+                            /* Manual field selector for unmatched entries */
+                            <div className="mt-1.5">
+                              <div className="relative">
+                                <select
+                                  value=""
+                                  onChange={e => handleManualField(p.abbreviation, e.target.value)}
+                                  className="w-full text-[11px] pl-2 pr-6 py-1 rounded-md border border-[var(--color-severity-orange)]/30 bg-white text-[var(--color-text-secondary)] appearance-none cursor-pointer hover:border-[var(--color-primary)] transition-colors"
+                                >
+                                  <option value="" disabled>
+                                    {es ? '¿A qué campo corresponde?' : 'Which field does it map to?'}
+                                  </option>
+                                  {fields.map(f => (
+                                    <option key={f.name} value={f.name}>
+                                      {f[labelKey]}
+                                    </option>
+                                  ))}
+                                </select>
+                                <ChevronDown className="w-3 h-3 absolute right-1.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)] pointer-events-none" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
