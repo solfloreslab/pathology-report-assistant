@@ -111,35 +111,51 @@ export function ReportPreview({
     <div className="space-y-2">
       {/* Row 1: 3 cuadros — Completitud | Crítico | Mayor */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        {/* Completitud */}
+        {/* Completitud — anillo + barras */}
         <div className={`rounded-lg border p-2.5 ${cardClass}`}>
-          <div className="flex items-center justify-between mb-1">
-            <span className={`text-[11px] font-semibold uppercase ${textSec}`}>
-              {t('completion.title', lang)}
-            </span>
-            <span className="text-sm font-bold font-mono" style={{
-              color: completionPercent >= 80 ? 'var(--color-success)' :
-                completionPercent >= 50 ? 'var(--color-warning-text)' : 'var(--color-critical)',
-            }}>{completionPercent}%</span>
-          </div>
-          <div className={`w-full h-1.5 rounded-full overflow-hidden mb-1.5 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
-            <div className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${completionPercent}%`,
-                backgroundColor: completionPercent >= 80 ? 'var(--color-success)' :
-                  completionPercent >= 50 ? 'var(--color-warning)' : 'var(--color-critical)',
-              }} />
-          </div>
-          <div className="space-y-0">
-            {sectionStatuses.map(s => (
-              <a key={s.id} href={`#section-${s.id}`}
-                className="flex items-center justify-between text-[11px] leading-[18px] px-1 rounded hover:bg-[var(--color-surface-alt)]">
-                <span className="text-[var(--color-text-secondary)] truncate">{t(`form.section.${s.id}` as any, lang)}</span>
-                <span className={`font-mono ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
-                  {s.status === 'complete' ? '✓' : `${s.filled}/${s.total}`}
-                </span>
-              </a>
-            ))}
+          <div className="flex gap-3">
+            {/* Completion Ring SVG */}
+            <div className="shrink-0 flex items-center justify-center">
+              <svg width="64" height="64" viewBox="0 0 64 64" className="transform -rotate-90">
+                <circle cx="32" cy="32" r="26" fill="none" stroke={dm ? '#374151' : '#E2E5EA'} strokeWidth="6" />
+                <circle cx="32" cy="32" r="26" fill="none"
+                  stroke={completionPercent >= 80 ? 'var(--color-success)' : completionPercent >= 50 ? 'var(--color-warning)' : 'var(--color-critical)'}
+                  strokeWidth="6" strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 26}`}
+                  strokeDashoffset={`${2 * Math.PI * 26 * (1 - completionPercent / 100)}`}
+                  className="transition-all duration-700 ease-out"
+                />
+                <text x="32" y="32" textAnchor="middle" dominantBaseline="central"
+                  className="transform rotate-90 origin-center"
+                  fill={completionPercent >= 80 ? 'var(--color-success)' : completionPercent >= 50 ? 'var(--color-warning-text)' : 'var(--color-critical)'}
+                  fontSize="14" fontWeight="700" fontFamily="var(--font-mono)">
+                  {completionPercent}%
+                </text>
+              </svg>
+            </div>
+            {/* Section bars */}
+            <div className="flex-1 min-w-0 space-y-0.5">
+              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSec}`}>
+                {t('completion.title', lang)}
+              </span>
+              {sectionStatuses.map(s => {
+                const pct = s.total > 0 ? (s.filled / s.total) * 100 : 0
+                const barColor = s.status === 'complete' ? 'var(--color-success)' : s.status === 'partial' ? 'var(--color-warning)' : (dm ? '#374151' : '#E2E5EA')
+                return (
+                  <a key={s.id} href={`#section-${s.id}`}
+                    className="flex items-center gap-2 text-[11px] leading-[16px] px-1 rounded hover:bg-[var(--color-surface-alt)] group">
+                    <span className="text-[var(--color-text-secondary)] truncate flex-1 min-w-0">{t(`form.section.${s.id}` as any, lang)}</span>
+                    <div className={`w-14 h-1.5 rounded-full overflow-hidden shrink-0 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
+                      <div className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${pct}%`, backgroundColor: barColor }} />
+                    </div>
+                    <span className={`font-mono w-7 text-right text-[10px] shrink-0 ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
+                      {s.status === 'complete' ? '✓' : `${s.filled}/${s.total}`}
+                    </span>
+                  </a>
+                )
+              })}
+            </div>
           </div>
         </div>
 
