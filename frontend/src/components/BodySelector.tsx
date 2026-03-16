@@ -9,24 +9,26 @@ import { getFavorites, toggleFavorite } from './favorites'
 interface BodySelectorProps {
   lang: Lang
   onSelect: (protocol: ProtocolDef) => void
+  darkMode?: boolean
 }
 
 const ORGAN_GROUPS = [
-  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['colon-resection'] },
-  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['melanoma'] },
-  { id: 'breast', label_es: 'Mama', label_en: 'Breast', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['breast-biopsy'] },
-  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['gastric'] },
-  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['cytology-cervical'] },
-  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
-  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
-  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
-  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
-  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
-  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
-  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', protocols: [] },
+  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', gradient: 'from-[#134E4A] to-[#0F766E]', disabledGradient: 'from-gray-700 to-gray-600', protocols: ['colon-resection'] },
+  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', gradient: 'from-[#134E4A] to-[#0F766E]', disabledGradient: 'from-gray-700 to-gray-600', protocols: ['melanoma'] },
+  { id: 'breast', label_es: 'Mama', label_en: 'Breast', gradient: 'from-[#134E4A] to-[#0F766E]', disabledGradient: 'from-gray-700 to-gray-600', protocols: ['breast-biopsy'] },
+  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', gradient: 'from-[#134E4A] to-[#0F766E]', disabledGradient: 'from-gray-700 to-gray-600', protocols: ['gastric'] },
+  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', gradient: 'from-[#134E4A] to-[#0F766E]', disabledGradient: 'from-gray-700 to-gray-600', protocols: ['cytology-cervical'] },
+  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
+  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
+  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
+  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
+  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
+  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
+  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', gradient: 'from-[#E2E8F0] to-[#CBD5E1]', disabledGradient: 'from-gray-700 to-gray-600', protocols: [] },
 ]
 
-export function BodySelector({ lang, onSelect }: BodySelectorProps) {
+export function BodySelector({ lang, onSelect, darkMode }: BodySelectorProps) {
+  const dm = darkMode ?? false
   const [query, setQuery] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [favs, setFavs] = useState(getFavorites)
@@ -74,7 +76,7 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder={lang === 'es' ? 'Buscar órgano o protocolo...' : 'Search organ or protocol...'}
-          className="w-full pl-9 pr-4 py-2.5 text-sm border border-[var(--color-border)] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent shadow-sm"
+          className={`w-full pl-9 pr-4 py-2.5 text-sm border rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent shadow-sm ${dm ? 'bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500' : 'bg-white border-[var(--color-border)] text-[var(--color-text)]'}`}
         />
       </div>
 
@@ -100,7 +102,7 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               {/* Card header with gradient */}
-              <div className={`flex items-center gap-4 p-4 bg-gradient-to-br ${group.gradient}`}>
+              <div className={`flex items-center gap-4 p-4 bg-gradient-to-br ${!hasProtocols && dm ? group.disabledGradient : group.gradient}`}>
                 <div className="flex w-10 h-10 items-center justify-center rounded-xl bg-white/10 flex-shrink-0">
                   <div className="w-4 h-4 rounded-full bg-white/30" />
                 </div>
