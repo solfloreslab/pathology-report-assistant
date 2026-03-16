@@ -9,6 +9,8 @@ import type { ReportStyle } from '../data/templates'
 import type { FieldDef } from '../data/protocols'
 
 import { highlightClinical } from '../data/utils'
+import { evaluateRules } from '../data/rules'
+import type { InlineAlert } from '../data/rules'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -94,6 +96,9 @@ export function ReportPreview({
   const criticalPending = pendingFields.filter(f => f.severity === 'critical')
   const majorPending = pendingFields.filter(f => f.severity === 'major')
   const hasAnyData = completionPercent > 0
+
+  // Inline deterministic rules
+  const inlineAlerts = useMemo(() => evaluateRules(protocol.id, values), [protocol.id, values])
 
   const dm = darkMode
   const cardClass = dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'
@@ -273,6 +278,28 @@ export function ReportPreview({
             </div>
           )}
       </div>
+
+      {/* Inline rule alerts */}
+      {inlineAlerts.length > 0 && (
+        <div className="space-y-1.5">
+          {inlineAlerts.map(a => (
+            <div key={a.id} className={`p-2.5 rounded-lg border-l-3 text-[13px] ${
+              a.severity === 'error' ? 'bg-red-50 border-l-red-500' :
+              a.severity === 'warning' ? 'bg-amber-50 border-l-amber-500' :
+              'bg-blue-50 border-l-blue-400'
+            }`}>
+              <span className={`text-[10px] font-bold uppercase ${
+                a.severity === 'error' ? 'text-red-600' :
+                a.severity === 'warning' ? 'text-amber-600' :
+                'text-blue-600'
+              }`}>
+                {a.severity === 'error' ? 'ERROR' : a.severity === 'warning' ? (lang === 'es' ? 'AVISO' : 'WARNING') : 'INFO'}
+              </span>
+              <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(lang === 'es' ? a.message_es : a.message_en) }} />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Row 2: Informe editable con toolbar */}
       <div className="rounded-lg border border-[var(--color-border)] overflow-hidden bg-white flex flex-col flex-1">
