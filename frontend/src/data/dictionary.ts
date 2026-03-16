@@ -28,10 +28,10 @@ const colonRules: DictRule[] = [
   { patterns: [/\bG3\b/i, /\bpobre/i, /\bpoorly/i], field: 'histologic_grade', value: 'G3' },
 
   // Depth
-  { patterns: [/\bsubmuc/i], field: 'depth_of_invasion', value: 'submucosa' },
-  { patterns: [/\bmusc.*prop/i, /\bmuscular\b/i], field: 'depth_of_invasion', value: 'muscularis_propria' },
-  { patterns: [/\bpericol/i, /\bsubser/i], field: 'depth_of_invasion', value: 'pericolorectal' },
-  { patterns: [/\bseros/i], field: 'depth_of_invasion', value: 'serosa' },
+  { patterns: [/\bsubmuc/i], field: 'depth_of_invasion', value: 'pT1' },
+  { patterns: [/\bmusc.*prop/i, /\bmuscular\b/i], field: 'depth_of_invasion', value: 'pT2' },
+  { patterns: [/\bpericol/i, /\bsubser/i], field: 'depth_of_invasion', value: 'pT3' },
+  { patterns: [/\bseros/i], field: 'depth_of_invasion', value: 'pT4a' },
 
   // Location
   { patterns: [/\bsigmoid/i], field: 'tumor_location', value: 'sigmoid' },
