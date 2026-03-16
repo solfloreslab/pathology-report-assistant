@@ -133,7 +133,9 @@ export default function App() {
                 <button
                   onClick={handleAudit}
                   disabled={auditorReviewing || !auditorText.trim()}
-                  className="px-6 py-2.5 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium flex items-center gap-2 hover:opacity-90 disabled:opacity-50"
+                  className={`px-6 py-2.5 rounded-lg text-white text-sm font-medium flex items-center gap-2 transition-all ${
+                    auditorReviewing ? 'bg-green-600 animate-pulse cursor-wait' : 'bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-50'
+                  }`}
                 >
                   {auditorReviewing ? (
                     <><span className="animate-spin">⏳</span> {lang === 'es' ? 'Analizando...' : 'Analyzing...'}</>

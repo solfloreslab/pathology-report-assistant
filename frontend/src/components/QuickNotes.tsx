@@ -78,7 +78,9 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
       <button
         onClick={handlePrefill}
         disabled={!notes.trim() || loading}
-        className="mt-2 w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--color-primary-dark)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className={`mt-2 w-full flex items-center justify-center gap-2 py-2.5 px-4 text-white text-sm font-semibold rounded-lg transition-all ${
+          loading ? 'bg-green-600 animate-pulse cursor-wait' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-40 disabled:cursor-not-allowed'
+        }`}
       >
         {loading ? (
           <>
