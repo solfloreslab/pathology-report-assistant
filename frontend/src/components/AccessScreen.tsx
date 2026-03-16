@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
 import { MicroscopeMascot } from './MicroscopeMascot'
+import { ParticleCanvas } from './ParticleCanvas'
 
 interface AccessScreenProps {
   lang: Lang
@@ -25,9 +26,13 @@ export function AccessScreen({ lang, toggleLang, onLogin }: AccessScreenProps) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4"
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{ background: 'radial-gradient(ellipse at 30% 20%, #E6F4F1 0%, #F7F8FA 50%, #EDF5FF 100%)' }}>
-      <div className="w-full max-w-sm">
+      {/* Particle constellation — bottom right */}
+      <div className="absolute bottom-0 right-0 w-[60%] h-[60%] opacity-60">
+        <ParticleCanvas count={50} color="#0E6B5E" />
+      </div>
+      <div className="w-full max-w-sm relative z-10">
         {/* Microscope with parallax */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
