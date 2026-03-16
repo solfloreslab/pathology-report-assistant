@@ -114,6 +114,18 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
   lines.push(lang === 'es' ? 'DESCRIPCIÓN MICROSCÓPICA:' : 'MICROSCOPIC DESCRIPTION:')
   const microParts: string[] = []
 
+  // Procedure + location context (important for clinical consistency)
+  const proc = displayVal(protocol, values, 'procedure_type', lang)
+  const tumorLoc = displayVal(protocol, values, 'tumor_location', lang)
+  if (proc || tumorLoc) {
+    const contextParts: string[] = []
+    if (proc) contextParts.push(proc)
+    if (tumorLoc) contextParts.push(tumorLoc.toLowerCase())
+    microParts.push(lang === 'es'
+      ? `Espécimen de ${contextParts.join(', ')}`
+      : `Specimen from ${contextParts.join(', ')}`)
+  }
+
   const histType = displayVal(protocol, values, 'histologic_type', lang)
   const histGrade = displayVal(protocol, values, 'histologic_grade', lang)
   const depth = displayVal(protocol, values, 'depth_of_invasion', lang)
@@ -299,7 +311,7 @@ function generateSynoptic(protocol: ProtocolDef, values: FormValues, lang: Lang)
       displayValue = tristateText(v, lang) || v
     }
 
-    lines.push(`• ${fieldLabel}: ${displayValue}`)
+    lines.push(`• ${fieldLabel}: ${cleanLabel(displayValue)}`)
   }
 
   // TNM summary
@@ -338,7 +350,7 @@ function generateMixed(protocol: ProtocolDef, values: FormValues, lang: Lang): s
 
   if (loc) lines.push(`• ${lang === 'es' ? 'Localización' : 'Location'}: ${loc}`)
   if (histType) lines.push(`• ${lang === 'es' ? 'Tipo histológico' : 'Histologic type'}: ${histType}`)
-  if (histGrade) lines.push(`• ${lang === 'es' ? 'Grado' : 'Grade'}: ${histGrade}`)
+  if (histGrade) lines.push(`• ${lang === 'es' ? 'Grado' : 'Grade'}: ${cleanLabel(histGrade)}`)
 
   const pt = val(values, 'pt_stage')
   const pn = val(values, 'pn_stage')
