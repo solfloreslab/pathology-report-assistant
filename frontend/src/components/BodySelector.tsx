@@ -11,18 +11,18 @@ interface BodySelectorProps {
 }
 
 const ORGAN_GROUPS = [
-  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', gradient: 'from-[#0E6B5E] to-[#0A5249]', protocols: ['colon-resection'] },
-  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', gradient: 'from-[#0E6B5E] to-[#065F46]', protocols: ['melanoma'] },
-  { id: 'breast', label_es: 'Mama', label_en: 'Breast', gradient: 'from-[#115E59] to-[#0E6B5E]', protocols: ['breast-biopsy'] },
-  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', gradient: 'from-[#0A5249] to-[#115E59]', protocols: ['gastric'] },
-  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', gradient: 'from-[#065F46] to-[#0E6B5E]', protocols: ['cytology-cervical'] },
-  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
-  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
-  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
-  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
-  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
-  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
-  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['colon-resection'] },
+  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['melanoma'] },
+  { id: 'breast', label_es: 'Mama', label_en: 'Breast', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['breast-biopsy'] },
+  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['gastric'] },
+  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', gradient: 'from-[#134E4A] to-[#0F766E]', protocols: ['cytology-cervical'] },
+  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
+  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
+  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
+  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
+  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
+  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
+  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', gradient: 'from-[#A7F3D0] to-[#6EE7B7]', protocols: [] },
 ]
 
 export function BodySelector({ lang, onSelect }: BodySelectorProps) {
