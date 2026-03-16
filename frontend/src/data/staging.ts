@@ -99,7 +99,15 @@ function suggestColonPt(values: FormValues): StagingSuggestion | null {
   const depth = values['depth_of_invasion']
   if (!depth) return null
 
+  // Values match dropdown option values in protocols.ts
   const mapping: Record<string, string> = {
+    'pTis': 'pTis',
+    'pT1': 'pT1',
+    'pT2': 'pT2',
+    'pT3': 'pT3',
+    'pT4a': 'pT4a',
+    'pT4b': 'pT4b',
+    // Legacy keys
     'submucosa': 'pT1',
     'muscularis_propria': 'pT2',
     'pericolorectal': 'pT3',
@@ -111,6 +119,12 @@ function suggestColonPt(values: FormValues): StagingSuggestion | null {
   if (!stage) return null
 
   const depthLabels: Record<string, [string, string]> = {
+    'pTis': ['Mucosa (in situ)', 'Mucosa (in situ)'],
+    'pT1': ['Submucosa', 'Submucosa'],
+    'pT2': ['Muscular propia', 'Muscularis propria'],
+    'pT3': ['Subserosa', 'Subserosa'],
+    'pT4a': ['Serosa', 'Serosa'],
+    'pT4b': ['Órganos adyacentes', 'Adjacent organs'],
     'submucosa': ['Submucosa', 'Submucosa'],
     'muscularis_propria': ['Muscular propia', 'Muscularis propria'],
     'pericolorectal': ['Tejido pericolónico', 'Pericolorectal tissues'],
@@ -181,6 +195,61 @@ const pmTable: StagingReference = {
 
 // ─── PUBLIC API ───
 
+// --- GASTRIC pT from depth ---
+function suggestGastricPt(values: FormValues): StagingSuggestion | null {
+  const depth = values['depth_of_invasion'] || values['tumor_extent']
+  if (!depth) return null
+  const mapping: Record<string, string> = {
+    'pTis': 'pTis', 'pT1a': 'pT1a', 'pT1b': 'pT1b', 'pT2': 'pT2', 'pT3': 'pT3', 'pT4a': 'pT4a', 'pT4b': 'pT4b',
+    'lamina_propria': 'pT1a', 'muscularis_mucosae': 'pT1a', 'submucosa': 'pT1b',
+    'muscularis_propria': 'pT2', 'subserosal': 'pT3', 'serosa': 'pT4a', 'adjacent_structures': 'pT4b',
+  }
+  const stage = mapping[depth]
+  if (!stage) return null
+  return { field: 'pt_stage', value: stage, reason_es: `Profundidad: ${depth}`, reason_en: `Depth: ${depth}` }
+}
+
+// --- GASTRIC pN from nodes ---
+function suggestGastricPn(values: FormValues): StagingSuggestion | null {
+  const pos = parseInt(values['lymph_nodes_positive'] || '')
+  if (isNaN(pos)) return null
+  let stage: string
+  if (pos === 0) stage = 'pN0'
+  else if (pos <= 2) stage = 'pN1'
+  else if (pos <= 6) stage = 'pN2'
+  else if (pos <= 15) stage = 'pN3a'
+  else stage = 'pN3b'
+  return { field: 'pn_stage', value: stage, reason_es: `${pos} ganglios positivos`, reason_en: `${pos} positive nodes` }
+}
+
+// --- BREAST pT from size ---
+function suggestBreastPt(values: FormValues): StagingSuggestion | null {
+  const size = parseFloat(values['tumor_size'] || values['tumor_size_mm'] || '')
+  if (isNaN(size) || size <= 0) return null
+  // Size in mm for breast
+  const mm = values['tumor_size_mm'] ? size : size * 10
+  let stage: string
+  if (mm <= 1) stage = 'pt1mi'
+  else if (mm <= 5) stage = 'pt1a'
+  else if (mm <= 10) stage = 'pt1b'
+  else if (mm <= 20) stage = 'pt1c'
+  else if (mm <= 50) stage = 'pt2'
+  else stage = 'pt3'
+  return { field: 'pt_category', value: stage, reason_es: `Tamaño: ${mm}mm`, reason_en: `Size: ${mm}mm` }
+}
+
+// --- BREAST pN from nodes ---
+function suggestBreastPn(values: FormValues): StagingSuggestion | null {
+  const macro = parseInt(values['lymph_nodes_with_macrometastases'] || values['lymph_nodes_positive'] || '')
+  if (isNaN(macro)) return null
+  let stage: string
+  if (macro === 0) stage = 'pn0'
+  else if (macro <= 3) stage = 'pn1a'
+  else if (macro <= 9) stage = 'pn2a'
+  else stage = 'pn3a'
+  return { field: 'pn_category', value: stage, reason_es: `${macro} ganglios con macrometástasis`, reason_en: `${macro} nodes with macrometastases` }
+}
+
 export function getSuggestions(protocolId: string, values: FormValues): StagingSuggestion[] {
   const suggestions: StagingSuggestion[] = []
 
@@ -193,6 +262,20 @@ export function getSuggestions(protocolId: string, values: FormValues): StagingS
     const pt = suggestColonPt(values)
     if (pt) suggestions.push(pt)
     const pn = suggestColonPn(values)
+    if (pn) suggestions.push(pn)
+  }
+
+  if (protocolId === 'gastric') {
+    const pt = suggestGastricPt(values)
+    if (pt) suggestions.push(pt)
+    const pn = suggestGastricPn(values)
+    if (pn) suggestions.push(pn)
+  }
+
+  if (protocolId === 'breast-biopsy') {
+    const pt = suggestBreastPt(values)
+    if (pt) suggestions.push(pt)
+    const pn = suggestBreastPn(values)
     if (pn) suggestions.push(pn)
   }
 
