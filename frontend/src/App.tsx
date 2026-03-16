@@ -123,9 +123,10 @@ export default function App() {
       <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
         {/* AUDITOR MODE */}
         {mode === 'auditor' ? (
-          <div className="max-w-5xl mx-auto mt-4">
-            {/* Input area — full width */}
-            <div className="mb-4">
+          <div className="mx-auto mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Input area — left column */}
+            <div>
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h3 className="text-base font-bold">{lang === 'es' ? 'Pegar informe para auditar' : 'Paste report to audit'}</h3>
@@ -149,12 +150,12 @@ export default function App() {
                 value={auditorText}
                 onChange={(e) => { setAuditorText(e.target.value); setAuditorResult(null) }}
                 placeholder={lang === 'es' ? 'Pegue aquí el informe completo de anatomía patológica...' : 'Paste the full pathology report here...'}
-                className={`w-full h-48 p-3 rounded-xl border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
+                className={`w-full min-h-[300px] p-3 rounded-xl border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
               />
             </div>
 
-            {/* Results — grid below */}
-            <div>
+            {/* Results — right column */}
+            <div className="space-y-3">
                 {auditorResult?.error ? (
                   <div className="p-4 bg-red-50 rounded-xl border border-red-200 text-red-700 text-sm">
                     {lang === 'es' ? 'Error al auditar: ' : 'Audit error: '}{auditorResult.message}
@@ -277,6 +278,7 @@ export default function App() {
                   </div>
                 ) : null}
             </div>
+            </div>{/* close grid */}
           </div>
         ) : !protocol ? (
           <div className="mt-4">
