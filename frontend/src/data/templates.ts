@@ -180,7 +180,8 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
     const mv = val(values, mf)
     if (mv) {
       const field = protocol.fields.find(f => f.name === mf)
-      if (field) marginParts.push(`${label(field, lang)}: ${mv}`)
+      const unit = field?.unit || ''
+      if (field) marginParts.push(`${label(field, lang)}: ${mv}${unit ? ' ' + unit : ''}`)
     }
   }
   if (marginParts.length > 0) {
