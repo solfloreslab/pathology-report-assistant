@@ -416,38 +416,52 @@ export const CIE_O_CODES: Record<string, {
 }> = {
   'colon-resection': {
     topography: {
-      'cecum': 'C18.0', 'ascending': 'C18.2', 'hepatic': 'C18.3',
-      'transverse': 'C18.4', 'splenic': 'C18.5', 'descending': 'C18.6',
-      'sigmoid': 'C18.7', 'rectum': 'C20.9',
+      'cecum': 'C18.0', 'ascending_colon': 'C18.2', 'hepatic_flexure': 'C18.3',
+      'transverse_colon': 'C18.4', 'splenic_flexure': 'C18.5', 'descending_colon': 'C18.6',
+      'sigmoid_colon': 'C18.7', 'rectum': 'C20.9', 'rectosigmoid': 'C19.9',
     },
     morphology: {
-      'adeno_nos': 'M8140/3', 'mucinous': 'M8480/3',
-      'serrated': 'M8213/3', 'signet': 'M8490/3',
-      'medullary': 'M8510/3',
+      'adeno_nos': 'M8140/3', 'mucinous': 'M8480/3', 'serrated': 'M8213/3',
+      'signet_ring': 'M8490/3', 'medullary': 'M8510/3', 'adenosquamous': 'M8560/3',
     },
   },
   melanoma: {
-    topography: { '': 'C44.9' },
+    topography: {
+      'trunk': 'C44.5', 'upper_limb': 'C44.6', 'lower_limb': 'C44.7',
+      'scalp_neck': 'C44.4', 'face': 'C44.3', 'ear': 'C44.2',
+    },
     morphology: {
-      'superficial': 'M8743/3', 'nodular': 'M8721/3',
-      'lentigo': 'M8742/3', 'acral': 'M8744/3', 'desmoplastic': 'M8745/3',
+      'superficial_spreading': 'M8743/3', 'nodular': 'M8721/3',
+      'lentigo_maligna': 'M8742/3', 'acral': 'M8744/3', 'desmoplastic': 'M8745/3',
     },
   },
   'breast-biopsy': {
-    topography: { '': 'C50.9' },
+    topography: {
+      'upper_outer': 'C50.4', 'lower_outer': 'C50.5', 'upper_inner': 'C50.2',
+      'lower_inner': 'C50.3', 'central': 'C50.1', 'nipple': 'C50.0',
+    },
     morphology: {
-      'ductal': 'M8500/3', 'lobular': 'M8520/3',
-      'mucinous': 'M8480/3', 'tubular': 'M8211/3',
+      'ductal_nst': 'M8500/3', 'lobular': 'M8520/3', 'mucinous': 'M8480/3',
+      'tubular': 'M8211/3', 'micropapillary': 'M8507/3', 'medullary': 'M8510/3',
     },
   },
   gastric: {
     topography: {
-      'cardia': 'C16.0', 'fundus': 'C16.1', 'body': 'C16.2',
-      'antrum': 'C16.3', 'pylorus': 'C16.4',
+      'cardia': 'C16.0', 'fundus': 'C16.1', 'body_anterior': 'C16.2', 'body_posterior': 'C16.2',
+      'body_lesser': 'C16.2', 'body_greater': 'C16.2', 'antrum_anterior': 'C16.3',
+      'antrum_lesser': 'C16.3', 'pylorus': 'C16.4',
     },
     morphology: {
-      'intestinal': 'M8144/3', 'diffuse': 'M8145/3',
-      'mucinous': 'M8480/3',
+      'adenocarcinoma_intestinal': 'M8144/3', 'adenocarcinoma_diffuse': 'M8145/3',
+      'adenocarcinoma_mixed': 'M8140/3', 'mucinous': 'M8480/3',
+    },
+  },
+  'cytology-cervical': {
+    topography: {
+      'endocervix': 'C53.0', 'exocervix': 'C53.1',
+    },
+    morphology: {
+      'squamous': 'M8070/3', 'adenocarcinoma': 'M8140/3', 'adenosquamous': 'M8560/3',
     },
   },
 }
