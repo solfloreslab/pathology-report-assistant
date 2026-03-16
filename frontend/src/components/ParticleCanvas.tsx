@@ -27,12 +27,15 @@ export function ParticleCanvas({ count = 50, color = '#0E6B5E', className = '' }
     }
     resize()
 
+    const w0 = canvas.width / dpr
+    const h0 = canvas.height / dpr
+    // Concentrate particles in bottom-right quadrant
     const particles = Array.from({ length: count }, () => ({
-      x: Math.random() * canvas.width / dpr,
-      y: Math.random() * canvas.height / dpr,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 2 + 1,
+      x: w0 * 0.4 + Math.random() * w0 * 0.6,
+      y: h0 * 0.3 + Math.random() * h0 * 0.7,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 2.5 + 1,
     }))
 
     const threshold = 100
@@ -57,7 +60,7 @@ export function ParticleCanvas({ count = 50, color = '#0E6B5E', className = '' }
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < threshold) {
-            const alpha = (1 - dist / threshold) * 0.12
+            const alpha = (1 - dist / threshold) * 0.3
             ctx.strokeStyle = `${color}${Math.round(alpha * 255).toString(16).padStart(2, '0')}`
             ctx.lineWidth = 0.5
             ctx.beginPath()
@@ -70,7 +73,7 @@ export function ParticleCanvas({ count = 50, color = '#0E6B5E', className = '' }
 
       // Draw particles
       for (const p of particles) {
-        ctx.fillStyle = `${color}18`
+        ctx.fillStyle = `${color}40`
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
         ctx.fill()

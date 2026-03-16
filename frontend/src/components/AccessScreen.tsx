@@ -29,7 +29,7 @@ export function AccessScreen({ lang, toggleLang, onLogin }: AccessScreenProps) {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{ background: 'radial-gradient(ellipse at 30% 20%, #E6F4F1 0%, #F7F8FA 50%, #EDF5FF 100%)' }}>
       {/* Particle constellation — bottom right */}
-      <div className="absolute bottom-0 right-0 w-[60%] h-[60%] opacity-60">
+      <div className="absolute bottom-0 right-0 w-[70%] h-[70%]">
         <ParticleCanvas count={50} color="#0E6B5E" />
       </div>
       <div className="w-full max-w-sm relative z-10">
