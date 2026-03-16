@@ -43,22 +43,38 @@ function matchScore(input: string, candidate: string): number {
   const a = normalize(input)
   const b = normalize(candidate)
   if (a === b) return 100                     // Exact
-  if (b.startsWith(a)) return 90              // Prefix
-  if (b.includes(a)) return 70                // Substring
+  if (b.startsWith(a)) return 90              // Input is prefix of candidate
+  if (a.startsWith(b)) return 85              // Candidate is prefix of input
+  if (b.includes(a)) return 70                // Input found inside candidate
+  if (a.includes(b) && b.length > 4) return 65 // Candidate found inside input (min length to avoid false positives)
   if (a.length > 3 && b.includes(a.slice(0, -1))) return 50  // Fuzzy (1 char off)
   return 0
+}
+
+/** Word-boundary check: ensures we match whole words, not substrings like "no" in "carcinoma" */
+function hasWord(text: string, word: string): boolean {
+  const re = new RegExp(`(?:^|\\s|[/\\-])${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|\\s|[/\\-])`)
+  return re.test(text)
 }
 
 /** Tristate field matching: detect present/absent/not_evaluated from natural text */
 function matchTristate(expansion: string): string | null {
   const n = normalize(expansion)
-  const presentWords = ['presente', 'present', 'positiv', 'si', 'yes', 'identified', 'identificad']
-  const absentWords = ['ausente', 'absent', 'negativ', 'no', 'sin ', 'not identified', 'no identificad', 'not_evaluated']
-  const neWords = ['no evaluad', 'not evaluated', 'ne', 'n/e', 'indeterminad', 'cannot be determined']
 
-  for (const w of neWords) if (n.includes(w)) return 'not_evaluated'
-  for (const w of absentWords) if (n.includes(w)) return 'absent'
-  for (const w of presentWords) if (n.includes(w)) return 'present'
+  // Not evaluated (check first — most specific)
+  const nePatterns = ['no evaluad', 'not evaluated', 'n/e', 'indeterminad', 'cannot be determined']
+  for (const w of nePatterns) if (n.includes(w)) return 'not_evaluated'
+
+  // Absent — use word boundaries for short words to avoid false positives
+  const absentExact = ['ausente', 'absent', 'negativo', 'negative', 'not identified', 'no identificad']
+  for (const w of absentExact) if (n.includes(w)) return 'absent'
+  if (hasWord(n, 'no') || hasWord(n, 'sin')) return 'absent'
+
+  // Present — use word boundaries for short words
+  const presentExact = ['presente', 'present', 'positivo', 'positive', 'identified', 'identificad']
+  for (const w of presentExact) if (n.includes(w)) return 'present'
+  if (hasWord(n, 'si') || hasWord(n, 'yes')) return 'present'
+
   return null
 }
 
@@ -218,6 +234,22 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
     setText('')
   }, [])
 
+  /** Intercept Tab key to insert a tab character instead of changing focus */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const ta = e.currentTarget
+      const start = ta.selectionStart
+      const end = ta.selectionEnd
+      const newText = text.slice(0, start) + '\t' + text.slice(end)
+      setText(newText)
+      // Restore cursor position after React re-render
+      requestAnimationFrame(() => {
+        ta.selectionStart = ta.selectionEnd = start + 1
+      })
+    }
+  }, [text])
+
   if (!open) return null
 
   const es = lang === 'es'
@@ -282,6 +314,7 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
               <textarea
                 value={text}
                 onChange={e => setText(e.target.value)}
+                onKeyDown={handleKeyDown}
                 spellCheck={false}
                 placeholder={[
                   es ? '# Ejemplo (líneas con # se ignoran):' : '# Example (# lines are ignored):',
