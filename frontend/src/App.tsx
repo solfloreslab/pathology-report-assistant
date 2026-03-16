@@ -290,7 +290,7 @@ export default function App() {
                 {t('app.subtitle', lang)}
               </p>
             </div>
-            <BodySelector lang={lang} onSelect={handleSelectProtocol} />
+            <BodySelector lang={lang} onSelect={handleSelectProtocol} darkMode={darkMode} />
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-3">

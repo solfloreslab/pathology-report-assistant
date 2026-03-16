@@ -61,6 +61,30 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Dark mode overrides — triggered by Tailwind's bg-gray-950 on root */
+  .bg-gray-950 {
+    --color-page: #030712;
+    --color-surface: #111827;
+    --color-surface-alt: #1F2937;
+    --color-text: #E5E7EB;
+    --color-text-secondary: #9CA3AF;
+    --color-text-tertiary: #6B7280;
+    --color-border: #374151;
+    --color-border-input: #4B5563;
+    --color-primary-light: #064E3B;
+    --color-critical-bg: #450a0a;
+    --color-critical-text: #FCA5A5;
+    --color-major-bg: #431407;
+    --color-major-text: #FDBA74;
+    --color-warning-bg: #422006;
+    --color-warning-text: #FDE68A;
+    --color-success-bg: #052e16;
+    --color-success-text: #86EFAC;
+    --color-info-bg: #1e1b4b;
+    --color-info-text: #93C5FD;
+    --color-na-bg: #1F2937;
+  }
+
   #root {
     min-height: 100vh;
     display: flex;

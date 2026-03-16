@@ -111,7 +111,11 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
 
   if (histType) {
     let desc = histType
-    if (histGrade) desc += `, ${histGrade.toLowerCase()}`
+    if (histGrade) {
+      // Remove the dash separator from dropdown labels like "G2 — Moderadamente diferenciado"
+      const gradeClean = histGrade.replace(/\s*—\s*/, ', ')
+      desc += `, ${gradeClean}`
+    }
     microParts.push(desc)
   }
 

@@ -47,7 +47,7 @@ export function ProtocolSearch({ lang, onSelect, selected }: ProtocolSearchProps
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-between p-3 bg-white rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-colors"
+        className="w-full flex items-center justify-between p-3 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-lg">{selected.icon}</span>
@@ -64,7 +64,7 @@ export function ProtocolSearch({ lang, onSelect, selected }: ProtocolSearchProps
   }
 
   return (
-    <div className="bg-white rounded-xl border border-[var(--color-border)] overflow-hidden">
+    <div className="bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] overflow-hidden">
       <div className="p-3 border-b border-[var(--color-surface-alt)]">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />

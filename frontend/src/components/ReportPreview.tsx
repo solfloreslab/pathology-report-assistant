@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react'
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { Copy, Check, AlertTriangle, Sparkles, Bold, Italic, Underline, CaseSensitive, Loader2, Settings2 } from 'lucide-react'
 import type { ProtocolDef } from '../data/protocols'
 import type { FormValues, SectionStatus } from '../hooks/useFormState'

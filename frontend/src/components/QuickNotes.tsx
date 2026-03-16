@@ -68,7 +68,7 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-all bg-white"
+        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-all bg-[var(--color-surface)]"
       >
         <MessageSquareText className="w-4 h-4" />
         {lang === 'es' ? 'Texto libre' : 'Free text'}
@@ -77,7 +77,7 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
   }
 
   return (
-    <div className="bg-white rounded-xl border border-dashed border-[var(--color-primary)] border-opacity-40 p-4">
+    <div className="bg-[var(--color-surface)] rounded-xl border border-dashed border-[var(--color-primary)] border-opacity-40 p-4">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[var(--color-primary)]" />
@@ -112,7 +112,7 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
         onChange={e => handleChange(e.target.value)}
         placeholder={lang === 'es' ? 'Escriba sus notas aquí...' : 'Write your notes here...'}
         rows={3}
-        className="w-full px-3 py-2 text-sm border border-[var(--color-border-input)] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent text-[var(--color-text)] resize-y"
+        className="w-full px-3 py-2 text-sm border border-[var(--color-border-input)] rounded-lg bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent text-[var(--color-text)] resize-y"
       />
       {matchCount > 0 && (
         <div className="flex items-center gap-1 mt-1 mb-1">
