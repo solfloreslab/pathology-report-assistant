@@ -301,6 +301,18 @@ export function ReportPreview({
         </div>
       )}
 
+      {/* Banner CAP compliance warning */}
+      {hasAnyData && criticalPending.length > 0 && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600 text-white text-[12px] font-medium">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+          <span>
+            {lang === 'es'
+              ? `${criticalPending.length} campo${criticalPending.length > 1 ? 's' : ''} obligatorio${criticalPending.length > 1 ? 's' : ''} CAP pendiente${criticalPending.length > 1 ? 's' : ''} — el informe no cumple protocolo`
+              : `${criticalPending.length} required CAP field${criticalPending.length > 1 ? 's' : ''} pending — report does not meet protocol`}
+          </span>
+        </div>
+      )}
+
       {/* Row 2: Informe editable con toolbar */}
       <div className="rounded-lg border border-[var(--color-border)] overflow-hidden bg-white flex flex-col flex-1">
         {/* Toolbar: formato + copiar + IA */}
