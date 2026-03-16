@@ -271,138 +271,136 @@ export function ReportPreview({
         </div>
       </div>
 
-      {/* AI Review alerts — below the 3 boxes */}
-      <div className="space-y-1.5">
+      {/* Alerts: side-by-side — Automatic (left) | AI Review (right) */}
+      {(inlineAlerts.length > 0 || reviewResult || reviewing) && (
+        <div className="grid grid-cols-1 lg:grid-cols-[35%_1fr] gap-2 text-[13px]">
 
-          {/* AI Review results — shown in alert panel */}
-          {reviewing && (
-            <div className={`p-2.5 rounded-lg flex items-center gap-2 ${dm ? 'bg-blue-900/30' : 'bg-[var(--color-info-bg)]'}`}>
-              <Loader2 className="w-4 h-4 animate-spin text-[var(--color-primary)]" />
-              <span className={`text-[13px] ${dm ? 'text-blue-300' : 'text-[var(--color-info-text)]'}`}>
-                {lang === 'es' ? 'La IA está revisando...' : 'AI is reviewing...'}
-              </span>
+          {/* LEFT — Automatic validation */}
+          <div className={`rounded-xl border overflow-hidden self-start ${dm ? 'bg-gray-900 border-gray-700' : 'bg-[var(--color-surface)] border-[var(--color-border)]'}`}>
+            <div className={`flex items-center gap-2 px-3 py-2 border-b ${dm ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-[var(--color-border)]'}`}>
+              <span className="text-sm">⚡</span>
+              <div>
+                <span className={`text-xs font-bold uppercase ${dm ? 'text-gray-300' : 'text-gray-700'}`}>
+                  {lang === 'es' ? 'Validación automática' : 'Automatic validation'}
+                </span>
+                <p className={`text-[11px] ${dm ? 'text-gray-500' : 'text-gray-400'}`}>
+                  {lang === 'es' ? 'Instantánea, basada en reglas' : 'Instant, rule-based'}
+                </p>
+              </div>
             </div>
-          )}
+            {inlineAlerts.length > 0 ? (
+              <div>
+                {inlineAlerts.map(a => (
+                  <div key={a.id} className={`px-3 py-2.5 border-b last:border-b-0 ${dm ? 'border-gray-800' : 'border-gray-100'}`}>
+                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                      a.severity === 'error' ? 'bg-red-500' : a.severity === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
+                    }`} />
+                    <span className={`text-[11px] font-bold uppercase mr-1.5 ${
+                      a.severity === 'error' ? (dm ? 'text-red-400' : 'text-red-600') :
+                      a.severity === 'warning' ? (dm ? 'text-amber-400' : 'text-amber-600') :
+                      (dm ? 'text-blue-400' : 'text-blue-600')
+                    }`}>
+                      {a.severity === 'error' ? 'ERROR' : a.severity === 'warning' ? (lang === 'es' ? 'AVISO' : 'WARNING') : 'INFO'}
+                    </span>
+                    <div className={`mt-1 ${dm ? 'text-gray-300' : 'text-gray-700'}`}
+                      dangerouslySetInnerHTML={{ __html: highlightClinical(lang === 'es' ? a.message_es : a.message_en) }} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={`px-3 py-4 text-center ${dm ? 'text-gray-600' : 'text-gray-400'}`}>
+                {lang === 'es' ? 'Sin alertas automáticas' : 'No automatic alerts'}
+              </div>
+            )}
+          </div>
 
-          {reviewResult && !reviewing && (
-            <div className={`rounded-xl border overflow-hidden ${dm ? 'border-gray-700' : 'border-blue-200'}`}>
-              <div className={`flex items-center gap-2 px-3 py-1.5 ${dm ? 'bg-gray-800' : 'bg-blue-50'} border-b ${dm ? 'border-gray-700' : 'border-blue-200'}`}>
-                <span className="text-sm">🔬</span>
-                <span className={`text-xs font-bold uppercase ${dm ? 'text-blue-400' : 'text-blue-700'}`}>
+          {/* RIGHT — AI Review */}
+          <div className={`rounded-xl border overflow-hidden self-start ${dm ? 'bg-gray-900 border-gray-700' : 'bg-[var(--color-surface)] border-[var(--color-border)]'}`}>
+            <div className={`flex items-center gap-2 px-3 py-2 border-b ${dm ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-[var(--color-border)]'}`}>
+              <span className="text-sm">🔬</span>
+              <div>
+                <span className={`text-xs font-bold uppercase ${dm ? 'text-gray-300' : 'text-gray-700'}`}>
                   {lang === 'es' ? 'Revisión IA' : 'AI Review'}
                 </span>
-                <span className={`text-[11px] ${dm ? 'text-gray-500' : 'text-blue-400'}`}>
-                  — {lang === 'es' ? 'análisis profundo del informe' : 'deep report analysis'}
-                </span>
+                <p className={`text-[11px] ${dm ? 'text-gray-500' : 'text-gray-400'}`}>
+                  {lang === 'es' ? 'Análisis profundo del informe' : 'Deep report analysis'}
+                </p>
               </div>
-              <div className="space-y-0">
-              {/* AI Review — no issues */}
-              {(reviewResult.inconsistencies?.length === 0 && reviewResult.clinical_alerts?.length === 0) && (
-                <div className="p-2.5 rounded-lg text-[13px] border-l-3 bg-green-50 border-l-green-500 dark:bg-green-900/20">
-                  <span className="font-bold text-green-700 dark:text-green-300">
+            </div>
+
+            {reviewing ? (
+              <div className={`px-3 py-4 flex items-center justify-center gap-2 ${dm ? 'text-blue-300' : 'text-[var(--color-info-text)]'}`}>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {lang === 'es' ? 'La IA está revisando...' : 'AI is reviewing...'}
+              </div>
+            ) : reviewResult ? (
+              <div>
+                {/* No issues */}
+                {(reviewResult.inconsistencies?.length === 0 && reviewResult.clinical_alerts?.length === 0 && (!reviewResult.missing_fields || reviewResult.missing_fields.length === 0)) && (
+                  <div className={`px-3 py-4 text-center font-medium ${dm ? 'text-green-400' : 'text-green-600'}`}>
                     ✓ {lang === 'es' ? 'Sin inconsistencias detectadas' : 'No inconsistencies detected'}
-                  </span>
-                </div>
-              )}
-              {/* Inconsistencies */}
-              {reviewResult.inconsistencies?.map((inc, i) => (
-                <div key={`inc-${i}`} className={`p-2.5 rounded-lg text-[13px] border-l-3 ${
-                  inc.severity === 'error'
-                    ? 'bg-[var(--color-critical-bg)] border-l-red-500'
-                    : 'bg-[var(--color-warning-bg)] border-l-amber-500'
-                }`}>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span className={`font-bold text-[10px] uppercase ${
-                      inc.severity === 'error' ? 'text-red-600' : 'text-amber-600'
+                  </div>
+                )}
+
+                {/* Inconsistencies */}
+                {reviewResult.inconsistencies?.map((inc, i) => (
+                  <div key={`inc-${i}`} className={`px-3 py-2.5 border-b last:border-b-0 ${dm ? 'border-gray-800' : 'border-gray-100'}`}>
+                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                      inc.severity === 'error' ? 'bg-red-500' : 'bg-amber-500'
+                    }`} />
+                    <span className={`text-[11px] font-bold uppercase mr-1.5 ${
+                      inc.severity === 'error' ? (dm ? 'text-red-400' : 'text-red-600') : (dm ? 'text-amber-400' : 'text-amber-600')
                     }`}>
                       {inc.severity === 'error' ? 'ERROR' : (lang === 'es' ? 'AVISO' : 'WARNING')}
                     </span>
+                    <div className={`mt-1 ${dm ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span dangerouslySetInnerHTML={{ __html: highlightClinical(inc.finding || inc.description || '') }} />
+                      {inc.suggestion && (
+                        <span className={dm ? 'text-gray-400' : 'text-gray-500'}> → <span dangerouslySetInnerHTML={{ __html: highlightClinical(inc.suggestion) }} /></span>
+                      )}
+                    </div>
                   </div>
-                  <div className={dm ? 'text-gray-200' : 'text-gray-800'}>
-                    <span dangerouslySetInnerHTML={{ __html: highlightClinical(inc.finding || inc.description || '') }} />
-                    {inc.suggestion && (
-                      <span className={dm ? 'text-gray-400' : 'text-gray-500'}> → <span dangerouslySetInnerHTML={{ __html: highlightClinical(inc.suggestion) }} /></span>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {/* Clinical Alerts */}
-              {reviewResult.clinical_alerts?.map((alert, i) => (
-                <div key={`alert-${i}`} className={`p-2.5 rounded-lg text-[13px] border-l-3 ${
-                  alert.type === 'warning'
-                    ? 'bg-amber-50 border-l-amber-400 dark:bg-amber-900/20'
-                    : 'bg-blue-50 border-l-blue-400 dark:bg-blue-900/20'
-                }`}>
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-[10px] font-bold uppercase text-blue-600">
+                ))}
+
+                {/* Clinical Alerts */}
+                {reviewResult.clinical_alerts?.map((alert, i) => (
+                  <div key={`alert-${i}`} className={`px-3 py-2.5 border-b last:border-b-0 ${dm ? 'border-gray-800' : 'border-gray-100'}`}>
+                    <span className="inline-block w-2 h-2 rounded-full mr-2 bg-blue-500" />
+                    <span className={`text-[11px] font-bold uppercase mr-1.5 ${dm ? 'text-blue-400' : 'text-blue-600'}`}>
                       {lang === 'es' ? 'ALERTA CLÍNICA' : 'CLINICAL ALERT'}
                     </span>
+                    <div className={`mt-1 ${dm ? 'text-gray-300' : 'text-gray-700'}`}
+                      dangerouslySetInnerHTML={{ __html: highlightClinical(alert.alert) }} />
                   </div>
-                  <div className={dm ? 'text-gray-200' : 'text-gray-800'}
-                    dangerouslySetInnerHTML={{ __html: highlightClinical(alert.alert) }}
-                  />
-                </div>
-              ))}
-              {/* Missing fields from AI (puntual) */}
-              {reviewResult.missing_fields?.length > 0 && (
-                <div className={`p-2.5 rounded-lg text-[13px] border-l-3 border-l-orange-400 ${dm ? 'bg-orange-900/20' : 'bg-orange-50'}`}>
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-orange-500" />
-                    <span className="text-[10px] font-bold uppercase text-orange-600">
-                      {lang === 'es' ? 'CAMPOS FALTANTES (IA)' : 'MISSING FIELDS (AI)'}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {reviewResult.missing_fields.filter(f => f.severity === 'critical').map((f, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">
-                        {f.label || f.field}{f.action ? ` → ${f.action}` : ''}
-                      </span>
-                    ))}
-                    {reviewResult.missing_fields.filter(f => f.severity === 'major').map((f, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                        {f.label || f.field}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              </div>
-            </div>
-          )}
-      </div>
+                ))}
 
-      {/* Inline rule alerts — automatic validation */}
-      {inlineAlerts.length > 0 && (
-        <div className={`rounded-xl border overflow-hidden ${dm ? 'border-gray-700' : 'border-amber-200'}`}>
-          <div className={`flex items-center gap-2 px-3 py-1.5 ${dm ? 'bg-gray-800' : 'bg-amber-50'} border-b ${dm ? 'border-gray-700' : 'border-amber-200'}`}>
-            <span className="text-sm">⚡</span>
-            <span className={`text-xs font-bold uppercase ${dm ? 'text-amber-400' : 'text-amber-700'}`}>
-              {lang === 'es' ? 'Validación automática' : 'Automatic validation'}
-            </span>
-            <span className={`text-[11px] ${dm ? 'text-gray-500' : 'text-amber-500'}`}>
-              — {lang === 'es' ? 'instantánea, basada en reglas' : 'instant, rule-based'}
-            </span>
-          </div>
-          <div className="space-y-0">
-            {inlineAlerts.map(a => (
-              <div key={a.id} className={`p-2.5 border-l-3 text-[13px] border-b last:border-b-0 ${
-                a.severity === 'error'
-                  ? (dm ? 'bg-red-950/30 border-l-red-500 border-b-gray-800' : 'bg-red-50/50 border-l-red-500 border-b-red-100')
-                  : a.severity === 'warning'
-                  ? (dm ? 'bg-amber-950/30 border-l-amber-500 border-b-gray-800' : 'bg-amber-50/50 border-l-amber-500 border-b-amber-100')
-                  : (dm ? 'bg-blue-950/30 border-l-blue-400 border-b-gray-800' : 'bg-blue-50/50 border-l-blue-400 border-b-blue-100')
-              }`}>
-                <span className={`text-[11px] font-bold uppercase ${
-                  a.severity === 'error' ? (dm ? 'text-red-400' : 'text-red-600') :
-                  a.severity === 'warning' ? (dm ? 'text-amber-400' : 'text-amber-600') :
-                  (dm ? 'text-blue-400' : 'text-blue-600')
-                }`}>
-                  {a.severity === 'error' ? 'ERROR' : a.severity === 'warning' ? (lang === 'es' ? 'AVISO' : 'WARNING') : 'INFO'}
-                </span>
-                <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(lang === 'es' ? a.message_es : a.message_en) }} />
+                {/* Missing fields from AI */}
+                {reviewResult.missing_fields?.length > 0 && (
+                  <div className={`px-3 py-2.5 border-b last:border-b-0 ${dm ? 'border-gray-800' : 'border-gray-100'}`}>
+                    <span className="inline-block w-2 h-2 rounded-full mr-2 bg-orange-500" />
+                    <span className={`text-[11px] font-bold uppercase mr-1.5 ${dm ? 'text-orange-400' : 'text-orange-600'}`}>
+                      {lang === 'es' ? 'CAMPOS FALTANTES' : 'MISSING FIELDS'}
+                    </span>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {reviewResult.missing_fields.filter(f => f.severity === 'critical').map((f, i) => (
+                        <span key={i} className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${dm ? 'bg-red-900/40 text-red-300' : 'bg-red-100 text-red-700'}`}>
+                          {f.label || f.field}{f.action ? ` → ${f.action}` : ''}
+                        </span>
+                      ))}
+                      {reviewResult.missing_fields.filter(f => f.severity === 'major').map((f, i) => (
+                        <span key={i} className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${dm ? 'bg-amber-900/40 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
+                          {f.label || f.field}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            ))}
+            ) : (
+              <div className={`px-3 py-4 text-center ${dm ? 'text-gray-600' : 'text-gray-400'}`}>
+                {lang === 'es' ? 'Pulse "Revisar con IA" para analizar' : 'Click "Review with AI" to analyze'}
+              </div>
+            )}
           </div>
         </div>
       )}

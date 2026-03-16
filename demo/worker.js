@@ -330,10 +330,10 @@ Output schema:
     {"field": "field_name", "label": "Human name in {LANG}", "severity": "critical"|"major"|"minor", "action": "What to do in {LANG}"}
   ],
   "inconsistencies": [
-    {"finding": "What is wrong in {LANG}", "severity": "warning"|"error", "suggestion": "How to fix in {LANG}"}
+    {"finding": "SHORT summary in 1 line (e.g. 'pT1 + pN2b + M1a inconsistente')", "detail": "Brief explanation in 1-2 lines", "severity": "warning"|"error", "suggestion": "Action in 1 line"}
   ],
   "clinical_alerts": [
-    {"alert": "Clinical observation in {LANG}", "type": "info"|"warning"}
+    {"alert": "SHORT clinical observation in 1-2 lines max", "type": "info"|"warning"}
   ],
   "suggested_coding": {
     "topography": "CIE-O topography code (e.g. C18.7) or null",
@@ -362,7 +362,11 @@ Rules:
     - Low lymph node count for the procedure type
   * RULE: If the finding is anatomically/logically impossible → "error". If it is rare but can exist in clinical practice → "warning". When in doubt → "warning".
 - suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
-- Keep text SHORT and actionable.
+- Keep ALL text SHORT and scannable. The pathologist has 2 seconds to read each item.
+- "finding" must be ONE LINE (max 15 words). Example: "Ganglios positivos (9) > examinados (8)"
+- "detail" is the brief explanation (1-2 lines max). Example: "pN2b y M1a no son compatibles con pT1"
+- "suggestion" is the action (1 line). Example: "Revisar estadificación"
+- "alert" must be 1-2 lines max. NO paragraphs.
 --- PROTOCOL FIELDS ---
 {FIELDS}
 --- PROTOCOL RULES ---
