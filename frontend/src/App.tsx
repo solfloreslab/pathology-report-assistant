@@ -92,8 +92,9 @@ export default function App() {
       if (!res.ok) throw new Error('API error')
       const data = await res.json()
       setAuditorResult(data)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Audit failed:', err)
+      setAuditorResult({ error: true, message: err.message || 'Error al auditar' })
     } finally {
       setAuditorReviewing(false)
     }
@@ -154,7 +155,11 @@ export default function App() {
 
             {/* Results — grid below */}
             <div>
-                {auditorResult ? (
+                {auditorResult?.error ? (
+                  <div className="p-4 bg-red-50 rounded-xl border border-red-200 text-red-700 text-sm">
+                    {lang === 'es' ? 'Error al auditar: ' : 'Audit error: '}{auditorResult.message}
+                  </div>
+                ) : auditorResult ? (
                   <div className="space-y-3">
                     {/* Completeness score */}
                     {auditorResult.validation?.completeness_score !== undefined && (
