@@ -42,5 +42,11 @@ confidential/
 # Internal docs (plans, research, AI assistant config)
 _private/
 
+# Legacy versions
+_legacy/
+
+# Python cache
+.pytest_cache/
+
 # Plans (local only)
 *.plan.md
