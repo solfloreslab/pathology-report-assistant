@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { TriStateControl } from './TriStateControl'
 import { StagingPopup } from './StagingPopup'
 import type { FieldDef } from '../data/protocols'
@@ -37,16 +37,21 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
     || /margin|margen|size|tamaño/i.test(field.name)
   const hasUnitToggle = isDistanceField && (field.type === 'number' || field.type === 'text')
   const defaultUnit = field.unit === 'mm' ? 'mm' : 'cm'
-  const [activeUnit, setActiveUnit] = useState(() =>
-    hasUnitToggle ? getPreferredUnit(field.name, defaultUnit) : (field.unit || '')
-  )
+
+  const [activeUnit, setActiveUnit] = useState(defaultUnit)
+
+  // Sync from localStorage on mount
+  useEffect(() => {
+    if (hasUnitToggle) {
+      setActiveUnit(getPreferredUnit(field.name, defaultUnit))
+    }
+  }, [field.name])
 
   const handleUnitToggle = (e: React.MouseEvent, unit: string) => {
     e.preventDefault()
     e.stopPropagation()
-    if (unit === activeUnit) return
-    setActiveUnit(unit)
     setPreferredUnit(field.name, unit)
+    setActiveUnit(unit)
   }
   const label = lang === 'es' ? field.label_es : field.label_en
   const isFilled = value !== '' && value !== undefined
