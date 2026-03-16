@@ -348,9 +348,19 @@ Rules:
 - "not_reported" or null = MISSING.
 - Each issue = SEPARATE object.
 - INCONSISTENCY SEVERITY:
-  * "error" = ONLY for IMPOSSIBLE combinations (e.g. right hemicolectomy + sigmoid location, positive nodes > examined nodes, pT4 with depth submucosa). These are DATA ENTRY ERRORS that cannot exist in reality.
-  * "warning" = for UNUSUAL but clinically POSSIBLE findings (e.g. signet ring cell in mucosa only, high mitotic index for tumor type). These are CLINICAL OBSERVATIONS that the pathologist should verify, NOT errors.
-  * NEVER classify unusual-but-possible findings as "error". When in doubt, use "warning".
+  * "error" = IMPOSSIBLE combinations that CANNOT exist anatomically or logically:
+    - Right hemicolectomy + sigmoid/descending/splenic location (wrong side of colon)
+    - Left hemicolectomy + cecum/ascending (wrong side of colon)
+    - Positive lymph nodes > examined lymph nodes
+    - pT4 with depth reported as submucosa (pT1)
+    - Breslow 0.5mm with pT4 (impossible staging)
+    - More than 100% Ki-67
+  * "warning" = UNUSUAL but clinically POSSIBLE findings that the pathologist should verify:
+    - Signet ring cell carcinoma limited to mucosa (rare but exists)
+    - Very high mitotic index for the tumor type
+    - Young patient with diffuse gastric cancer (consider CDH1)
+    - Low lymph node count for the procedure type
+  * RULE: If the finding is anatomically/logically impossible → "error". If it is rare but can exist in clinical practice → "warning". When in doubt → "warning".
 - suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
 - Keep text SHORT and actionable.
 --- PROTOCOL FIELDS ---
