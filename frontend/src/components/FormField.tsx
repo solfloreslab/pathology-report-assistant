@@ -29,11 +29,7 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
   const severityClass = field.severity === 'critical' ? 'text-[var(--color-critical)]' :
     field.severity === 'major' ? 'text-[var(--color-major)]' : 'text-[var(--color-text-tertiary)]'
 
-  const inputBase = `w-full px-3 py-1.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent ${
-    darkMode
-      ? 'bg-gray-800 border-gray-600 text-gray-200 placeholder-gray-500'
-      : 'bg-white border-[var(--color-border-input)] text-[var(--color-text)]'
-  } border`
+  const inputBase = `w-full px-3 py-1.5 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent bg-[var(--color-surface)] border-[var(--color-border-input)] text-[var(--color-text)] border`
 
   return (
     <div className={`flex flex-col gap-1 pl-2.5 border-l-[3px] ${borderColor}`}>
