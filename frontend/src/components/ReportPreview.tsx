@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
-import { Copy, Check, AlertTriangle, Sparkles, Bold, Italic, Underline, CaseSensitive, Loader2 } from 'lucide-react'
+import { Copy, Check, AlertTriangle, Sparkles, Bold, Italic, Underline, CaseSensitive, Loader2, Settings2 } from 'lucide-react'
 import type { ProtocolDef } from '../data/protocols'
 import type { FormValues, SectionStatus } from '../hooks/useFormState'
 import type { Lang } from '../data/i18n'
@@ -33,12 +33,13 @@ interface ReportPreviewProps {
   darkMode?: boolean
   reportStyle: ReportStyle
   onStyleChange: (style: ReportStyle) => void
+  onOpenFormatConfig?: () => void
 }
 
 export function ReportPreview({
   protocol, values, lang, includeMacro,
   completionPercent, pendingFields, sectionStatuses, accessCode, darkMode,
-  reportStyle, onStyleChange,
+  reportStyle, onStyleChange, onOpenFormatConfig,
 }: ReportPreviewProps) {
   const [copied, setCopied] = useState(false)
   const [reviewing, setReviewing] = useState(false)
@@ -330,6 +331,16 @@ export function ReportPreview({
                 <option key={s.value} value={s.value}>{lang === 'es' ? s.label_es : s.label_en}</option>
               ))}
             </select>
+            {onOpenFormatConfig && (
+              <button
+                onClick={onOpenFormatConfig}
+                className={`flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-[var(--color-surface-alt)] transition-colors mr-1 ${dm ? 'text-gray-400 hover:text-gray-200' : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)]'}`}
+                title={lang === 'es' ? 'Configurar formato' : 'Format settings'}
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                <span className="text-[11px]">{lang === 'es' ? 'Formato' : 'Format'}</span>
+              </button>
+            )}
             <div className={`flex items-center border rounded ${dm ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
               <button onClick={() => applyFormat('bold')} className={toolbarBtn} title="Bold">
                 <Bold className="w-3.5 h-3.5" />

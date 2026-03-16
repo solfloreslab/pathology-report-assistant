@@ -335,6 +335,7 @@ export default function App() {
                   darkMode={darkMode}
                   reportStyle={reportStyle}
                   onStyleChange={setReportStyle}
+                  onOpenFormatConfig={() => setFormatOpen(true)}
                 />
               </div>
             </div>
