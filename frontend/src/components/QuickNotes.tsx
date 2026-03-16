@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Sparkles, Loader2, BookOpen } from 'lucide-react'
+import { Sparkles, Loader2, MessageSquareText, X } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
 import { parseNotes } from '../data/dictionary'
@@ -16,6 +16,7 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const [matchCount, setMatchCount] = useState(0)
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleChange = useCallback((text: string) => {
     setNotes(text)
@@ -40,6 +41,18 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
     }
   }
 
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-primary)] transition-all bg-white"
+      >
+        <MessageSquareText className="w-4 h-4" />
+        {lang === 'es' ? 'Texto libre' : 'Free text'}
+      </button>
+    )
+  }
+
   return (
     <div className="bg-white rounded-xl border border-dashed border-[var(--color-primary)] border-opacity-40 p-4">
       <div className="flex items-center justify-between mb-2">
@@ -49,7 +62,9 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
             {t('notes.title', lang)}
           </span>
         </div>
-        {/* Dictionary button — hidden for now, feature exists but UI needs polish */}
+        <button onClick={() => setIsOpen(false)} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text)] transition-colors">
+          <X className="w-4 h-4" />
+        </button>
       </div>
       <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1 italic">
         {lang === 'es'
@@ -73,7 +88,7 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
       <button
         onClick={handlePrefill}
         disabled={!notes.trim() || loading}
-        className={`mt-2 w-full flex items-center justify-center gap-2 py-2.5 px-4 text-white text-sm font-semibold rounded-lg transition-all ${
+        className={`mt-2 flex items-center justify-center gap-2 py-2 px-4 text-white text-sm font-semibold rounded-lg transition-all ${
           loading ? 'bg-green-600 animate-pulse cursor-wait' : 'bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] disabled:opacity-40 disabled:cursor-not-allowed'
         }`}
       >

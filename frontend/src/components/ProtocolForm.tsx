@@ -18,7 +18,30 @@ interface ProtocolFormProps {
 }
 
 export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang, darkMode }: ProtocolFormProps) {
-  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set())
+  // Start with all sections collapsed by default
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => {
+    const allSections = new Set<string>()
+    sectionOrder.forEach(s => {
+      const fields = protocol.fields.filter(f => f.section === s)
+      if (fields.length > 0) allSections.add(s)
+    })
+    return allSections
+  })
+  const [allExpanded, setAllExpanded] = useState(false)
+
+  const toggleAll = () => {
+    if (allExpanded) {
+      const allSections = new Set<string>()
+      sectionOrder.forEach(s => {
+        const fields = protocol.fields.filter(f => f.section === s)
+        if (fields.length > 0) allSections.add(s)
+      })
+      setCollapsedSections(allSections)
+    } else {
+      setCollapsedSections(new Set())
+    }
+    setAllExpanded(!allExpanded)
+  }
   const suggestions = getSuggestions(protocol.id, values)
 
   const toggleSection = (sectionId: string) => {
@@ -47,6 +70,16 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
 
   return (
     <div className="space-y-1.5">
+      <div className="flex justify-end mb-1">
+        <button
+          onClick={toggleAll}
+          className="text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)] transition-colors"
+        >
+          {allExpanded
+            ? (lang === 'es' ? '▲ Colapsar todo' : '▲ Collapse all')
+            : (lang === 'es' ? '▼ Expandir todo' : '▼ Expand all')}
+        </button>
+      </div>
       {sectionOrder.map(sectionId => {
         const fields = protocol.fields.filter(f => f.section === sectionId)
         if (fields.length === 0) return null
