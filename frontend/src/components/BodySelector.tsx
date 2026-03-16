@@ -11,18 +11,18 @@ interface BodySelectorProps {
 }
 
 const ORGAN_GROUPS = [
-  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', accent: '#0E6B5E', icon: '🫁', protocols: ['colon-resection'] },
-  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', accent: '#7A5B52', icon: '🔬', protocols: ['melanoma'] },
-  { id: 'breast', label_es: 'Mama', label_en: 'Breast', accent: '#8B6B7B', icon: '🎗️', protocols: ['breast-biopsy'] },
-  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', accent: '#8B7A4A', icon: '🫃', protocols: ['gastric'] },
-  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', accent: '#7B4A5E', icon: '🔍', protocols: ['cytology-cervical'] },
-  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', accent: '#5E6B7B', icon: '🧠', protocols: [] },
-  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', accent: '#4A6B7B', icon: '🫁', protocols: [] },
-  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', accent: '#4A7B6B', icon: '🦋', protocols: [] },
-  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', accent: '#5B4A7B', icon: '🫘', protocols: [] },
-  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', accent: '#4A7B5B', icon: '♂️', protocols: [] },
-  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', accent: '#7B5B4A', icon: '🫀', protocols: [] },
-  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', accent: '#7B6B4A', icon: '🔶', protocols: [] },
+  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', gradient: 'from-[#0E6B5E] to-[#0A5249]', protocols: ['colon-resection'] },
+  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', gradient: 'from-[#0E6B5E] to-[#065F46]', protocols: ['melanoma'] },
+  { id: 'breast', label_es: 'Mama', label_en: 'Breast', gradient: 'from-[#115E59] to-[#0E6B5E]', protocols: ['breast-biopsy'] },
+  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', gradient: 'from-[#0A5249] to-[#115E59]', protocols: ['gastric'] },
+  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', gradient: 'from-[#065F46] to-[#0E6B5E]', protocols: ['cytology-cervical'] },
+  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
+  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', gradient: 'from-[#374151] to-[#4B5563]', protocols: [] },
 ]
 
 export function BodySelector({ lang, onSelect }: BodySelectorProps) {
@@ -43,14 +43,15 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
 
     if (groupProtocols.length === 0) return
     if (groupProtocols.length === 1) {
-      onSelect(groupProtocols[0])
+      // Single protocol — expand to show it, then click enters
+      setExpandedId(expandedId === group.id ? null : group.id)
     } else {
       setExpandedId(expandedId === group.id ? null : group.id)
     }
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       {/* Search */}
       <div className="relative mb-5 max-w-md mx-auto">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
@@ -63,8 +64,8 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
         />
       </div>
 
-      {/* Accordion cards */}
-      <div className="space-y-2">
+      {/* 3-column grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {filtered.map((group) => {
           const hasProtocols = group.protocols.length > 0
           const isExpanded = expandedId === group.id
@@ -75,53 +76,45 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
           return (
             <motion.div
               key={group.id}
-              layoutId={`organ-${group.id}`}
+              layoutId={`card-${group.id}`}
               onClick={() => handleClick(group)}
-              className={`overflow-hidden rounded-xl border transition-all ${
+              className={`overflow-hidden rounded-xl border cursor-pointer ${
                 hasProtocols
-                  ? 'cursor-pointer bg-[#1e293b] border-[#334155] hover:border-[#475569] hover:shadow-lg'
-                  : 'bg-[#1e293b]/40 border-[#334155]/40 cursor-default'
-              } ${isExpanded ? 'border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10' : ''}`}
+                  ? 'border-white/10 hover:border-white/20'
+                  : 'border-white/5 opacity-40 cursor-default'
+              } ${isExpanded ? 'border-[var(--color-primary)]/50 shadow-lg shadow-[var(--color-primary)]/5' : ''}`}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
-              {/* Header */}
-              <div className="flex items-center gap-3.5 px-4 py-3">
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${!hasProtocols ? 'opacity-30' : ''}`}
-                  style={{ backgroundColor: group.accent + '25' }}
-                >
-                  {group.icon}
+              {/* Card header with gradient */}
+              <div className={`flex items-center gap-4 p-4 bg-gradient-to-br ${group.gradient}`}>
+                <div className="flex w-10 h-10 items-center justify-center rounded-xl bg-white/10 flex-shrink-0">
+                  <div className="w-4 h-4 rounded-full bg-white/30" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`text-sm font-semibold ${hasProtocols ? 'text-white' : 'text-white/30'}`}>
+                  <h3 className="font-bold text-white text-sm">
                     {lang === 'es' ? group.label_es : group.label_en}
                   </h3>
-                  {hasProtocols ? (
-                    <p className="text-[11px] text-white/40">
-                      {groupProtocols.length} {groupProtocols.length === 1
-                        ? (lang === 'es' ? 'protocolo' : 'protocol')
-                        : (lang === 'es' ? 'protocolos' : 'protocols')}
-                    </p>
-                  ) : (
-                    <p className="text-[10px] text-white/20 italic">
-                      {lang === 'es' ? 'Próximamente' : 'Coming soon'}
-                    </p>
-                  )}
+                  <p className="text-[11px] text-white/50">
+                    {hasProtocols
+                      ? `${groupProtocols.length} ${groupProtocols.length === 1 ? (lang === 'es' ? 'protocolo' : 'protocol') : (lang === 'es' ? 'protocolos' : 'protocols')}`
+                      : (lang === 'es' ? 'Próximamente' : 'Coming soon')
+                    }
+                  </p>
                 </div>
                 {hasProtocols && (
                   <motion.div
-                    animate={{ rotate: isExpanded ? 90 : 0 }}
+                    animate={{ rotate: isExpanded ? 45 : 0 }}
                     transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    className="flex w-7 h-7 items-center justify-center rounded-full bg-white/5"
+                    className="flex w-7 h-7 items-center justify-center rounded-full bg-white/10"
                   >
-                    <ChevronRight className="w-3.5 h-3.5 text-white/40" />
+                    <span className="text-sm text-white/60">+</span>
                   </motion.div>
                 )}
               </div>
 
-              {/* Expanded protocols */}
+              {/* Expanded content */}
               <AnimatePresence>
-                {isExpanded && groupProtocols.length > 0 && (
+                {isExpanded && hasProtocols && (
                   <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
@@ -132,27 +125,29 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
                     }}
                     className="overflow-hidden"
                   >
-                    <div className="border-t border-white/5 px-4 pb-3 pt-2 space-y-1.5">
-                      {groupProtocols.map((proto, i) => (
-                        <motion.button
-                          key={proto.id}
-                          initial={{ x: -10, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: i * 0.08 }}
-                          onClick={(e) => { e.stopPropagation(); onSelect(proto) }}
-                          className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-left group/proto"
-                        >
-                          <div>
-                            <div className="text-sm font-medium text-white group-hover/proto:text-[var(--color-primary)]">
-                              {lang === 'es' ? proto.name_es : proto.name_en}
+                    <div className={`border-t border-white/5 px-4 pb-4 pt-3 bg-gradient-to-br ${group.gradient}`}>
+                      <div className="space-y-2">
+                        {groupProtocols.map((proto, i) => (
+                          <motion.button
+                            key={proto.id}
+                            initial={{ y: 10, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: i * 0.1, duration: 0.3 }}
+                            onClick={(e) => { e.stopPropagation(); onSelect(proto) }}
+                            className="w-full flex items-center justify-between p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-left"
+                          >
+                            <div>
+                              <div className="text-sm font-medium text-white">
+                                {lang === 'es' ? proto.name_es : proto.name_en}
+                              </div>
+                              <div className="text-[10px] text-white/40">
+                                {proto.version} · {proto.fields.length} {lang === 'es' ? 'campos' : 'fields'}
+                              </div>
                             </div>
-                            <div className="text-[10px] text-white/40">
-                              {proto.version} · {proto.fields.length} {lang === 'es' ? 'campos' : 'fields'}
-                            </div>
-                          </div>
-                          <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover/proto:text-[var(--color-primary)]" />
-                        </motion.button>
-                      ))}
+                            <ChevronRight className="w-4 h-4 text-white/40" />
+                          </motion.button>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 )}
