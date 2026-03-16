@@ -6,7 +6,6 @@ import { MicroscopeMascot } from './MicroscopeMascot'
 interface HeaderProps {
   lang: Lang
   toggleLang: () => void
-  completionPercent?: number
   fontSize: number
   onFontSizeChange: (size: number) => void
   darkMode: boolean
@@ -17,7 +16,7 @@ interface HeaderProps {
   onModeChange?: (mode: 'copilot' | 'auditor') => void
 }
 
-export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout, onHome, mode, onModeChange }: HeaderProps) {
+export function Header({ lang, toggleLang, fontSize, onFontSizeChange, darkMode, onDarkModeToggle, onLogout, onHome, mode, onModeChange }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-[#0a1628] via-[#0A5249] to-[#0E6B5E] shadow-lg">
       <div className="px-4 h-14 flex items-center justify-between">
@@ -46,21 +45,6 @@ export function Header({ lang, toggleLang, completionPercent, fontSize, onFontSi
         </div>
 
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          {completionPercent !== undefined && completionPercent > 0 && (
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="w-16 h-1.5 bg-white/15 rounded-full overflow-hidden">
-                <div className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${completionPercent}%`,
-                    backgroundColor: completionPercent >= 80 ? '#24A148' :
-                      completionPercent >= 50 ? '#F1C21B' : '#DA1E28',
-                  }} />
-              </div>
-              <span className="text-xs font-mono text-white/80">
-                {completionPercent}%
-              </span>
-            </div>
-          )}
 
           {/* Language toggle */}
           <div className="flex rounded-full overflow-hidden border border-white/20">

@@ -105,7 +105,7 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-950 text-gray-200' : 'bg-[var(--color-page)] text-[var(--color-text)]'}`} style={{ fontSize: `${fontSize}px` }}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-950 text-gray-200' : 'bg-[var(--color-page)] text-[var(--color-text)]'}`} style={{ zoom: fontSize / 15 }}>
       <Header
         lang={lang}
         toggleLang={toggleLang}
@@ -150,7 +150,7 @@ export default function App() {
                 value={auditorText}
                 onChange={(e) => { setAuditorText(e.target.value); setAuditorResult(null) }}
                 placeholder={lang === 'es' ? 'Pegue aquí el informe completo de anatomía patológica...' : 'Paste the full pathology report here...'}
-                className={`w-full min-h-[300px] p-3 rounded-xl border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
+                className={`w-full min-h-[calc(100vh-220px)] p-3 rounded-xl border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
               />
             </div>
 

@@ -5,6 +5,7 @@ import type { FormValues, SectionStatus } from '../hooks/useFormState'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
 import { generateReport, REPORT_STYLES } from '../data/templates'
+import { getFormatRules } from './FormatConfig'
 import type { ReportStyle } from '../data/templates'
 import type { FieldDef } from '../data/protocols'
 
@@ -44,12 +45,68 @@ export function ReportPreview({
   const [copied, setCopied] = useState(false)
   const [reviewing, setReviewing] = useState(false)
   const [reviewResult, setReviewResult] = useState<AIReviewResult | null>(null)
+  const [formatVersion, setFormatVersion] = useState(0)
   const reportRef = useRef<HTMLDivElement>(null)
 
-  const report = useMemo(
+  // Listen for format config changes (localStorage)
+  useEffect(() => {
+    const handler = () => setFormatVersion(v => v + 1)
+    window.addEventListener('storage', handler)
+    // Also re-check when component gets focus (same-tab localStorage changes)
+    const focusHandler = () => setFormatVersion(v => v + 1)
+    window.addEventListener('focus', focusHandler)
+    return () => {
+      window.removeEventListener('storage', handler)
+      window.removeEventListener('focus', focusHandler)
+    }
+  }, [])
+
+  const rawReport = useMemo(
     () => generateReport(protocol, values, lang, includeMacro, reportStyle),
     [protocol, values, lang, includeMacro, reportStyle]
   )
+
+  // Apply format rules from FormatConfig to the report HTML
+  const report = useMemo(() => {
+    const fmt = getFormatRules()
+
+    const applyStyle = (text: string, style: { bold: boolean; italic: boolean; uppercase: boolean; underline: boolean }) => {
+      let t = text
+      if (style.uppercase) t = t.toUpperCase()
+      else t = t.replace(/^([A-ZÁÉÍÓÚÑ\s]+)$/gm, (m) => m.charAt(0).toUpperCase() + m.slice(1).toLowerCase())
+      const parts: string[] = []
+      if (style.bold) parts.push('font-weight:bold')
+      if (style.italic) parts.push('font-style:italic')
+      if (style.underline) parts.push('text-decoration:underline')
+      if (parts.length > 0) return `<span style="${parts.join(';')}">${t}</span>`
+      return t
+    }
+
+    // Known section headers and diagnosis line patterns
+    const sectionHeaders = [
+      'INFORME DE ANATOMÍA PATOLÓGICA', 'PATHOLOGY REPORT',
+      'INFORME SINÓPTICO DE ANATOMÍA PATOLÓGICA', 'SYNOPTIC PATHOLOGY REPORT',
+      'DESCRIPCIÓN MICROSCÓPICA', 'MICROSCOPIC DESCRIPTION',
+      'DESCRIPCIÓN MACROSCÓPICA', 'MACROSCOPIC DESCRIPTION', 'GROSS DESCRIPTION',
+      'CODIFICACIÓN', 'CODING', 'ICD-O CODING',
+      'ESTADIFICACIÓN', 'STAGING',
+    ]
+    const diagHeaders = ['DIAGNÓSTICO', 'DIAGNOSIS']
+
+    let result = rawReport
+    // Apply section header formatting
+    for (const h of sectionHeaders) {
+      const regex = new RegExp(`^(${h}:?)$`, 'gmi')
+      result = result.replace(regex, (match) => applyStyle(match, fmt.sectionHeaders))
+    }
+    // Apply diagnosis formatting
+    for (const h of diagHeaders) {
+      const regex = new RegExp(`^(${h}:?)$`, 'gmi')
+      result = result.replace(regex, (match) => applyStyle(match, fmt.diagnosis))
+    }
+
+    return result
+  }, [rawReport, formatVersion])
 
   const handleCopy = async () => {
     const text = reportRef.current?.innerText || report
@@ -143,8 +200,8 @@ export function ReportPreview({
                 const barColor = s.status === 'complete' ? 'var(--color-success)' : s.status === 'partial' ? 'var(--color-warning)' : (dm ? '#374151' : '#E2E5EA')
                 return (
                   <a key={s.id} href={`#section-${s.id}`}
-                    className="flex items-center gap-2 text-[11px] leading-[16px] px-1 rounded hover:bg-[var(--color-surface-alt)] group">
-                    <span className="text-[var(--color-text-secondary)] truncate flex-1 min-w-0">{t(`form.section.${s.id}` as any, lang)}</span>
+                    className={`flex items-center gap-2 text-[11px] leading-[16px] px-1 rounded group ${dm ? 'hover:bg-gray-800' : 'hover:bg-[var(--color-surface-alt)]'}`}>
+                    <span className={`truncate flex-1 min-w-0 ${textSec}`}>{t(`form.section.${s.id}` as any, lang)}</span>
                     <div className={`w-14 h-1.5 rounded-full overflow-hidden shrink-0 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct}%`, backgroundColor: barColor }} />
@@ -160,46 +217,54 @@ export function ReportPreview({
         </div>
 
         {/* Crítico */}
-        <div className={`rounded-lg border p-2.5 ${hasAnyData && criticalPending.length > 0 ? 'bg-[var(--color-critical-bg)] border-red-200' : cardClass}`}>
+        <div className={`rounded-lg border p-2.5 ${hasAnyData && criticalPending.length > 0
+          ? (dm ? 'bg-red-950/50 border-red-800' : 'bg-[var(--color-critical-bg)] border-red-200')
+          : cardClass}`}>
           <div className="flex items-center gap-1 mb-1">
-            {hasAnyData && criticalPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-critical)]" />}
-            <span className={`text-[11px] font-bold uppercase ${hasAnyData && criticalPending.length > 0 ? 'text-[var(--color-critical-text)]' : textSec}`}>
+            {hasAnyData && criticalPending.length > 0 && <AlertTriangle className={`w-3.5 h-3.5 ${dm ? 'text-red-400' : 'text-[var(--color-critical)]'}`} />}
+            <span className={`text-[11px] font-bold uppercase ${hasAnyData && criticalPending.length > 0
+              ? (dm ? 'text-red-400' : 'text-[var(--color-critical-text)]')
+              : textSec}`}>
               {lang === 'es' ? 'Faltantes críticos' : 'Critical missing'} ({criticalPending.length})
             </span>
           </div>
           {criticalPending.length > 0 ? (
             <div className="space-y-0.5">
               {criticalPending.map(f => (
-                <div key={f.name} className="text-[11px] text-[var(--color-critical-text)]">
+                <div key={f.name} className={`text-[11px] ${dm ? 'text-red-300' : 'text-[var(--color-critical-text)]'}`}>
                   • <strong>{lang === 'es' ? f.label_es : f.label_en}</strong>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
+            <div className={`flex items-center gap-1 text-[11px] ${dm ? 'text-green-400' : 'text-[var(--color-success)]'}`}>
               <Check className="w-3 h-3" /> {lang === 'es' ? 'Sin campos críticos' : 'No critical fields'}
             </div>
           )}
         </div>
 
         {/* Mayor */}
-        <div className={`rounded-lg border p-2.5 ${hasAnyData && majorPending.length > 0 ? 'bg-[var(--color-major-bg)] border-orange-200' : cardClass}`}>
+        <div className={`rounded-lg border p-2.5 ${hasAnyData && majorPending.length > 0
+          ? (dm ? 'bg-orange-950/50 border-orange-800' : 'bg-[var(--color-major-bg)] border-orange-200')
+          : cardClass}`}>
           <div className="flex items-center gap-1 mb-1">
-            {hasAnyData && majorPending.length > 0 && <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-major)]" />}
-            <span className={`text-[11px] font-bold uppercase ${hasAnyData && majorPending.length > 0 ? 'text-[var(--color-major-text)]' : textSec}`}>
+            {hasAnyData && majorPending.length > 0 && <AlertTriangle className={`w-3.5 h-3.5 ${dm ? 'text-orange-400' : 'text-[var(--color-major)]'}`} />}
+            <span className={`text-[11px] font-bold uppercase ${hasAnyData && majorPending.length > 0
+              ? (dm ? 'text-orange-400' : 'text-[var(--color-major-text)]')
+              : textSec}`}>
               {lang === 'es' ? 'Faltantes recomendados' : 'Recommended missing'} ({majorPending.length})
             </span>
           </div>
           {majorPending.length > 0 ? (
             <div className="space-y-0.5">
               {majorPending.map(f => (
-                <div key={f.name} className="text-[11px] text-[var(--color-major-text)]">
+                <div key={f.name} className={`text-[11px] ${dm ? 'text-orange-300' : 'text-[var(--color-major-text)]'}`}>
                   • {lang === 'es' ? f.label_es : f.label_en}
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex items-center gap-1 text-[11px] text-[var(--color-success)]">
+            <div className={`flex items-center gap-1 text-[11px] ${dm ? 'text-green-400' : 'text-[var(--color-success)]'}`}>
               <Check className="w-3 h-3" /> {lang === 'es' ? 'Sin campos mayores' : 'No major fields'}
             </div>
           )}
@@ -331,7 +396,7 @@ export function ReportPreview({
       )}
 
       {/* Row 2: Informe editable con toolbar */}
-      <div className="rounded-lg border border-[var(--color-border)] overflow-hidden bg-white flex flex-col flex-1">
+      <div className={`rounded-lg border overflow-hidden flex flex-col flex-1 ${dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'}`}>
         {/* Toolbar: formato + copiar + IA */}
         <div className="flex items-center justify-between px-2 py-1 border-b border-[var(--color-surface-alt)]">
           <div className="flex items-center gap-1">
