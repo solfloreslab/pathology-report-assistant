@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Sparkles, Loader2, MessageSquareText, X } from 'lucide-react'
+import { Sparkles, Loader2, MessageSquareText, X, BookOpen } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import { t } from '../data/i18n'
 import { parseNotes } from '../data/dictionary'
@@ -85,9 +85,20 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
             {t('notes.title', lang)}
           </span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text)] transition-colors">
-          <X className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-1">
+          {onOpenDictionary && (
+            <button
+              onClick={onOpenDictionary}
+              className="flex items-center gap-1.5 px-2 py-1 text-[11px] font-medium text-[var(--color-primary)] hover:bg-[var(--color-primary-light)] rounded-lg transition-colors"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              {lang === 'es' ? 'Mi diccionario' : 'My dictionary'}
+            </button>
+          )}
+          <button onClick={() => setIsOpen(false)} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text)] transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
       <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1 italic">
         {(protocolId && examplesByProtocol[protocolId])
