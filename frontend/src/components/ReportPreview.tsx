@@ -47,7 +47,6 @@ export function ReportPreview({
   const [reviewResult, setReviewResult] = useState<AIReviewResult | null>(null)
   const [formatVersion, setFormatVersion] = useState(0)
   const [manuallyEdited, setManuallyEdited] = useState(false)
-  const [savedDraft, setSavedDraft] = useState<string | null>(null)
   const reportRef = useRef<HTMLDivElement>(null)
 
   // Listen for format config changes (localStorage)
@@ -501,17 +500,19 @@ export function ReportPreview({
                 ref={reportRef}
                 contentEditable
                 suppressContentEditableWarning
-                className="outline-none whitespace-pre-wrap break-words text-[var(--color-text)] report-text"
+                className="outline-none whitespace-pre-wrap break-words text-[var(--color-text)] report-text min-h-[200px] p-1"
                 style={{ fontFamily: 'var(--font-sans)' }}
                 onInput={() => { if (!manuallyEdited) setManuallyEdited(true) }}
                 {...(!manuallyEdited ? { dangerouslySetInnerHTML: { __html: report.replace(/\n/g, '<br>') } } : {})}
               />
               {manuallyEdited && (
-                <div className="flex items-center gap-2 mt-2 text-[11px]">
-                  <span className="text-amber-600">{lang === 'es' ? 'Editado manualmente — los cambios del formulario no sobreescriben' : 'Manually edited — form changes won\'t overwrite'}</span>
-                  <button onClick={() => { setManuallyEdited(false); setSavedDraft(null) }}
-                    className="text-[var(--color-primary)] hover:underline">
-                    {lang === 'es' ? 'Regenerar desde formulario' : 'Regenerate from form'}
+                <div className="flex items-center gap-2 mt-2 text-[11px] flex-wrap">
+                  <span className="text-amber-600">
+                    {lang === 'es' ? '✏️ Texto editado — el formulario no sobreescribe. La IA revisará este texto.' : '✏️ Text edited — form won\'t overwrite. AI will review this text.'}
+                  </span>
+                  <button onClick={() => setManuallyEdited(false)}
+                    className="text-[var(--color-primary)] hover:underline font-medium">
+                    {lang === 'es' ? '↺ Regenerar desde formulario' : '↺ Regenerate from form'}
                   </button>
                 </div>
               )}

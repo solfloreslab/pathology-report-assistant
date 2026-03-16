@@ -41,7 +41,9 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
     hasUnitToggle ? getPreferredUnit(field.name, defaultUnit) : (field.unit || '')
   )
 
-  const handleUnitToggle = (unit: string) => {
+  const handleUnitToggle = (e: React.MouseEvent, unit: string) => {
+    e.preventDefault()
+    e.stopPropagation()
     if (unit === activeUnit) return
     setActiveUnit(unit)
     setPreferredUnit(field.name, unit)
@@ -121,8 +123,9 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
             <div className={`flex rounded-lg overflow-hidden border shrink-0 ${darkMode ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
               {['cm', 'mm'].map(u => (
                 <button
+                  type="button"
                   key={u}
-                  onClick={() => handleUnitToggle(u)}
+                  onClick={(e) => handleUnitToggle(e, u)}
                   className={`px-2 py-1.5 text-[11px] font-bold transition-colors ${
                     activeUnit === u
                       ? 'bg-[var(--color-primary)] text-white'
@@ -146,8 +149,9 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
             <div className={`flex rounded-lg overflow-hidden border shrink-0 ${darkMode ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
               {['cm', 'mm'].map(u => (
                 <button
+                  type="button"
                   key={u}
-                  onClick={() => handleUnitToggle(u)}
+                  onClick={(e) => handleUnitToggle(e, u)}
                   className={`px-2 py-1.5 text-[11px] font-bold transition-colors ${
                     activeUnit === u
                       ? 'bg-[var(--color-primary)] text-white'
