@@ -29,16 +29,28 @@ export function ParticleCanvas({ count = 50, color = '#0E6B5E', className = '' }
 
     const w0 = canvas.width / dpr
     const h0 = canvas.height / dpr
-    // Concentrate particles in bottom-right quadrant
+    // Concentrate particles tightly in bottom-right corner
     const particles = Array.from({ length: count }, () => ({
-      x: w0 * 0.4 + Math.random() * w0 * 0.6,
-      y: h0 * 0.3 + Math.random() * h0 * 0.7,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25,
-      r: Math.random() * 2.5 + 1,
+      x: w0 * 0.75 + Math.random() * w0 * 0.25,
+      y: h0 * 0.7 + Math.random() * h0 * 0.3,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 2.5 + 1.5,
     }))
 
-    const threshold = 100
+    const threshold = 80
+    let mouseX = -1000
+    let mouseY = -1000
+    const mouseThreshold = 120
+
+    const handleMouse = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      mouseX = e.clientX - rect.left
+      mouseY = e.clientY - rect.top
+    }
+    const handleLeave = () => { mouseX = -1000; mouseY = -1000 }
+    canvas.parentElement?.addEventListener('mousemove', handleMouse)
+    canvas.parentElement?.addEventListener('mouseleave', handleLeave)
 
     const draw = () => {
       const w = canvas.width / dpr
@@ -71,6 +83,29 @@ export function ParticleCanvas({ count = 50, color = '#0E6B5E', className = '' }
         }
       }
 
+      // Draw cursor connections + repel
+      for (const p of particles) {
+        const dx = p.x - mouseX
+        const dy = p.y - mouseY
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < mouseThreshold && dist > 0) {
+          // Repel gently
+          p.vx += (dx / dist) * 0.08
+          p.vy += (dy / dist) * 0.08
+          // Draw connection to cursor
+          const alpha = (1 - dist / mouseThreshold) * 0.4
+          ctx.strokeStyle = `${color}${Math.round(alpha * 255).toString(16).padStart(2, '0')}`
+          ctx.lineWidth = 1
+          ctx.beginPath()
+          ctx.moveTo(p.x, p.y)
+          ctx.lineTo(mouseX, mouseY)
+          ctx.stroke()
+        }
+        // Dampen velocity
+        p.vx *= 0.995
+        p.vy *= 0.995
+      }
+
       // Draw particles
       for (const p of particles) {
         ctx.fillStyle = `${color}40`
@@ -90,6 +125,8 @@ export function ParticleCanvas({ count = 50, color = '#0E6B5E', className = '' }
     return () => {
       cancelAnimationFrame(animId)
       ro.disconnect()
+      canvas.parentElement?.removeEventListener('mousemove', handleMouse)
+      canvas.parentElement?.removeEventListener('mouseleave', handleLeave)
     }
   }, [count, color])
 
