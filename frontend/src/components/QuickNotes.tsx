@@ -49,12 +49,7 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
             {t('notes.title', lang)}
           </span>
         </div>
-        {onOpenDictionary && (
-          <button onClick={onOpenDictionary} className="flex items-center gap-1 text-[11px] text-[var(--color-primary)] hover:underline">
-            <BookOpen className="w-3 h-3" />
-            {lang === 'es' ? 'Mi diccionario' : 'My dictionary'}
-          </button>
-        )}
+        {/* Dictionary button — hidden for now, feature exists but UI needs polish */}
       </div>
       <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1 italic">
         {lang === 'es'

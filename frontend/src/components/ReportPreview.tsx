@@ -274,7 +274,7 @@ export function ReportPreview({
       </div>
 
       {/* Row 2: Informe editable con toolbar */}
-      <div className="rounded-lg border border-[var(--color-border)] overflow-hidden bg-white flex flex-col min-h-[400px]">
+      <div className="rounded-lg border border-[var(--color-border)] overflow-hidden bg-white flex flex-col flex-1">
         {/* Toolbar: formato + copiar + IA */}
         <div className="flex items-center justify-between px-2 py-1 border-b border-[var(--color-surface-alt)]">
           <div className="flex items-center gap-1">
