@@ -250,6 +250,31 @@ function suggestBreastPn(values: FormValues): StagingSuggestion | null {
   return { field: 'pn_category', value: stage, reason_es: `${macro} ganglios con macrometástasis`, reason_en: `${macro} nodes with macrometastases` }
 }
 
+// --- CERVIX pT from stromal invasion depth + tumor size ---
+function suggestCervixPt(values: FormValues): StagingSuggestion | null {
+  const depth = parseFloat(values['stromal_invasion_depth_mm'] || '')
+  const size = parseFloat(values['tumor_size_cm'] || values['tumor_size'] || '')
+  if (isNaN(depth) && isNaN(size)) return null
+
+  let stage: string
+  let reason_es: string
+  let reason_en: string
+
+  if (!isNaN(depth) && depth <= 3) {
+    stage = 'pt1a1'; reason_es = `Invasión estromal ${depth}mm (≤3mm)`; reason_en = `Stromal invasion ${depth}mm (≤3mm)`
+  } else if (!isNaN(depth) && depth <= 5) {
+    stage = 'pt1a2'; reason_es = `Invasión estromal ${depth}mm (>3-5mm)`; reason_en = `Stromal invasion ${depth}mm (>3-5mm)`
+  } else if (!isNaN(size) && size <= 2) {
+    stage = 'pt1b1'; reason_es = `Tumor ${size}cm (≤2cm)`; reason_en = `Tumor ${size}cm (≤2cm)`
+  } else if (!isNaN(size) && size <= 4) {
+    stage = 'pt1b2'; reason_es = `Tumor ${size}cm (>2-4cm)`; reason_en = `Tumor ${size}cm (>2-4cm)`
+  } else if (!isNaN(size) && size > 4) {
+    stage = 'pt1b3'; reason_es = `Tumor ${size}cm (>4cm)`; reason_en = `Tumor ${size}cm (>4cm)`
+  } else return null
+
+  return { field: 'pt_category', value: stage, reason_es, reason_en }
+}
+
 export function getSuggestions(protocolId: string, values: FormValues): StagingSuggestion[] {
   const suggestions: StagingSuggestion[] = []
 
@@ -277,6 +302,11 @@ export function getSuggestions(protocolId: string, values: FormValues): StagingS
     if (pt) suggestions.push(pt)
     const pn = suggestBreastPn(values)
     if (pn) suggestions.push(pn)
+  }
+
+  if (protocolId === 'cytology-cervical') {
+    const pt = suggestCervixPt(values)
+    if (pt) suggestions.push(pt)
   }
 
   return suggestions

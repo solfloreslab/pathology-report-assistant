@@ -175,12 +175,46 @@ const breastRules: RuleFn[] = [
   },
 ]
 
+// --- CERVIX RULES ---
+const cervixRules: RuleFn[] = [
+  // Invasión estromal > 5mm → no puede ser pT1a
+  (v) => {
+    const depth = parseFloat(v.stromal_invasion_depth_mm || '')
+    const pt = v.pt_category || ''
+    if (!isNaN(depth) && depth > 5 && pt.includes('1a'))
+      return { id: 'depth_gt5_not_1a', severity: 'error', field: 'pt_category',
+        message_es: `Invasión estromal ${depth}mm (>5mm): tumor es al menos pT1b1 — los tumores macroscópicos nunca son pT1a`,
+        message_en: `Stromal invasion ${depth}mm (>5mm): tumor is at least pT1b1 — macroscopic tumors are never pT1a` }
+    return null
+  },
+  // LVI no altera pT1a (FIGO 2018 corrigendum)
+  (v) => {
+    const lvi = v.lvi || ''
+    const pt = v.pt_category || ''
+    if (lvi === 'present' && pt.includes('1a'))
+      return { id: 'lvi_pt1a_note', severity: 'info', field: 'lvi',
+        message_es: `Nota: LVI NO altera el estadio pT1a (AJCC-UICC 9 / FIGO 2018 Corrigendum)`,
+        message_en: `Note: LVI does NOT alter pT1a stage (AJCC-UICC 9 / FIGO 2018 Corrigendum)` }
+    return null
+  },
+  // HPV-independiente → peor pronóstico
+  (v) => {
+    const hist = v.histologic_type || ''
+    if (hist.includes('hpv_independent') || hist.includes('hpv_indep'))
+      return { id: 'hpv_indep_prognosis', severity: 'warning', field: 'histologic_type',
+        message_es: `Carcinoma HPV-independiente: generalmente peor pronóstico que HPV-asociado`,
+        message_en: `HPV-independent carcinoma: generally worse prognosis than HPV-associated` }
+    return null
+  },
+]
+
 // Registry
 const rulesByProtocol: Record<string, RuleFn[]> = {
   'colon-resection': colonRules,
   'melanoma': melanomaRules,
   'gastric': gastricRules,
   'breast-biopsy': breastRules,
+  'cytology-cervical': cervixRules,
 }
 
 export function evaluateRules(protocolId: string, values: FormValues): InlineAlert[] {
