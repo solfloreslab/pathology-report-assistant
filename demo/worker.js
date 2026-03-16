@@ -347,6 +347,10 @@ Rules:
 - Status: complete>=90, mostly_complete 70-89, incomplete 50-69, critically_incomplete<50.
 - "not_reported" or null = MISSING.
 - Each issue = SEPARATE object.
+- INCONSISTENCY SEVERITY:
+  * "error" = ONLY for IMPOSSIBLE combinations (e.g. right hemicolectomy + sigmoid location, positive nodes > examined nodes, pT4 with depth submucosa). These are DATA ENTRY ERRORS that cannot exist in reality.
+  * "warning" = for UNUSUAL but clinically POSSIBLE findings (e.g. signet ring cell in mucosa only, high mitotic index for tumor type). These are CLINICAL OBSERVATIONS that the pathologist should verify, NOT errors.
+  * NEVER classify unusual-but-possible findings as "error". When in doubt, use "warning".
 - suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
 - Keep text SHORT and actionable.
 --- PROTOCOL FIELDS ---
