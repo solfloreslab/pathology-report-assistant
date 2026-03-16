@@ -27,10 +27,20 @@ function displayVal(protocol: ProtocolDef, values: FormValues, name: string, lan
 
 function tristateText(v: string | null, lang: Lang): string | null {
   if (!v) return null
-  if (v === 'present') return lang === 'es' ? 'presente' : 'present'
-  if (v === 'absent') return lang === 'es' ? 'ausente' : 'absent'
-  if (v === 'ne') return lang === 'es' ? 'no evaluado/a' : 'not evaluated'
+  if (v === 'present') return lang === 'es' ? 'Presente' : 'Present'
+  if (v === 'absent') return lang === 'es' ? 'Ausente' : 'Absent'
+  if (v === 'ne') return lang === 'es' ? 'No evaluado/a' : 'Not evaluated'
   return v
+}
+
+// Clean dropdown labels: remove dash separator, capitalize first letter
+function cleanLabel(text: string): string {
+  return text.replace(/\s*—\s*/, ', ')
+}
+
+function capitalize(text: string): string {
+  if (!text) return text
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }
 
 export type ReportStyle = 'prose' | 'synoptic' | 'mixed'
@@ -110,12 +120,8 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
   const breslow = val(values, 'breslow_thickness')
 
   if (histType) {
-    let desc = histType
-    if (histGrade) {
-      // Remove the dash separator from dropdown labels like "G2 — Moderadamente diferenciado"
-      const gradeClean = histGrade.replace(/\s*—\s*/, ', ')
-      desc += `, ${gradeClean}`
-    }
+    let desc = capitalize(histType)
+    if (histGrade) desc += `, ${cleanLabel(histGrade)}`
     microParts.push(desc)
   }
 
@@ -200,9 +206,9 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
   lines.push(lang === 'es' ? 'DIAGNÓSTICO:' : 'DIAGNOSIS:')
   const diagParts: string[] = []
   const loc = displayVal(protocol, values, 'tumor_location', lang)
-  if (loc) diagParts.push(loc)
-  if (histType) diagParts.push(histType)
-  if (histGrade) diagParts.push(histGrade)
+  if (loc) diagParts.push(capitalize(loc))
+  if (histType) diagParts.push(capitalize(histType))
+  if (histGrade) diagParts.push(cleanLabel(histGrade))
 
   // Build pTNM from separate fields
   const ptStage = val(values, 'pt_stage')

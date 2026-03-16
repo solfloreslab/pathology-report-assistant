@@ -167,32 +167,32 @@ export function ReportPreview({
   return (
     <div className="space-y-2">
       {/* Row 1: 3 cuadros — Completitud | Crítico | Mayor */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[13px]">
         {/* Completitud — anillo + barras */}
-        <div className={`rounded-lg border p-2.5 ${cardClass}`}>
+        <div className={`rounded-lg border p-3 ${cardClass}`}>
           <div className="flex gap-3">
             {/* Completion Ring SVG */}
             <div className="shrink-0 flex items-center justify-center">
-              <svg width="64" height="64" viewBox="0 0 64 64" className="transform -rotate-90">
-                <circle cx="32" cy="32" r="26" fill="none" stroke={dm ? '#374151' : '#E2E5EA'} strokeWidth="6" />
-                <circle cx="32" cy="32" r="26" fill="none"
+              <svg width="72" height="72" viewBox="0 0 72 72" className="transform -rotate-90">
+                <circle cx="36" cy="36" r="29" fill="none" stroke={dm ? '#374151' : '#E2E5EA'} strokeWidth="6" />
+                <circle cx="36" cy="36" r="29" fill="none"
                   stroke={completionPercent >= 80 ? 'var(--color-success)' : completionPercent >= 50 ? 'var(--color-warning)' : 'var(--color-critical)'}
                   strokeWidth="6" strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 26}`}
-                  strokeDashoffset={`${2 * Math.PI * 26 * (1 - completionPercent / 100)}`}
+                  strokeDasharray={`${2 * Math.PI * 29}`}
+                  strokeDashoffset={`${2 * Math.PI * 29 * (1 - completionPercent / 100)}`}
                   className="transition-all duration-700 ease-out"
                 />
-                <text x="32" y="32" textAnchor="middle" dominantBaseline="central"
+                <text x="36" y="36" textAnchor="middle" dominantBaseline="central"
                   className="transform rotate-90 origin-center"
                   fill={completionPercent >= 80 ? 'var(--color-success)' : completionPercent >= 50 ? 'var(--color-warning-text)' : 'var(--color-critical)'}
-                  fontSize="14" fontWeight="700" fontFamily="var(--font-mono)">
+                  fontSize="16" fontWeight="700" fontFamily="var(--font-mono)">
                   {completionPercent}%
                 </text>
               </svg>
             </div>
             {/* Section bars */}
             <div className="flex-1 min-w-0 space-y-0.5">
-              <span className={`text-xs font-semibold uppercase tracking-wider ${textSec}`}>
+              <span className={`text-[13px] font-semibold uppercase tracking-wider ${textSec}`}>
                 {t('completion.title', lang)}
               </span>
               {sectionStatuses.map(s => {
@@ -200,13 +200,13 @@ export function ReportPreview({
                 const barColor = s.status === 'complete' ? 'var(--color-success)' : s.status === 'partial' ? 'var(--color-warning)' : (dm ? '#374151' : '#E2E5EA')
                 return (
                   <a key={s.id} href={`#section-${s.id}`}
-                    className={`flex items-center gap-2 text-xs leading-[18px] px-1 rounded group ${dm ? 'hover:bg-gray-800' : 'hover:bg-[var(--color-surface-alt)]'}`}>
+                    className={`flex items-center gap-2 leading-[20px] px-1 rounded group ${dm ? 'hover:bg-gray-800' : 'hover:bg-[var(--color-surface-alt)]'}`}>
                     <span className={`truncate flex-1 min-w-0 ${textSec}`}>{t(`form.section.${s.id}` as any, lang)}</span>
                     <div className={`w-16 h-1.5 rounded-full overflow-hidden shrink-0 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct}%`, backgroundColor: barColor }} />
                     </div>
-                    <span className={`font-mono w-8 text-right text-[11px] shrink-0 ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
+                    <span className={`font-mono w-8 text-right text-xs shrink-0 ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
                       {s.status === 'complete' ? '✓' : `${s.filled}/${s.total}`}
                     </span>
                   </a>
@@ -217,12 +217,12 @@ export function ReportPreview({
         </div>
 
         {/* Crítico */}
-        <div className={`rounded-lg border p-2.5 ${hasAnyData && criticalPending.length > 0
+        <div className={`rounded-lg border p-3 ${hasAnyData && criticalPending.length > 0
           ? (dm ? 'bg-red-950/50 border-red-800' : 'bg-[var(--color-critical-bg)] border-red-200')
           : cardClass}`}>
-          <div className="flex items-center gap-1 mb-1">
-            {hasAnyData && criticalPending.length > 0 && <AlertTriangle className={`w-3.5 h-3.5 ${dm ? 'text-red-400' : 'text-[var(--color-critical)]'}`} />}
-            <span className={`text-xs font-bold uppercase ${hasAnyData && criticalPending.length > 0
+          <div className="flex items-center gap-1.5 mb-1.5">
+            {hasAnyData && criticalPending.length > 0 && <AlertTriangle className={`w-4 h-4 ${dm ? 'text-red-400' : 'text-[var(--color-critical)]'}`} />}
+            <span className={`font-bold uppercase ${hasAnyData && criticalPending.length > 0
               ? (dm ? 'text-red-400' : 'text-[var(--color-critical-text)]')
               : textSec}`}>
               {lang === 'es' ? 'Faltantes críticos' : 'Critical missing'} ({criticalPending.length})
@@ -231,25 +231,25 @@ export function ReportPreview({
           {criticalPending.length > 0 ? (
             <div className="space-y-0.5">
               {criticalPending.map(f => (
-                <div key={f.name} className={`text-[11px] ${dm ? 'text-red-300' : 'text-[var(--color-critical-text)]'}`}>
+                <div key={f.name} className={`${dm ? 'text-red-300' : 'text-[var(--color-critical-text)]'}`}>
                   • <strong>{lang === 'es' ? f.label_es : f.label_en}</strong>
                 </div>
               ))}
             </div>
           ) : (
-            <div className={`flex items-center gap-1 text-[11px] ${dm ? 'text-green-400' : 'text-[var(--color-success)]'}`}>
-              <Check className="w-3 h-3" /> {lang === 'es' ? 'Sin campos críticos' : 'No critical fields'}
+            <div className={`flex items-center gap-1.5 ${dm ? 'text-green-400' : 'text-[var(--color-success)]'}`}>
+              <Check className="w-4 h-4" /> {lang === 'es' ? 'Sin campos críticos' : 'No critical fields'}
             </div>
           )}
         </div>
 
         {/* Mayor */}
-        <div className={`rounded-lg border p-2.5 ${hasAnyData && majorPending.length > 0
+        <div className={`rounded-lg border p-3 ${hasAnyData && majorPending.length > 0
           ? (dm ? 'bg-orange-950/50 border-orange-800' : 'bg-[var(--color-major-bg)] border-orange-200')
           : cardClass}`}>
-          <div className="flex items-center gap-1 mb-1">
-            {hasAnyData && majorPending.length > 0 && <AlertTriangle className={`w-3.5 h-3.5 ${dm ? 'text-orange-400' : 'text-[var(--color-major)]'}`} />}
-            <span className={`text-xs font-bold uppercase ${hasAnyData && majorPending.length > 0
+          <div className="flex items-center gap-1.5 mb-1.5">
+            {hasAnyData && majorPending.length > 0 && <AlertTriangle className={`w-4 h-4 ${dm ? 'text-orange-400' : 'text-[var(--color-major)]'}`} />}
+            <span className={`font-bold uppercase ${hasAnyData && majorPending.length > 0
               ? (dm ? 'text-orange-400' : 'text-[var(--color-major-text)]')
               : textSec}`}>
               {lang === 'es' ? 'Faltantes recomendados' : 'Recommended missing'} ({majorPending.length})
@@ -258,14 +258,14 @@ export function ReportPreview({
           {majorPending.length > 0 ? (
             <div className="space-y-0.5">
               {majorPending.map(f => (
-                <div key={f.name} className={`text-[11px] ${dm ? 'text-orange-300' : 'text-[var(--color-major-text)]'}`}>
+                <div key={f.name} className={`${dm ? 'text-orange-300' : 'text-[var(--color-major-text)]'}`}>
                   • {lang === 'es' ? f.label_es : f.label_en}
                 </div>
               ))}
             </div>
           ) : (
-            <div className={`flex items-center gap-1 text-[11px] ${dm ? 'text-green-400' : 'text-[var(--color-success)]'}`}>
-              <Check className="w-3 h-3" /> {lang === 'es' ? 'Sin campos mayores' : 'No major fields'}
+            <div className={`flex items-center gap-1.5 ${dm ? 'text-green-400' : 'text-[var(--color-success)]'}`}>
+              <Check className="w-4 h-4" /> {lang === 'es' ? 'Sin campos mayores' : 'No major fields'}
             </div>
           )}
         </div>
