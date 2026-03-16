@@ -115,8 +115,7 @@ export function ReportPreview({
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
-    }
-  }, [protocol.id])
+  }
 
   const applyFormat = useCallback((command: string, value?: string) => {
     document.execCommand(command, false, value)
