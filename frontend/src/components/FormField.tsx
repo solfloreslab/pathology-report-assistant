@@ -1,9 +1,25 @@
+import { useState } from 'react'
 import { TriStateControl } from './TriStateControl'
 import { StagingPopup } from './StagingPopup'
 import type { FieldDef } from '../data/protocols'
 import type { Lang } from '../data/i18n'
 import type { StagingSuggestion, StagingReference } from '../data/staging'
 import { ChevronDown, Lightbulb } from 'lucide-react'
+
+/** Get/set preferred unit for a field from localStorage */
+function getPreferredUnit(fieldName: string, defaultUnit: string): string {
+  try {
+    const prefs = JSON.parse(localStorage.getItem('patho-unit-prefs') || '{}')
+    return prefs[fieldName] || defaultUnit
+  } catch { return defaultUnit }
+}
+function setPreferredUnit(fieldName: string, unit: string) {
+  try {
+    const prefs = JSON.parse(localStorage.getItem('patho-unit-prefs') || '{}')
+    prefs[fieldName] = unit
+    localStorage.setItem('patho-unit-prefs', JSON.stringify(prefs))
+  } catch { /* ignore */ }
+}
 
 interface FormFieldProps {
   field: FieldDef
@@ -16,6 +32,20 @@ interface FormFieldProps {
 }
 
 export function FormField({ field, value, onChange, lang, darkMode, suggestion, reference }: FormFieldProps) {
+  // Show cm/mm toggle on: number fields with cm/mm unit, OR text fields for margins/size
+  const isDistanceField = (field.unit === 'cm' || field.unit === 'mm')
+    || /margin|margen|size|tamaño/i.test(field.name)
+  const hasUnitToggle = isDistanceField && (field.type === 'number' || field.type === 'text')
+  const defaultUnit = field.unit === 'mm' ? 'mm' : 'cm'
+  const [activeUnit, setActiveUnit] = useState(() =>
+    hasUnitToggle ? getPreferredUnit(field.name, defaultUnit) : (field.unit || '')
+  )
+
+  const handleUnitToggle = (unit: string) => {
+    if (unit === activeUnit) return
+    setActiveUnit(unit)
+    setPreferredUnit(field.name, unit)
+  }
   const label = lang === 'es' ? field.label_es : field.label_en
   const isFilled = value !== '' && value !== undefined
   const borderColor = isFilled ? 'border-[var(--color-success)]' :
@@ -37,7 +67,8 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
         <div className="flex items-center gap-1">
           <label className={`text-[13px] font-medium ${darkMode ? 'text-gray-300' : 'text-[var(--color-text-secondary)]'}`}>
             {label}
-            {field.unit && <span className={`ml-1 ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>({field.unit})</span>}
+            {field.unit && !hasUnitToggle && <span className={`ml-1 ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>({field.unit})</span>}
+            {hasUnitToggle && activeUnit && <span className={`ml-1 ${darkMode ? 'text-gray-500' : 'text-[var(--color-text-tertiary)]'}`}>({activeUnit})</span>}
           </label>
           {reference && <StagingPopup reference={reference} suggestion={suggestion} lang={lang} darkMode={darkMode} />}
         </div>
@@ -83,14 +114,52 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
       )}
 
       {field.type === 'text' && (
-        <input type="text" value={value || ''} onChange={e => onChange(e.target.value)}
-          placeholder={lang === 'es' ? 'Introducir valor' : 'Enter value'} className={inputBase} />
+        <div className="flex items-center gap-1.5">
+          <input type="text" value={value || ''} onChange={e => onChange(e.target.value)}
+            placeholder={lang === 'es' ? 'Introducir valor' : 'Enter value'} className={inputBase} />
+          {hasUnitToggle && (
+            <div className={`flex rounded-lg overflow-hidden border shrink-0 ${darkMode ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
+              {['cm', 'mm'].map(u => (
+                <button
+                  key={u}
+                  onClick={() => handleUnitToggle(u)}
+                  className={`px-2 py-1.5 text-[11px] font-bold transition-colors ${
+                    activeUnit === u
+                      ? 'bg-[var(--color-primary)] text-white'
+                      : (darkMode ? 'bg-gray-800 text-gray-400 hover:text-gray-200' : 'bg-[var(--color-surface)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text)]')
+                  }`}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
 
       {field.type === 'number' && (
-        <input type="text" inputMode="decimal" value={value || ''}
-          onChange={e => { if (/^\d*[.,]?\d*$/.test(e.target.value)) onChange(e.target.value) }}
-          placeholder="—" className={inputBase} />
+        <div className="flex items-center gap-1.5">
+          <input type="text" inputMode="decimal" value={value || ''}
+            onChange={e => { if (/^\d*[.,]?\d*$/.test(e.target.value)) onChange(e.target.value) }}
+            placeholder="—" className={inputBase} />
+          {hasUnitToggle && (
+            <div className={`flex rounded-lg overflow-hidden border shrink-0 ${darkMode ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
+              {['cm', 'mm'].map(u => (
+                <button
+                  key={u}
+                  onClick={() => handleUnitToggle(u)}
+                  className={`px-2 py-1.5 text-[11px] font-bold transition-colors ${
+                    activeUnit === u
+                      ? 'bg-[var(--color-primary)] text-white'
+                      : (darkMode ? 'bg-gray-800 text-gray-400 hover:text-gray-200' : 'bg-[var(--color-surface)] text-[var(--color-text-tertiary)] hover:text-[var(--color-text)]')
+                  }`}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   )
