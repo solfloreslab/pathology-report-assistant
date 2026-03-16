@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { ChevronDown, Search } from 'lucide-react'
+import { Search, ChevronRight } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import type { ProtocolDef } from '../data/protocols'
 import { protocols } from '../data/protocols'
@@ -11,18 +11,18 @@ interface BodySelectorProps {
 }
 
 const ORGAN_GROUPS = [
-  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', accent: '#0E6B5E', protocols: ['colon-resection'] },
-  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', accent: '#9F1239', protocols: ['melanoma'] },
-  { id: 'breast', label_es: 'Mama', label_en: 'Breast', accent: '#BE185D', protocols: ['breast-biopsy'] },
-  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', accent: '#B45309', protocols: ['gastric'] },
-  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', accent: '#9F1239', protocols: ['cytology-cervical'] },
-  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', accent: '#6D28D9', protocols: [] },
-  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', accent: '#0369A1', protocols: [] },
-  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', accent: '#0E7490', protocols: [] },
-  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', accent: '#4338CA', protocols: [] },
-  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', accent: '#15803D', protocols: [] },
-  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', accent: '#92400E', protocols: [] },
-  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', accent: '#C2410C', protocols: [] },
+  { id: 'colon', label_es: 'Colon / Recto', label_en: 'Colon / Rectum', accent: '#0E6B5E', icon: '🫁', protocols: ['colon-resection'] },
+  { id: 'skin', label_es: 'Piel / Melanoma', label_en: 'Skin / Melanoma', accent: '#7A5B52', icon: '🔬', protocols: ['melanoma'] },
+  { id: 'breast', label_es: 'Mama', label_en: 'Breast', accent: '#8B6B7B', icon: '🎗️', protocols: ['breast-biopsy'] },
+  { id: 'stomach', label_es: 'Estómago', label_en: 'Stomach', accent: '#8B7A4A', icon: '🫃', protocols: ['gastric'] },
+  { id: 'cervix', label_es: 'Cérvix', label_en: 'Cervix', accent: '#7B4A5E', icon: '🔍', protocols: ['cytology-cervical'] },
+  { id: 'brain', label_es: 'Cerebro', label_en: 'Brain', accent: '#5E6B7B', icon: '🧠', protocols: [] },
+  { id: 'lung', label_es: 'Pulmón', label_en: 'Lung', accent: '#4A6B7B', icon: '🫁', protocols: [] },
+  { id: 'thyroid', label_es: 'Tiroides', label_en: 'Thyroid', accent: '#4A7B6B', icon: '🦋', protocols: [] },
+  { id: 'kidney', label_es: 'Riñón', label_en: 'Kidney', accent: '#5B4A7B', icon: '🫘', protocols: [] },
+  { id: 'prostate', label_es: 'Próstata', label_en: 'Prostate', accent: '#4A7B5B', icon: '♂️', protocols: [] },
+  { id: 'liver', label_es: 'Hígado', label_en: 'Liver', accent: '#7B5B4A', icon: '🫀', protocols: [] },
+  { id: 'pancreas', label_es: 'Páncreas', label_en: 'Pancreas', accent: '#7B6B4A', icon: '🔶', protocols: [] },
 ]
 
 export function BodySelector({ lang, onSelect }: BodySelectorProps) {
@@ -36,7 +36,7 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
       )
     : ORGAN_GROUPS
 
-  const handleCardClick = (group: typeof ORGAN_GROUPS[0]) => {
+  const handleClick = (group: typeof ORGAN_GROUPS[0]) => {
     const groupProtocols = group.protocols
       .map(pid => protocols.find(p => p.id === pid))
       .filter(Boolean) as ProtocolDef[]
@@ -50,9 +50,9 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-3xl mx-auto">
       {/* Search */}
-      <div className="relative mb-6 max-w-md mx-auto">
+      <div className="relative mb-5 max-w-md mx-auto">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-tertiary)]" />
         <input
           type="text"
@@ -63,8 +63,8 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
         />
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+      {/* Accordion cards */}
+      <div className="space-y-2">
         {filtered.map((group) => {
           const hasProtocols = group.protocols.length > 0
           const isExpanded = expandedId === group.id
@@ -75,52 +75,49 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
           return (
             <motion.div
               key={group.id}
-              layout
-              onClick={() => handleCardClick(group)}
-              className={`rounded-xl border bg-white overflow-hidden transition-shadow ${
+              layoutId={`organ-${group.id}`}
+              onClick={() => handleClick(group)}
+              className={`overflow-hidden rounded-xl border transition-all ${
                 hasProtocols
-                  ? 'cursor-pointer hover:shadow-lg border-[var(--color-border)] hover:border-gray-300'
-                  : 'border-dashed border-gray-200'
-              } ${isExpanded ? 'shadow-lg border-gray-300 col-span-2 row-span-2' : ''}`}
+                  ? 'cursor-pointer bg-[#1e293b] border-[#334155] hover:border-[#475569] hover:shadow-lg'
+                  : 'bg-[#1e293b]/40 border-[#334155]/40 cursor-default'
+              } ${isExpanded ? 'border-[var(--color-primary)] shadow-lg shadow-[var(--color-primary)]/10' : ''}`}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               {/* Header */}
-              <div className="p-4 flex items-center gap-3">
-                {/* Color accent dot */}
+              <div className="flex items-center gap-3.5 px-4 py-3">
                 <div
-                  className={`w-3 h-3 rounded-full flex-shrink-0 ${!hasProtocols ? 'opacity-25' : ''}`}
-                  style={{ backgroundColor: group.accent }}
-                />
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${!hasProtocols ? 'opacity-30' : ''}`}
+                  style={{ backgroundColor: group.accent + '25' }}
+                >
+                  {group.icon}
+                </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className={`text-sm font-semibold ${hasProtocols ? 'text-[var(--color-text)]' : 'text-gray-400'}`}>
+                  <h3 className={`text-sm font-semibold ${hasProtocols ? 'text-white' : 'text-white/30'}`}>
                     {lang === 'es' ? group.label_es : group.label_en}
                   </h3>
                   {hasProtocols ? (
-                    <p className="text-[11px] text-[var(--color-text-tertiary)]">
+                    <p className="text-[11px] text-white/40">
                       {groupProtocols.length} {groupProtocols.length === 1
-                        ? (lang === 'es' ? 'protocolo disponible' : 'protocol available')
-                        : (lang === 'es' ? 'protocolos disponibles' : 'protocols available')}
+                        ? (lang === 'es' ? 'protocolo' : 'protocol')
+                        : (lang === 'es' ? 'protocolos' : 'protocols')}
                     </p>
                   ) : (
-                    <p className="text-[10px] text-gray-400 italic">
+                    <p className="text-[10px] text-white/20 italic">
                       {lang === 'es' ? 'Próximamente' : 'Coming soon'}
                     </p>
                   )}
                 </div>
-                {hasProtocols && groupProtocols.length > 1 && (
-                  <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                    <ChevronDown className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+                {hasProtocols && (
+                  <motion.div
+                    animate={{ rotate: isExpanded ? 90 : 0 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    className="flex w-7 h-7 items-center justify-center rounded-full bg-white/5"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-white/40" />
                   </motion.div>
                 )}
-                {hasProtocols && groupProtocols.length === 1 && (
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: group.accent + '15' }}>
-                    <span className="text-xs" style={{ color: group.accent }}>→</span>
-                  </div>
-                )}
               </div>
-
-              {/* Colored bottom border */}
-              <div className="h-[3px]" style={{ backgroundColor: hasProtocols ? group.accent : 'transparent', opacity: hasProtocols ? 0.6 : 0 }} />
 
               {/* Expanded protocols */}
               <AnimatePresence>
@@ -135,7 +132,7 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
                     }}
                     className="overflow-hidden"
                   >
-                    <div className="px-4 pb-4 pt-2 space-y-2 border-t border-[var(--color-surface-alt)]">
+                    <div className="border-t border-white/5 px-4 pb-3 pt-2 space-y-1.5">
                       {groupProtocols.map((proto, i) => (
                         <motion.button
                           key={proto.id}
@@ -143,19 +140,17 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
                           animate={{ x: 0, opacity: 1 }}
                           transition={{ delay: i * 0.08 }}
                           onClick={(e) => { e.stopPropagation(); onSelect(proto) }}
-                          className="w-full flex items-center justify-between p-3 rounded-lg bg-[var(--color-surface-alt)] hover:bg-[var(--color-primary-light)] transition-colors text-left group/proto"
+                          className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-left group/proto"
                         >
                           <div>
-                            <div className="text-sm font-medium text-[var(--color-text)] group-hover/proto:text-[var(--color-primary)]">
+                            <div className="text-sm font-medium text-white group-hover/proto:text-[var(--color-primary)]">
                               {lang === 'es' ? proto.name_es : proto.name_en}
                             </div>
-                            <div className="text-[10px] text-[var(--color-text-tertiary)]">
+                            <div className="text-[10px] text-white/40">
                               {proto.version} · {proto.fields.length} {lang === 'es' ? 'campos' : 'fields'}
                             </div>
                           </div>
-                          <span className="text-xs text-[var(--color-primary)] opacity-0 group-hover/proto:opacity-100 transition-opacity">
-                            {lang === 'es' ? 'Abrir →' : 'Open →'}
-                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover/proto:text-[var(--color-primary)]" />
                         </motion.button>
                       ))}
                     </div>
