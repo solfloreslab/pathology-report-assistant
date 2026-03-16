@@ -12,6 +12,29 @@ interface QuickNotesProps {
   onOpenDictionary?: () => void
 }
 
+const examplesByProtocol: Record<string, { es: string; en: string }> = {
+  'colon-resection': {
+    es: 'ej: sigmoide adeno mod G2 s/perineural 2/18 gang marg 3cm ILV+ MMR conservado',
+    en: 'e.g.: sigmoid adeno mod G2 no perineural 2/18 nodes marg 3cm LVI+ MMR proficient',
+  },
+  'melanoma': {
+    es: 'ej: espalda MES Breslow 1.8 Clark IV ulcerado 3 mit/mm2 s/ILV s/neurotropismo borde lat 3mm prof 2mm',
+    en: 'e.g.: back SSM Breslow 1.8 Clark IV ulcerated 3 mit/mm2 no LVI no neurotropism lat margin 3mm deep 2mm',
+  },
+  'breast-biopsy': {
+    es: 'ej: CDI G2 Nottingham 6 RE+ RP+ HER2 1+ Ki67 15% 1.8cm marg libres 2/3 gang',
+    en: 'e.g.: IDC G2 Nottingham 6 ER+ PR+ HER2 1+ Ki67 15% 1.8cm margins clear 2/3 nodes',
+  },
+  'gastric': {
+    es: 'ej: antro adeno intestinal G2 submucosa 3/22 gang ILV+ s/perineural HER2 2+ MMR intacto',
+    en: 'e.g.: antrum adeno intestinal G2 submucosa 3/22 nodes LVI+ no perineural HER2 2+ MMR intact',
+  },
+  'cytology-cervical': {
+    es: 'ej: escamoso HPV-asociado G2 2.5cm invasión estromal 8mm s/ILV parametrio libre',
+    en: 'e.g.: squamous HPV-associated G2 2.5cm stromal invasion 8mm no LVI parametrium clear',
+  },
+}
+
 export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpenDictionary }: QuickNotesProps) {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
@@ -67,16 +90,18 @@ export function QuickNotes({ lang, onPrefill, onRealtimeParse, protocolId, onOpe
         </button>
       </div>
       <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1 italic">
-        {lang === 'es'
-          ? 'ej: sigmoide adeno mod G2 s/perineural 2/18 gang marg 3cm ILV+ MMR conservado'
-          : 'e.g.: sigmoid adeno mod G2 no perineural 2/18 nodes marg 3cm LVI+ MMR proficient'}
+        {(protocolId && examplesByProtocol[protocolId])
+          ? examplesByProtocol[protocolId][lang]
+          : (lang === 'es'
+            ? 'ej: escriba notas abreviadas del caso'
+            : 'e.g.: write abbreviated case notes')}
       </p>
       <textarea
         value={notes}
         onChange={e => handleChange(e.target.value)}
         placeholder={lang === 'es' ? 'Escriba sus notas aquí...' : 'Write your notes here...'}
         rows={3}
-        className="w-full px-3 py-2 text-sm border border-[var(--color-border-input)] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent text-[var(--color-text)] resize-none"
+        className="w-full px-3 py-2 text-sm border border-[var(--color-border-input)] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent text-[var(--color-text)] resize-y"
       />
       {matchCount > 0 && (
         <div className="flex items-center gap-1 mt-1 mb-1">

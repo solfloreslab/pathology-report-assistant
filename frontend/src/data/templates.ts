@@ -48,7 +48,7 @@ function generateCodingSection(protocol: ProtocolDef, values: FormValues, lang: 
   const locationVal = values['tumor_location'] || ''
   const histVal = values['histologic_type'] || ''
 
-  const topo = codes.topography[locationVal] || codes.topography[''] || null
+  const topo = locationVal ? (codes.topography[locationVal] || null) : null
   const morph = codes.morphology[histVal] || null
 
   if (!topo && !morph) return ''
