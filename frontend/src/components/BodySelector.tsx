@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Search, ChevronRight } from 'lucide-react'
+import { Search, ChevronRight, Star } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 import type { ProtocolDef } from '../data/protocols'
 import { protocols } from '../data/protocols'
+import { getFavorites, toggleFavorite } from './favorites'
 
 interface BodySelectorProps {
   lang: Lang
@@ -28,13 +29,26 @@ const ORGAN_GROUPS = [
 export function BodySelector({ lang, onSelect }: BodySelectorProps) {
   const [query, setQuery] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [favs, setFavs] = useState(getFavorites)
 
-  const filtered = query.trim()
+  const handleToggleFav = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    setFavs(toggleFavorite(id))
+  }
+
+  const base = query.trim()
     ? ORGAN_GROUPS.filter(g =>
         g.label_es.toLowerCase().includes(query.toLowerCase()) ||
         g.label_en.toLowerCase().includes(query.toLowerCase())
       )
     : ORGAN_GROUPS
+
+  // Organs with favorited protocols float to the top
+  const filtered = [...base].sort((a, b) => {
+    const aHasFav = a.protocols.some(pid => favs.includes(pid)) ? 0 : 1
+    const bHasFav = b.protocols.some(pid => favs.includes(pid)) ? 0 : 1
+    return aHasFav - bHasFav
+  })
 
   const handleClick = (group: typeof ORGAN_GROUPS[0]) => {
     const groupProtocols = group.protocols
@@ -127,26 +141,41 @@ export function BodySelector({ lang, onSelect }: BodySelectorProps) {
                   >
                     <div className={`border-t border-white/5 px-4 pb-4 pt-3 bg-gradient-to-br ${group.gradient}`}>
                       <div className="space-y-2">
-                        {groupProtocols.map((proto, i) => (
-                          <motion.button
-                            key={proto.id}
-                            initial={{ y: 10, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: i * 0.1, duration: 0.3 }}
-                            onClick={(e) => { e.stopPropagation(); onSelect(proto) }}
-                            className="w-full flex items-center justify-between p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-left"
-                          >
-                            <div>
-                              <div className="text-sm font-medium text-white">
-                                {lang === 'es' ? proto.name_es : proto.name_en}
+                        {groupProtocols.map((proto, i) => {
+                          const isFav = favs.includes(proto.id)
+                          return (
+                            <motion.button
+                              key={proto.id}
+                              initial={{ y: 10, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              transition={{ delay: i * 0.1, duration: 0.3 }}
+                              onClick={(e) => { e.stopPropagation(); onSelect(proto) }}
+                              className="w-full flex items-center justify-between p-3 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-left"
+                            >
+                              <div>
+                                <div className="text-sm font-medium text-white">
+                                  {lang === 'es' ? proto.name_es : proto.name_en}
+                                </div>
+                                <div className="text-[10px] text-white/40">
+                                  {proto.version} · {proto.fields.length} {lang === 'es' ? 'campos' : 'fields'}
+                                </div>
                               </div>
-                              <div className="text-[10px] text-white/40">
-                                {proto.version} · {proto.fields.length} {lang === 'es' ? 'campos' : 'fields'}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={(e) => handleToggleFav(e, proto.id)}
+                                  className="p-1 rounded-md hover:bg-white/10 transition-colors"
+                                >
+                                  <Star className={`w-4 h-4 transition-colors ${
+                                    isFav
+                                      ? 'fill-amber-400 text-amber-400'
+                                      : 'text-white/30 hover:text-amber-400'
+                                  }`} />
+                                </button>
+                                <ChevronRight className="w-4 h-4 text-white/40" />
                               </div>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-white/40" />
-                          </motion.button>
-                        ))}
+                            </motion.button>
+                          )
+                        })}
                       </div>
                     </div>
                   </motion.div>
