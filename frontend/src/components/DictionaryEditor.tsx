@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
-import { Plus, Trash2, X, BookOpen } from 'lucide-react'
+import { X, BookOpen, Save, RotateCcw, Info } from 'lucide-react'
 import type { Lang } from '../data/i18n'
 
 interface CustomRule {
@@ -12,22 +12,40 @@ interface CustomRule {
 
 const STORAGE_KEY = 'patho-custom-dictionary'
 
-const FIELD_OPTIONS = [
-  { value: 'histologic_type', label_es: 'Tipo histológico', label_en: 'Histologic type' },
-  { value: 'histologic_grade', label_es: 'Grado histológico', label_en: 'Histologic grade' },
-  { value: 'tumor_location', label_es: 'Localización tumoral', label_en: 'Tumor location' },
-  { value: 'depth_of_invasion', label_es: 'Profundidad de invasión', label_en: 'Depth of invasion' },
-  { value: 'lymphovascular_invasion', label_es: 'Invasión linfovascular', label_en: 'Lymphovascular invasion' },
-  { value: 'perineural_invasion', label_es: 'Invasión perineural', label_en: 'Perineural invasion' },
-  { value: 'mmr_msi', label_es: 'Estado MMR/MSI', label_en: 'MMR/MSI status' },
-  { value: 'margins_proximal', label_es: 'Margen proximal', label_en: 'Proximal margin' },
-  { value: 'margins_distal', label_es: 'Margen distal', label_en: 'Distal margin' },
-]
-
 export function getCustomRules(): CustomRule[] {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
   } catch { return [] }
+}
+
+/** Serialize rules array → textarea text (one pair per line, tab-separated) */
+function rulesToText(rules: CustomRule[]): string {
+  return rules.map(r => `${r.abbreviation}\t${r.value}`).join('\n')
+}
+
+/** Parse textarea text → rules array */
+function textToRules(text: string): CustomRule[] {
+  const rules: CustomRule[] = []
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue // skip empty & comments
+
+    // Split by tab, → , or multiple spaces
+    const parts = trimmed.split(/\t|→|➜|->|  +/)
+    if (parts.length >= 2) {
+      const abbr = parts[0].trim().toLowerCase()
+      const val = parts.slice(1).join(' ').trim()
+      if (abbr && val) {
+        rules.push({
+          id: `custom-${abbr}-${Date.now()}-${rules.length}`,
+          abbreviation: abbr,
+          field: 'custom',
+          value: val,
+        })
+      }
+    }
+  }
+  return rules
 }
 
 interface DictionaryEditorProps {
@@ -37,38 +55,41 @@ interface DictionaryEditorProps {
 }
 
 export function DictionaryEditor({ lang, open, onClose }: DictionaryEditorProps) {
-  const [rules, setRules] = useState<CustomRule[]>([])
-  const [newAbbr, setNewAbbr] = useState('')
-  const [newField, setNewField] = useState('histologic_type')
-  const [newValue, setNewValue] = useState('')
+  const [text, setText] = useState('')
+  const [saved, setSaved] = useState(false)
+  const [parsedCount, setParsedCount] = useState(0)
 
+  // Load from localStorage on open
   useEffect(() => {
-    setRules(getCustomRules())
+    if (open) {
+      const rules = getCustomRules()
+      setText(rules.length > 0 ? rulesToText(rules) : '')
+      setParsedCount(rules.length)
+      setSaved(false)
+    }
   }, [open])
 
-  const save = (updated: CustomRule[]) => {
-    setRules(updated)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
-  }
+  // Live parse count
+  useEffect(() => {
+    const rules = textToRules(text)
+    setParsedCount(rules.length)
+  }, [text])
 
-  const addRule = () => {
-    if (!newAbbr.trim() || !newValue.trim()) return
-    const rule: CustomRule = {
-      id: Date.now().toString(),
-      abbreviation: newAbbr.trim().toLowerCase(),
-      field: newField,
-      value: newValue.trim(),
-    }
-    save([...rules, rule])
-    setNewAbbr('')
-    setNewValue('')
-  }
+  const handleSave = useCallback(() => {
+    const rules = textToRules(text)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(rules))
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }, [text])
 
-  const removeRule = (id: string) => {
-    save(rules.filter(r => r.id !== id))
-  }
+  const handleReset = useCallback(() => {
+    setText('')
+    setParsedCount(0)
+  }, [])
 
   if (!open) return null
+
+  const es = lang === 'es'
 
   return (
     <AnimatePresence>
@@ -84,103 +105,90 @@ export function DictionaryEditor({ lang, open, onClose }: DictionaryEditorProps)
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={e => e.stopPropagation()}
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col"
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-[var(--color-primary)]" />
               <h2 className="text-base font-bold text-[var(--color-text)]">
-                {lang === 'es' ? 'Mi diccionario de abreviaciones' : 'My abbreviation dictionary'}
+                {es ? 'Mi Diccionario' : 'My Dictionary'}
               </h2>
             </div>
-            <button onClick={onClose} className="p-1 rounded-lg hover:bg-gray-100"><X className="w-4 h-4" /></button>
+            <button onClick={onClose} className="p-1 rounded-lg hover:bg-gray-100 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Add new */}
-          <div className="p-4 border-b border-[var(--color-surface-alt)] bg-[var(--color-surface-alt)]">
-            <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-              {lang === 'es'
-                ? 'Agregue abreviaciones personalizadas. Al escribir en notas rápidas, se rellenarán automáticamente.'
-                : 'Add custom abbreviations. When typing in quick notes, they will auto-fill.'}
-            </p>
-            <div className="flex gap-2">
-              <input
-                value={newAbbr}
-                onChange={e => setNewAbbr(e.target.value)}
-                placeholder={lang === 'es' ? 'Abreviación (ej: adeno)' : 'Abbreviation (eg: adeno)'}
-                className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-lg"
-              />
-              <select
-                value={newField}
-                onChange={e => setNewField(e.target.value)}
-                className="px-2 py-2 text-sm border border-[var(--color-border)] rounded-lg"
-              >
-                {FIELD_OPTIONS.map(f => (
-                  <option key={f.value} value={f.value}>{lang === 'es' ? f.label_es : f.label_en}</option>
-                ))}
-              </select>
-              <input
-                value={newValue}
-                onChange={e => setNewValue(e.target.value)}
-                placeholder={lang === 'es' ? 'Valor' : 'Value'}
-                className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-lg"
-              />
-              <button
-                onClick={addRule}
-                disabled={!newAbbr.trim() || !newValue.trim()}
-                className="px-3 py-2 rounded-lg bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+          {/* Explanation */}
+          <div className="px-5 pt-4 pb-2">
+            <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[var(--color-primary-light)] border border-[var(--color-primary)]/20">
+              <Info className="w-4 h-4 text-[var(--color-primary)] mt-0.5 shrink-0" />
+              <div className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                <p className="font-medium text-[var(--color-text)] mb-1">
+                  {es
+                    ? 'Escriba sus abreviaciones personalizadas, una por línea.'
+                    : 'Write your custom abbreviations, one per line.'}
+                </p>
+                <p>
+                  {es
+                    ? 'Separe la abreviación del significado con tabulación, → o varios espacios. Al escribir en notas rápidas, se reconocerán automáticamente.'
+                    : 'Separate the abbreviation from its meaning with a tab, → or multiple spaces. When typing in quick notes, they will be recognized automatically.'}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Rules list */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {rules.length === 0 ? (
-              <div className="text-center text-sm text-[var(--color-text-tertiary)] py-8">
-                {lang === 'es' ? 'Sin abreviaciones personalizadas' : 'No custom abbreviations'}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {rules.map(rule => {
-                  const fieldLabel = FIELD_OPTIONS.find(f => f.value === rule.field)
-                  return (
-                    <motion.div
-                      key={rule.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center gap-3 p-2.5 rounded-lg border border-[var(--color-border)] bg-white"
-                    >
-                      <code className="text-sm font-mono font-bold text-[var(--color-primary)] bg-[var(--color-primary-light)] px-2 py-0.5 rounded">
-                        {rule.abbreviation}
-                      </code>
-                      <span className="text-xs text-[var(--color-text-tertiary)]">→</span>
-                      <span className="text-xs text-[var(--color-text-secondary)]">
-                        {lang === 'es' ? fieldLabel?.label_es : fieldLabel?.label_en}:
-                      </span>
-                      <span className="text-sm font-medium text-[var(--color-text)]">{rule.value}</span>
-                      <button
-                        onClick={() => removeRule(rule.id)}
-                        className="ml-auto p-1 rounded hover:bg-red-50 text-gray-400 hover:text-red-500"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </motion.div>
-                  )
-                })}
-              </div>
-            )}
+          {/* Textarea */}
+          <div className="flex-1 px-5 py-3 min-h-0">
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value)}
+              spellCheck={false}
+              placeholder={[
+                es ? '# Ejemplo (las líneas con # se ignoran):' : '# Example (lines with # are ignored):',
+                'adeno\tAdenocarcinoma',
+                'mod\tModeradamente diferenciado',
+                's/pni\tSin invasión perineural',
+                'ILV+\tInvasión linfovascular presente',
+                'marg lib\tMárgenes libres de neoplasia',
+              ].join('\n')}
+              className="w-full h-full min-h-[240px] px-4 py-3 text-sm font-mono leading-relaxed border border-[var(--color-border)] rounded-xl bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] resize-none transition-all"
+              style={{ tabSize: 20 }}
+            />
           </div>
 
           {/* Footer */}
-          <div className="p-3 border-t border-[var(--color-border)] text-center">
-            <span className="text-[10px] text-[var(--color-text-tertiary)]">
-              {lang === 'es'
-                ? `${rules.length} abreviaciones personalizadas · Guardado en este navegador`
-                : `${rules.length} custom abbreviations · Saved in this browser`}
-            </span>
+          <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface-alt)]">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-[var(--color-text-tertiary)]">
+                {parsedCount > 0 ? (
+                  <span className="text-[var(--color-primary)] font-medium">
+                    {parsedCount} {es ? 'abreviaciones reconocidas' : 'abbreviations recognized'}
+                  </span>
+                ) : (
+                  es ? 'Sin abreviaciones aún' : 'No abbreviations yet'
+                )}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleReset}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text)] rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                {es ? 'Limpiar' : 'Clear'}
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-white rounded-lg bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] transition-colors"
+              >
+                <Save className="w-3.5 h-3.5" />
+                {saved
+                  ? (es ? '¡Guardado!' : 'Saved!')
+                  : (es ? 'Guardar' : 'Save')}
+              </button>
+            </div>
           </div>
         </motion.div>
       </motion.div>
