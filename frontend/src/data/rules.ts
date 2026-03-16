@@ -15,6 +15,27 @@ type RuleFn = (values: FormValues) => InlineAlert | null
 
 // --- COLON RULES ---
 const colonRules: RuleFn[] = [
+  // Anatomía incompatible: procedimiento vs localización
+  (v) => {
+    const proc = v.procedure_type || ''
+    const loc = v.tumor_location || ''
+    // Hemicolectomía derecha solo para: ciego, ascendente, hepático, transverso proximal
+    const rightProcs = ['right_hemicolectomy']
+    const leftLocations = ['sigmoid', 'descending', 'splenic', 'rectum', 'rectosigmoid']
+    // Hemicolectomía izquierda / sigmoidectomía solo para: sigmoide, descendente, esplénico
+    const leftProcs = ['left_hemicolectomy', 'sigmoidectomy']
+    const rightLocations = ['cecum', 'ascending', 'hepatic']
+
+    if (rightProcs.includes(proc) && leftLocations.includes(loc))
+      return { id: 'anatomy_mismatch', severity: 'error', field: 'procedure_type',
+        message_es: `ERROR ANATÓMICO: Hemicolectomía derecha NO es compatible con ${loc === 'sigmoid' ? 'colon sigmoide' : loc} (lado izquierdo del colon)`,
+        message_en: `ANATOMICAL ERROR: Right hemicolectomy is NOT compatible with ${loc} (left side of colon)` }
+    if (leftProcs.includes(proc) && rightLocations.includes(loc))
+      return { id: 'anatomy_mismatch', severity: 'error', field: 'procedure_type',
+        message_es: `ERROR ANATÓMICO: ${proc === 'sigmoidectomy' ? 'Sigmoidectomía' : 'Hemicolectomía izquierda'} NO es compatible con ${loc === 'cecum' ? 'ciego' : loc} (lado derecho del colon)`,
+        message_en: `ANATOMICAL ERROR: ${proc === 'sigmoidectomy' ? 'Sigmoidectomy' : 'Left hemicolectomy'} is NOT compatible with ${loc} (right side of colon)` }
+    return null
+  },
   // Ganglios positivos > examinados
   (v) => {
     const exam = parseInt(v.lymph_nodes_examined || '')

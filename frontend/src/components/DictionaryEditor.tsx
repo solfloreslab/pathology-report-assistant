@@ -290,7 +290,7 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={e => e.stopPropagation()}
-          className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col"
+          className="bg-[var(--color-surface)] rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] md:max-h-[85vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
@@ -329,8 +329,8 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
             </div>
           </div>
 
-          {/* Split view: textarea + preview */}
-          <div className="flex-1 flex gap-0 min-h-0 px-5 py-3">
+          {/* Split view: textarea + preview — stacks on mobile */}
+          <div className="flex-1 flex flex-col md:flex-row gap-0 min-h-0 px-4 md:px-5 py-3 overflow-auto">
             {/* Textarea */}
             <div className="flex-1 min-w-0">
               <textarea
@@ -345,13 +345,13 @@ export function DictionaryEditor({ lang, open, onClose, protocolId }: Dictionary
                   'ILV+\tInvasión linfovascular presente',
                   's/pni\tInvasión perineural ausente',
                 ].join('\n')}
-                className="w-full h-full min-h-[220px] px-4 py-3 text-sm font-mono leading-relaxed border border-[var(--color-border)] rounded-l-xl bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] resize-none transition-all"
+                className="w-full h-full min-h-[150px] md:min-h-[220px] px-4 py-3 text-sm font-mono leading-relaxed border border-[var(--color-border)] rounded-xl md:rounded-l-xl md:rounded-r-none bg-[var(--color-surface)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)] resize-none transition-all"
                 style={{ tabSize: 20 }}
               />
             </div>
 
             {/* Preview panel */}
-            <div className="w-[300px] shrink-0 border border-l-0 border-[var(--color-border)] rounded-r-xl bg-[var(--color-surface-alt)] overflow-y-auto">
+            <div className="w-full md:w-[300px] shrink-0 border md:border-l-0 border-[var(--color-border)] rounded-xl md:rounded-r-xl md:rounded-l-none bg-[var(--color-surface-alt)] overflow-y-auto max-h-[200px] md:max-h-none">
               {parsed.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-xs text-[var(--color-text-tertiary)] p-4 text-center">
                   {es

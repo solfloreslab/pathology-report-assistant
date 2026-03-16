@@ -78,7 +78,7 @@ export function ProtocolSearch({ lang, onSelect, selected }: ProtocolSearchProps
           />
         </div>
       </div>
-      <div className="max-h-72 overflow-y-auto">
+      <div className="max-h-[50vh] md:max-h-72 overflow-y-auto">
         {filtered.map((p, i) => {
           const isFav = favs.includes(p.id)
           // Show divider between favorites and non-favorites

@@ -31,13 +31,13 @@ export function Header({ lang, toggleLang, fontSize, onFontSizeChange, darkMode,
             </span>
           </div>
           {mode && onModeChange && (
-            <div className="hidden sm:flex gap-0.5 p-0.5 rounded-lg bg-white/10 ml-4">
+            <div className="flex gap-0.5 p-0.5 rounded-lg bg-white/10 ml-2 sm:ml-4">
               <button onClick={() => onModeChange('copilot')}
-                className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${mode === 'copilot' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
+                className={`px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-[11px] font-medium transition-all ${mode === 'copilot' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
                 {lang === 'es' ? 'Copiloto' : 'Copilot'}
               </button>
               <button onClick={() => onModeChange('auditor')}
-                className={`px-3 py-1 rounded-md text-[11px] font-medium transition-all ${mode === 'auditor' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
+                className={`px-2 sm:px-3 py-1 rounded-md text-[10px] sm:text-[11px] font-medium transition-all ${mode === 'auditor' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
                 {lang === 'es' ? 'Auditor' : 'Auditor'}
               </button>
             </div>

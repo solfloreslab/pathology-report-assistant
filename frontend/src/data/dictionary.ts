@@ -17,7 +17,7 @@ interface DictRule {
 
 const colonRules: DictRule[] = [
   // Histologic type
-  { patterns: [/\badeno\b/i, /\badenocarcinoma\b/i], field: 'histologic_type', value: 'adenocarcinoma' },
+  { patterns: [/\badeno\b/i, /\badenocarcinoma\b/i], field: 'histologic_type', value: 'adeno_nos' },
   { patterns: [/\bmucino/i], field: 'histologic_type', value: 'mucinous' },
   { patterns: [/\bserrad/i, /\bserrat/i], field: 'histologic_type', value: 'serrated' },
   { patterns: [/\banillo.*sello/i, /\bsignet/i], field: 'histologic_type', value: 'signet_ring' },

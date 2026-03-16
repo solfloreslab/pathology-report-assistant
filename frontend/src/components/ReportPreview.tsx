@@ -167,7 +167,7 @@ export function ReportPreview({
   return (
     <div className="space-y-2">
       {/* Row 1: 3 cuadros — Completitud | Crítico | Mayor */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {/* Completitud — anillo + barras */}
         <div className={`rounded-lg border p-2.5 ${cardClass}`}>
           <div className="flex gap-3">
@@ -192,7 +192,7 @@ export function ReportPreview({
             </div>
             {/* Section bars */}
             <div className="flex-1 min-w-0 space-y-0.5">
-              <span className={`text-[10px] font-semibold uppercase tracking-wider ${textSec}`}>
+              <span className={`text-xs font-semibold uppercase tracking-wider ${textSec}`}>
                 {t('completion.title', lang)}
               </span>
               {sectionStatuses.map(s => {
@@ -200,13 +200,13 @@ export function ReportPreview({
                 const barColor = s.status === 'complete' ? 'var(--color-success)' : s.status === 'partial' ? 'var(--color-warning)' : (dm ? '#374151' : '#E2E5EA')
                 return (
                   <a key={s.id} href={`#section-${s.id}`}
-                    className={`flex items-center gap-2 text-[11px] leading-[16px] px-1 rounded group ${dm ? 'hover:bg-gray-800' : 'hover:bg-[var(--color-surface-alt)]'}`}>
+                    className={`flex items-center gap-2 text-xs leading-[18px] px-1 rounded group ${dm ? 'hover:bg-gray-800' : 'hover:bg-[var(--color-surface-alt)]'}`}>
                     <span className={`truncate flex-1 min-w-0 ${textSec}`}>{t(`form.section.${s.id}` as any, lang)}</span>
-                    <div className={`w-14 h-1.5 rounded-full overflow-hidden shrink-0 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
+                    <div className={`w-16 h-1.5 rounded-full overflow-hidden shrink-0 ${dm ? 'bg-gray-700' : 'bg-[var(--color-surface-alt)]'}`}>
                       <div className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct}%`, backgroundColor: barColor }} />
                     </div>
-                    <span className={`font-mono w-7 text-right text-[10px] shrink-0 ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
+                    <span className={`font-mono w-8 text-right text-[11px] shrink-0 ${s.status === 'complete' ? 'text-[var(--color-success)]' : s.status === 'partial' ? 'text-[var(--color-warning-text)]' : 'text-[var(--color-na)]'}`}>
                       {s.status === 'complete' ? '✓' : `${s.filled}/${s.total}`}
                     </span>
                   </a>
@@ -222,7 +222,7 @@ export function ReportPreview({
           : cardClass}`}>
           <div className="flex items-center gap-1 mb-1">
             {hasAnyData && criticalPending.length > 0 && <AlertTriangle className={`w-3.5 h-3.5 ${dm ? 'text-red-400' : 'text-[var(--color-critical)]'}`} />}
-            <span className={`text-[11px] font-bold uppercase ${hasAnyData && criticalPending.length > 0
+            <span className={`text-xs font-bold uppercase ${hasAnyData && criticalPending.length > 0
               ? (dm ? 'text-red-400' : 'text-[var(--color-critical-text)]')
               : textSec}`}>
               {lang === 'es' ? 'Faltantes críticos' : 'Critical missing'} ({criticalPending.length})
@@ -249,7 +249,7 @@ export function ReportPreview({
           : cardClass}`}>
           <div className="flex items-center gap-1 mb-1">
             {hasAnyData && majorPending.length > 0 && <AlertTriangle className={`w-3.5 h-3.5 ${dm ? 'text-orange-400' : 'text-[var(--color-major)]'}`} />}
-            <span className={`text-[11px] font-bold uppercase ${hasAnyData && majorPending.length > 0
+            <span className={`text-xs font-bold uppercase ${hasAnyData && majorPending.length > 0
               ? (dm ? 'text-orange-400' : 'text-[var(--color-major-text)]')
               : textSec}`}>
               {lang === 'es' ? 'Faltantes recomendados' : 'Recommended missing'} ({majorPending.length})
@@ -398,7 +398,7 @@ export function ReportPreview({
       {/* Row 2: Informe editable con toolbar */}
       <div className={`rounded-lg border overflow-hidden flex flex-col flex-1 ${dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'}`}>
         {/* Toolbar: formato + copiar + IA */}
-        <div className="flex items-center justify-between px-2 py-1 border-b border-[var(--color-surface-alt)]">
+        <div className="flex flex-wrap items-center justify-between gap-1 px-2 py-1 border-b border-[var(--color-surface-alt)]">
           <div className="flex items-center gap-1">
             <span className={`text-[12px] font-semibold uppercase tracking-wider mr-2 ${textSec}`}>
               {t('report.title', lang)}
