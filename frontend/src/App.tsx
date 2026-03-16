@@ -356,7 +356,7 @@ export default function App() {
         </div>
       </footer>
 
-      <DictionaryEditor lang={lang} open={dictOpen} onClose={() => setDictOpen(false)} />
+      <DictionaryEditor lang={lang} open={dictOpen} onClose={() => setDictOpen(false)} protocolId={protocol?.id} />
       <FormatConfig lang={lang} open={formatOpen} onClose={() => setFormatOpen(false)} />
     </div>
   )
