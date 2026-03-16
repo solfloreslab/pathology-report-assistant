@@ -446,7 +446,9 @@ export default {
       const body = await request.json();
 
       // Access code
-      if (!body.access_code || body.access_code !== env.ACCESS_CODE) {
+      // Support multiple access codes: ACCESS_CODE (primary) + DEMO_CODE (public demo)
+      const validCodes = [env.ACCESS_CODE, env.DEMO_CODE].filter(Boolean)
+      if (!body.access_code || !validCodes.includes(body.access_code)) {
         return Response.json(
           { error: "Invalid access code", user_message: "Código de acceso incorrecto." },
           { status: 401, headers: corsHeaders }

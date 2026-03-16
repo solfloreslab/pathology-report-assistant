@@ -285,8 +285,18 @@ export function ReportPreview({
           )}
 
           {reviewResult && !reviewing && (
-            <div className="space-y-1.5">
-              {/* AI Review header */}
+            <div className={`rounded-xl border overflow-hidden ${dm ? 'border-gray-700' : 'border-blue-200'}`}>
+              <div className={`flex items-center gap-2 px-3 py-1.5 ${dm ? 'bg-gray-800' : 'bg-blue-50'} border-b ${dm ? 'border-gray-700' : 'border-blue-200'}`}>
+                <span className="text-sm">🔬</span>
+                <span className={`text-xs font-bold uppercase ${dm ? 'text-blue-400' : 'text-blue-700'}`}>
+                  {lang === 'es' ? 'Revisión IA' : 'AI Review'}
+                </span>
+                <span className={`text-[11px] ${dm ? 'text-gray-500' : 'text-blue-400'}`}>
+                  — {lang === 'es' ? 'análisis profundo del informe' : 'deep report analysis'}
+                </span>
+              </div>
+              <div className="space-y-0">
+              {/* AI Review — no issues */}
               {(reviewResult.inconsistencies?.length === 0 && reviewResult.clinical_alerts?.length === 0) && (
                 <div className="p-2.5 rounded-lg text-[13px] border-l-3 bg-green-50 border-l-green-500 dark:bg-green-900/20">
                   <span className="font-bold text-green-700 dark:text-green-300">
@@ -357,29 +367,43 @@ export function ReportPreview({
                   </div>
                 </div>
               )}
+              </div>
             </div>
           )}
       </div>
 
-      {/* Inline rule alerts */}
+      {/* Inline rule alerts — automatic validation */}
       {inlineAlerts.length > 0 && (
-        <div className="space-y-1.5">
-          {inlineAlerts.map(a => (
-            <div key={a.id} className={`p-2.5 rounded-lg border-l-3 text-[13px] ${
-              a.severity === 'error' ? 'bg-red-50 border-l-red-500' :
-              a.severity === 'warning' ? 'bg-amber-50 border-l-amber-500' :
-              'bg-blue-50 border-l-blue-400'
-            }`}>
-              <span className={`text-[10px] font-bold uppercase ${
-                a.severity === 'error' ? 'text-red-600' :
-                a.severity === 'warning' ? 'text-amber-600' :
-                'text-blue-600'
+        <div className={`rounded-xl border overflow-hidden ${dm ? 'border-gray-700' : 'border-amber-200'}`}>
+          <div className={`flex items-center gap-2 px-3 py-1.5 ${dm ? 'bg-gray-800' : 'bg-amber-50'} border-b ${dm ? 'border-gray-700' : 'border-amber-200'}`}>
+            <span className="text-sm">⚡</span>
+            <span className={`text-xs font-bold uppercase ${dm ? 'text-amber-400' : 'text-amber-700'}`}>
+              {lang === 'es' ? 'Validación automática' : 'Automatic validation'}
+            </span>
+            <span className={`text-[11px] ${dm ? 'text-gray-500' : 'text-amber-500'}`}>
+              — {lang === 'es' ? 'instantánea, basada en reglas' : 'instant, rule-based'}
+            </span>
+          </div>
+          <div className="space-y-0">
+            {inlineAlerts.map(a => (
+              <div key={a.id} className={`p-2.5 border-l-3 text-[13px] border-b last:border-b-0 ${
+                a.severity === 'error'
+                  ? (dm ? 'bg-red-950/30 border-l-red-500 border-b-gray-800' : 'bg-red-50/50 border-l-red-500 border-b-red-100')
+                  : a.severity === 'warning'
+                  ? (dm ? 'bg-amber-950/30 border-l-amber-500 border-b-gray-800' : 'bg-amber-50/50 border-l-amber-500 border-b-amber-100')
+                  : (dm ? 'bg-blue-950/30 border-l-blue-400 border-b-gray-800' : 'bg-blue-50/50 border-l-blue-400 border-b-blue-100')
               }`}>
-                {a.severity === 'error' ? 'ERROR' : a.severity === 'warning' ? (lang === 'es' ? 'AVISO' : 'WARNING') : 'INFO'}
-              </span>
-              <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(lang === 'es' ? a.message_es : a.message_en) }} />
-            </div>
-          ))}
+                <span className={`text-[11px] font-bold uppercase ${
+                  a.severity === 'error' ? (dm ? 'text-red-400' : 'text-red-600') :
+                  a.severity === 'warning' ? (dm ? 'text-amber-400' : 'text-amber-600') :
+                  (dm ? 'text-blue-400' : 'text-blue-600')
+                }`}>
+                  {a.severity === 'error' ? 'ERROR' : a.severity === 'warning' ? (lang === 'es' ? 'AVISO' : 'WARNING') : 'INFO'}
+                </span>
+                <div className="mt-0.5" dangerouslySetInnerHTML={{ __html: highlightClinical(lang === 'es' ? a.message_es : a.message_en) }} />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
