@@ -48,11 +48,11 @@ export function Header({ lang, toggleLang, fontSize, onFontSizeChange, darkMode,
 
           {/* Language toggle */}
           <div className="flex rounded-full overflow-hidden border border-white/20">
-            <button onClick={lang === 'en' ? toggleLang : undefined}
+            <button onClick={lang === 'es' ? toggleLang : undefined}
               className={`px-2.5 py-1 text-[11px] font-bold transition-all ${lang === 'en' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
               EN
             </button>
-            <button onClick={lang === 'es' ? undefined : toggleLang}
+            <button onClick={lang === 'en' ? toggleLang : undefined}
               className={`px-2.5 py-1 text-[11px] font-bold transition-all ${lang === 'es' ? 'bg-white text-[#0a1628]' : 'text-white/60 hover:text-white'}`}>
               ES
             </button>

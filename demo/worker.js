@@ -386,15 +386,20 @@ Rules:
 {RULES}`;
 
 // --- Pipeline: Auditor mode ---
-async function runAuditor(env, reportText, protocol, protocolId, lang = 'es') {
+async function runAuditor(env, reportText, protocol, protocolId, lang = 'es', preExtractedData = null) {
   const fieldsText = protocol.fields.join(", ");
   const rulesText = protocol.rules.join("\n");
   const langFull = lang === 'es' ? 'Spanish (español)' : 'English';
 
-  // Extract
-  const extractorPrompt = EXTRACTOR_PROMPT_TEMPLATE.replace("{FIELDS}", fieldsText);
-  const extractRaw = await callLLM(env, extractorPrompt, reportText);
-  const extractedData = parseJSON(extractRaw);
+  // Extract (skip if frontend sent extracted_data from form)
+  let extractedData;
+  if (preExtractedData && Object.keys(preExtractedData).length > 0) {
+    extractedData = preExtractedData;
+  } else {
+    const extractorPrompt = EXTRACTOR_PROMPT_TEMPLATE.replace("{FIELDS}", fieldsText);
+    const extractRaw = await callLLM(env, extractorPrompt, reportText);
+    extractedData = parseJSON(extractRaw);
+  }
 
   // Full audit validation (completeness + inconsistencies + CIE-O)
   const validatorPrompt = AUDITOR_VALIDATOR_PROMPT
@@ -556,7 +561,7 @@ export default {
       // Auditor mode (default)
       if (protocol) {
         const userLang = body.lang || 'es';
-        const auditor = await runAuditor(env, reportText, protocol, protocolId, userLang);
+        const auditor = await runAuditor(env, reportText, protocol, protocolId, userLang, body.extracted_data);
 
         return Response.json({
           mode: "auditor",

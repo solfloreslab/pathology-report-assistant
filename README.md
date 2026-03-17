@@ -12,6 +12,24 @@ A pathology report assistant with structured forms following CAP/ICCR protocols,
 
 > **🚧 Active Development** — This project is updated frequently. Features described below are at different levels of maturity.
 
+### Screenshots
+
+| Login | Protocol selection |
+|:---:|:---:|
+| ![Login](docs/screenshots/01-login.png) | ![Protocol selection](docs/screenshots/02-protocol-select.png) |
+
+| Copilot: text to report | Copilot: AI review with error detection |
+|:---:|:---:|
+| ![Text to report](docs/screenshots/04-text-to-report.png) | ![AI review](docs/screenshots/05-copilot-review.png) |
+
+| Auditor mode | Dark mode |
+|:---:|:---:|
+| ![Auditor](docs/screenshots/06-auditor-light.png) | ![Dark mode](docs/screenshots/07-auditor-dark.png) |
+
+| English interface |
+|:---:|
+| ![English](docs/screenshots/08-copilot-english.png) |
+
 ---
 
 ## What it does

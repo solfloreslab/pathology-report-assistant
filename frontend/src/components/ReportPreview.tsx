@@ -155,6 +155,7 @@ export function ReportPreview({
         body: JSON.stringify({
           mode: 'auditor',
           report_text: reportText,
+          extracted_data: values,
           access_code: accessCode,
           lang: lang,
           protocol_id: protocol.id,

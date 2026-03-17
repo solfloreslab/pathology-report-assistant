@@ -26,8 +26,6 @@ interface AuditorResultsProps {
 export function AuditorResults({ validation, lang, darkMode }: AuditorResultsProps) {
   const es = lang === 'es'
   const dm = darkMode ?? false
-  const score = validation.completeness_score
-  const reported = validation.reported_fields
   const total = validation.total_required_fields
 
   const critical = validation.missing_required?.filter(f => f.severity === 'critical') || []
@@ -48,8 +46,6 @@ export function AuditorResults({ validation, lang, darkMode }: AuditorResultsPro
   }
 
   const isPerfect = !critical.length && !major.length && !minor.length && !inconsistencies.length && !alerts.length
-  const ringColor = score >= 90 ? 'var(--color-success)' : score >= 70 ? 'var(--color-warning)' : 'var(--color-critical)'
-  const ringTextColor = score >= 90 ? 'var(--color-success)' : score >= 70 ? 'var(--color-warning-text)' : 'var(--color-critical)'
 
   const card = `rounded-xl border overflow-hidden ${dm ? 'bg-gray-900 border-gray-700' : 'bg-[var(--color-surface)] border-[var(--color-border)]'}`
 
@@ -57,37 +53,7 @@ export function AuditorResults({ validation, lang, darkMode }: AuditorResultsPro
     <div className="space-y-2 text-[13px]">
       {/* Row 1: Ring | Faltantes Críticos | CIE-O */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        {/* Completion ring */}
-        <div className={card}>
-          <div className="flex items-center gap-4 p-3">
-            <svg width="80" height="80" viewBox="0 0 80 80" className="transform -rotate-90 shrink-0">
-              <circle cx="40" cy="40" r="33" fill="none" stroke={dm ? '#374151' : '#E2E5EA'} strokeWidth="7" />
-              <circle cx="40" cy="40" r="33" fill="none"
-                stroke={ringColor}
-                strokeWidth="7" strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 33}`}
-                strokeDashoffset={`${2 * Math.PI * 33 * (1 - score / 100)}`}
-                className="transition-all duration-700 ease-out"
-              />
-              <text x="40" y="40" textAnchor="middle" dominantBaseline="central"
-                className="transform rotate-90 origin-center"
-                fill={ringTextColor}
-                fontSize="18" fontWeight="700" fontFamily="var(--font-mono)">
-                {score}%
-              </text>
-            </svg>
-            <div>
-              <div className={`text-lg font-bold ${dm ? 'text-gray-200' : 'text-[var(--color-text)]'}`}>
-                {reported}/{total}
-              </div>
-              <div className={`text-[13px] ${dm ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'}`}>
-                {es ? 'campos reportados' : 'fields reported'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Critical + Major missing fields */}
+        {/* Critical missing fields */}
         <div className={card}>
           <div className={`flex items-center gap-2 px-3 py-2 border-b ${dm ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-[var(--color-border)]'}`}>
             <AlertTriangle className={`w-4 h-4 ${critical.length > 0 ? (dm ? 'text-red-400' : 'text-red-600') : (dm ? 'text-green-400' : 'text-green-600')}`} />
@@ -95,24 +61,28 @@ export function AuditorResults({ validation, lang, darkMode }: AuditorResultsPro
               {es ? 'Faltantes críticos' : 'Critical missing'} ({critical.length})
             </span>
           </div>
-          {critical.length > 0 || major.length > 0 ? (
-            <div>
+          {critical.length > 0 ? (
+            <div className="p-3 space-y-1">
               {critical.map((f, i) => (
-                <div key={`c-${i}`} className={`px-3 py-2 border-b last:border-b-0 ${dm ? 'border-gray-800' : 'border-gray-100'}`}>
+                <div key={`c-${i}`} className={dm ? 'text-red-300' : 'text-red-700'}>
                   <span className="inline-block w-2 h-2 rounded-full mr-2 bg-red-500" />
-                  <span className={dm ? 'text-red-300' : 'text-red-700'}>• {f.label || f.field}</span>
-                </div>
-              ))}
-              {major.map((f, i) => (
-                <div key={`m-${i}`} className={`px-3 py-2 border-b last:border-b-0 ${dm ? 'border-gray-800' : 'border-gray-100'}`}>
-                  <span className="inline-block w-2 h-2 rounded-full mr-2 bg-amber-500" />
-                  <span className={dm ? 'text-amber-300' : 'text-amber-700'}>• {f.label || f.field}</span>
+                  • {f.label || f.field}
                 </div>
               ))}
             </div>
           ) : (
             <div className={`px-3 py-4 text-center font-medium ${dm ? 'text-green-400' : 'text-green-600'}`}>
               ✓ {es ? 'Sin campos críticos faltantes' : 'No critical fields missing'}
+            </div>
+          )}
+          {major.length > 0 && (
+            <div className={`p-3 border-t space-y-1 ${dm ? 'border-gray-700' : 'border-gray-100'}`}>
+              {major.map((f, i) => (
+                <div key={`m-${i}`} className={dm ? 'text-amber-300' : 'text-amber-700'}>
+                  <span className="inline-block w-2 h-2 rounded-full mr-2 bg-amber-500" />
+                  • {f.label || f.field}
+                </div>
+              ))}
             </div>
           )}
         </div>
