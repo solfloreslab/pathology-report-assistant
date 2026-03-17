@@ -12,12 +12,13 @@ interface ProtocolFormProps {
   protocol: ProtocolDef
   values: FormValues
   onChange: (fieldName: string, value: string) => void
+  onUnitChange?: () => void
   sectionStatuses: SectionStatus[]
   lang: Lang
   darkMode?: boolean
 }
 
-export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang, darkMode }: ProtocolFormProps) {
+export function ProtocolForm({ protocol, values, onChange, onUnitChange, sectionStatuses, lang, darkMode }: ProtocolFormProps) {
   // Start with all sections collapsed by default
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(() => {
     const allSections = new Set<string>()
@@ -117,6 +118,7 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
                     field={field}
                     value={values[field.name] || ''}
                     onChange={v => onChange(field.name, v)}
+                    onUnitChange={onUnitChange}
                     lang={lang}
                     darkMode={darkMode}
                     suggestion={suggestions.find(s => s.field === field.name)}

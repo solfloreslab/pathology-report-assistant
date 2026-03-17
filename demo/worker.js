@@ -360,6 +360,10 @@ Rules:
     - Very high mitotic index for the tumor type
     - Young patient with diffuse gastric cancer (consider CDH1)
     - Low lymph node count for the procedure type
+  * pTNM STAGING CHECK: Verify that pT, pN, pM are consistent with the reported data:
+    - pN must match lymph node count: pN0 (0 positive), pN1a (1), pN1b (2-3), pN2a (4-6), pN2b (≥7) for colorectal
+    - pT must match depth of invasion: pT1 (submucosa), pT2 (muscularis), pT3 (subserosa/pericolorectal), pT4a (serosa), pT4b (adjacent organs)
+    - Flag any mismatch between reported staging and the data that determines it
   * RULE: If the finding is anatomically/logically impossible → "error". If it is rare but can exist in clinical practice → "warning". When in doubt → "warning".
 - TEXT QUALITY CHECK (CRITICAL — read every sentence carefully):
   * You are a senior pathologist reviewing this report before sign-out.
@@ -371,7 +375,8 @@ Rules:
 - COMPLETENESS CHECK: If the report has very few clinical data points (<5 fields identifiable), warn that the report appears too incomplete for meaningful audit.
 - suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
 - Keep ALL text SHORT and scannable. The pathologist has 2 seconds to read each item.
-- "finding" must be ONE LINE (max 15 words). Example: "Ganglios positivos (9) > examinados (8)"
+- ALWAYS name the specific conflicting terms in parentheses. Example: "Procedimiento (Hemicolectomía derecha) inconsistente con localización (Colon sigmoide)". NEVER say just "inconsistente con el tipo de procedimiento" without naming the terms.
+- "finding" must be ONE LINE (max 20 words). Example: "Ganglios positivos (9) > examinados (8)"
 - "detail" is the brief explanation (1-2 lines max). Example: "pN2b y M1a no son compatibles con pT1"
 - "suggestion" is the action (1 line). Example: "Revisar estadificación"
 - "alert" must be 1-2 lines max. NO paragraphs.

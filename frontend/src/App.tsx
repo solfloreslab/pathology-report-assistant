@@ -31,6 +31,7 @@ export default function App() {
   const [auditorReviewing, setAuditorReviewing] = useState(false)
   const [dictOpen, setDictOpen] = useState(false)
   const [formatOpen, setFormatOpen] = useState(false)
+  const [unitVersion, setUnitVersion] = useState(0)
 
   const {
     values, setValue, bulkSetValues, resetValues,
@@ -202,6 +203,7 @@ export default function App() {
                 protocol={protocol}
                 values={values}
                 onChange={setValue}
+                onUnitChange={() => setUnitVersion(v => v + 1)}
                 sectionStatuses={sectionStatuses}
                 lang={lang}
                 darkMode={darkMode}
@@ -223,6 +225,7 @@ export default function App() {
                   reportStyle={reportStyle}
                   onStyleChange={setReportStyle}
                   onOpenFormatConfig={() => setFormatOpen(true)}
+                  unitVersion={unitVersion}
                 />
               </div>
             </div>

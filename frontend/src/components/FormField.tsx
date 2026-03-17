@@ -25,13 +25,14 @@ interface FormFieldProps {
   field: FieldDef
   value: string
   onChange: (value: string) => void
+  onUnitChange?: () => void
   lang: Lang
   darkMode?: boolean
   suggestion?: StagingSuggestion
   reference?: StagingReference | null
 }
 
-export function FormField({ field, value, onChange, lang, darkMode, suggestion, reference }: FormFieldProps) {
+export function FormField({ field, value, onChange, onUnitChange, lang, darkMode, suggestion, reference }: FormFieldProps) {
   // Show cm/mm toggle on: number fields with cm/mm unit, OR text fields for margins/size
   const isDistanceField = (field.unit === 'cm' || field.unit === 'mm')
     || /margin|margen|size|tamaño/i.test(field.name)
@@ -52,6 +53,7 @@ export function FormField({ field, value, onChange, lang, darkMode, suggestion, 
     e.stopPropagation()
     setPreferredUnit(field.name, unit)
     setActiveUnit(unit)
+    onUnitChange?.()
   }
   const label = lang === 'es' ? field.label_es : field.label_en
   const isFilled = value !== '' && value !== undefined

@@ -13,6 +13,14 @@ function val(values: FormValues, name: string): string | null {
   return v
 }
 
+/** Read preferred unit from localStorage (same key as FormField) */
+function getUnit(fieldName: string, defaultUnit: string): string {
+  try {
+    const prefs = JSON.parse(localStorage.getItem('patho-unit-prefs') || '{}')
+    return prefs[fieldName] || defaultUnit
+  } catch { return defaultUnit }
+}
+
 // Translate dropdown value to display label in the correct language
 function displayVal(protocol: ProtocolDef, values: FormValues, name: string, lang: Lang): string | null {
   const v = val(values, name)
@@ -103,7 +111,10 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
     const macroparts: string[] = []
     if (proc) macroparts.push(lang === 'es' ? `Se recibe espécimen de ${proc.toLowerCase()}` : `Specimen received from ${proc.toLowerCase()}`)
     if (loc) macroparts.push(lang === 'es' ? `localizado en ${loc.toLowerCase()}` : `located in ${loc.toLowerCase()}`)
-    if (size) macroparts.push(lang === 'es' ? `Tamaño tumoral: ${size}` : `Tumor size: ${size}`)
+    if (size) {
+      const sizeUnit = getUnit('tumor_size', protocol.fields.find(f => f.name === 'tumor_size')?.unit || 'cm')
+      macroparts.push(lang === 'es' ? `Tamaño tumoral: ${size} ${sizeUnit}` : `Tumor size: ${size} ${sizeUnit}`)
+    }
     if (macroparts.length > 0) {
       lines.push(macroparts.join('. ') + '.')
     }
@@ -137,8 +148,14 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
     microParts.push(desc)
   }
 
+  const tumorSize = val(values, 'tumor_size')
+  if (tumorSize) {
+    const sizeUnit = getUnit('tumor_size', protocol.fields.find(f => f.name === 'tumor_size')?.unit || 'cm')
+    microParts.push(lang === 'es' ? `Tamaño tumoral: ${tumorSize} ${sizeUnit}` : `Tumor size: ${tumorSize} ${sizeUnit}`)
+  }
+
   if (depth) microParts.push(lang === 'es' ? `Profundidad de invasión: ${depth}` : `Depth of invasion: ${depth}`)
-  if (breslow) microParts.push(lang === 'es' ? `Espesor de Breslow: ${breslow}` : `Breslow thickness: ${breslow}`)
+  if (breslow) microParts.push(lang === 'es' ? `Espesor de Breslow: ${breslow} mm` : `Breslow thickness: ${breslow} mm`)
 
   const ulceration = tristateText(val(values, 'ulceration'), lang)
   if (ulceration) microParts.push(lang === 'es' ? `Ulceración: ${ulceration}` : `Ulceration: ${ulceration}`)
@@ -180,8 +197,8 @@ function generateProse(protocol: ProtocolDef, values: FormValues, lang: Lang, in
     const mv = val(values, mf)
     if (mv) {
       const field = protocol.fields.find(f => f.name === mf)
-      const unit = field?.unit || ''
-      if (field) marginParts.push(`${label(field, lang)}: ${mv}${unit ? ' ' + unit : ''}`)
+      const unit = getUnit(mf, field?.unit || 'cm')
+      if (field) marginParts.push(`${label(field, lang)}: ${mv} ${unit}`)
     }
   }
   if (marginParts.length > 0) {
@@ -378,7 +395,8 @@ function generateMixed(protocol: ProtocolDef, values: FormValues, lang: Lang): s
     const mv = val(values, mf)
     if (mv) {
       const field = protocol.fields.find(f => f.name === mf)
-      if (field) lines.push(`• ${label(field, lang)}: ${mv}`)
+      const unit = getUnit(mf, field?.unit || 'cm')
+      if (field) lines.push(`• ${label(field, lang)}: ${mv} ${unit}`)
     }
   }
 

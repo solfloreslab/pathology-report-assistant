@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react'
-import { Copy, Check, AlertTriangle, Sparkles, Bold, Italic, Underline, CaseSensitive, Loader2, Settings2 } from 'lucide-react'
+import { Copy, Check, AlertTriangle, Sparkles, Loader2 } from 'lucide-react'
 import type { ProtocolDef } from '../data/protocols'
 import type { FormValues, SectionStatus } from '../hooks/useFormState'
 import type { Lang } from '../data/i18n'
@@ -34,12 +34,13 @@ interface ReportPreviewProps {
   reportStyle: ReportStyle
   onStyleChange: (style: ReportStyle) => void
   onOpenFormatConfig?: () => void
+  unitVersion?: number
 }
 
 export function ReportPreview({
   protocol, values, lang, includeMacro,
   completionPercent, pendingFields, sectionStatuses, accessCode, darkMode,
-  reportStyle, onStyleChange, onOpenFormatConfig,
+  reportStyle, onStyleChange, unitVersion,
 }: ReportPreviewProps) {
   const [copied, setCopied] = useState(false)
   const [reviewing, setReviewing] = useState(false)
@@ -64,7 +65,7 @@ export function ReportPreview({
 
   const rawReport = useMemo(
     () => generateReport(protocol, values, lang, includeMacro, reportStyle),
-    [protocol, values, lang, includeMacro, reportStyle]
+    [protocol, values, lang, includeMacro, reportStyle, unitVersion]
   )
 
   // Apply format rules from FormatConfig to the report HTML
@@ -181,12 +182,6 @@ export function ReportPreview({
   const dm = darkMode
   const cardClass = dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'
   const textSec = dm ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'
-  const toolbarBtn = `p-1.5 rounded transition-colors ${dm ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/10'}`
-
-  const applyFormat = (command: string) => {
-    document.execCommand(command, false)
-  }
-
   return (
     <div className="space-y-2">
       {/* Row 1: 3 cuadros — Completitud | Crítico | Mayor */}
@@ -457,36 +452,6 @@ export function ReportPreview({
                 <option key={s.value} value={s.value}>{lang === 'es' ? s.label_es : s.label_en}</option>
               ))}
             </select>
-            {onOpenFormatConfig && (
-              <button
-                onClick={onOpenFormatConfig}
-                className={`flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-[var(--color-surface-alt)] transition-colors mr-1 ${dm ? 'text-gray-400 hover:text-gray-200' : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-primary)]'}`}
-                title={lang === 'es' ? 'Configurar formato' : 'Format settings'}
-              >
-                <Settings2 className="w-3.5 h-3.5" />
-                <span className="text-[11px]">{lang === 'es' ? 'Formato' : 'Format'}</span>
-              </button>
-            )}
-            <div className={`flex items-center border rounded ${dm ? 'border-gray-600' : 'border-[var(--color-border)]'}`}>
-              <button onClick={() => applyFormat('bold')} className={toolbarBtn} title="Bold">
-                <Bold className="w-3.5 h-3.5" />
-              </button>
-              <button onClick={() => applyFormat('italic')} className={toolbarBtn} title="Italic">
-                <Italic className="w-3.5 h-3.5" />
-              </button>
-              <button onClick={() => applyFormat('underline')} className={toolbarBtn} title="Underline">
-                <Underline className="w-3.5 h-3.5" />
-              </button>
-              <button onClick={() => {
-                const sel = window.getSelection()
-                if (sel && sel.toString()) {
-                  const text = sel.toString()
-                  document.execCommand('insertText', false, text === text.toUpperCase() ? text.toLowerCase() : text.toUpperCase())
-                }
-              }} className={toolbarBtn} title="UPPERCASE / lowercase">
-                <CaseSensitive className="w-3.5 h-3.5" />
-              </button>
-            </div>
           </div>
           <div className="flex items-center gap-1.5">
             {report && (
