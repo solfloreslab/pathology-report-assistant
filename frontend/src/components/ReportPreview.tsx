@@ -171,7 +171,7 @@ export function ReportPreview({
     } finally {
       setReviewing(false)
     }
-  }, [report, reviewing, accessCode])
+  }, [editableText, reviewing, accessCode, lang, protocol.id])
 
   const criticalPending = pendingFields.filter(f => f.severity === 'critical')
   const majorPending = pendingFields.filter(f => f.severity === 'major')
