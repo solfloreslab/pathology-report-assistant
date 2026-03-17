@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CAP/ICCR](https://img.shields.io/badge/protocols-CAP%2FICCR-orange.svg)](#protocols)
 [![Active Development](https://img.shields.io/badge/status-active%20development-yellow.svg)](#project-status)
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen.svg)](https://pathology-report-assistant.pages.dev)
 
 A pathology report assistant with structured forms following CAP/ICCR protocols, real-time clinical validation, and optional AI review.
 
@@ -99,7 +100,7 @@ npm install
 
 # Create .dev.vars with your keys:
 echo "OPENROUTER_API_KEY=sk-or-v1-your-key" > .dev.vars
-echo "ACCESS_CODE=DEMO2026" >> .dev.vars
+echo "ACCESS_CODE=your-access-code" >> .dev.vars
 
 npx wrangler dev  # http://localhost:8787
 ```
@@ -200,7 +201,6 @@ The separation is intentional: 80% of functionality is deterministic and instant
 
 The application uses a simple access code (not patient authentication). For the demo:
 
-- **Demo code**: `DEMO2026` (public, rate-limited to 10 requests/minute)
 - The access code protects the AI API budget, not patient data (there is no patient data)
 - The OpenRouter API key is stored as a Worker secret and is never exposed to the browser
 
