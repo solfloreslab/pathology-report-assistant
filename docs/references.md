@@ -52,31 +52,18 @@
    - Synoptic/structured reports: **98% completeness**
    - Standardized reporting improves downstream clinical decision-making
 
-### Spain Healthcare AI Landscape
-
-9. **DigiPatICS** (Catalonia). Digital pathology infrastructure.
-   - 8 ICS hospitals, 168 pathologists, >1M slides/year
-   - Demonstrates that digital pathology infrastructure exists in Spain
-
-10. **eIASNS** (November 2025). Estrategia de Inteligencia Artificial del Sistema Nacional de Salud.
-    - Institutional framework for AI in Spanish healthcare
-    - Priorities: standardization, clinical decision support, human oversight
-
-11. **RedIA Salud**. €50M funding program for health AI projects.
-    - Validates institutional demand for clinical AI tools
-    - Focus on applied AI with measurable clinical impact
-
 ## Regulatory Framework
 
-12. **EU AI Act** (Regulation 2024/1689).
+9. **EU AI Act** (Regulation 2024/1689).
     - Art. 6(3)(d): Preparatory task exemption
     - Art. 12: Audit trail requirements
     - Art. 14: Human oversight requirements
     - Art. 52: Transparency obligations
 
-13. **MDCG 2019-11**. Guidance on qualification and classification of software in medical device regulatory framework.
+10. **MDCG 2019-11**. Guidance on qualification and classification of software in medical device regulatory framework.
     - Criteria for distinguishing medical device software from administrative tools
 
-14. **GDPR** (Regulation 2016/679).
+11. **GDPR** (Regulation 2016/679).
     - Art. 9(2)(h): Health data processing under professional responsibility
     - Art. 35: DPIA requirement for high-risk processing
+

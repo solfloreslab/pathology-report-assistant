@@ -25,7 +25,7 @@ The core experience (form → report) is **instant** — no AI or internet requi
 - **Protocol-specific form**: CAP dropdowns, tri-state controls (Present/Absent/Not evaluated), numeric validation
 - **Instant report generation**: 3 styles (narrative prose, synoptic checklist, mixed)
 - **Free-text parser**: type `adeno mod G2 2/18 gang` → form fields auto-populate in real-time
-- **pTNM auto-suggestions**: based on filled fields (depth → pT, nodes → pN) with AJCC 8th Ed. reference
+- **pTNM auto-suggestions**: based on filled fields (depth of invasion, tumor size → pT; lymph node count → pN) with AJCC 8th Ed. reference
 - **ICD-O coding**: auto-generated from selected histology and location
 - **Deterministic inline rules**: instant alerts without AI (e.g., "positive nodes > examined", "pT3 without lymph node evaluation", "anatomical mismatch: right hemicolectomy + sigmoid")
 - **CAP compliance banner**: warning when required protocol fields are missing

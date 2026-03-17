@@ -366,7 +366,7 @@ Rules:
   * Read EVERY sentence and ask: "Does this sentence make clinical sense in a pathology report?"
   * Flag ANY text that is NOT standard pathology language: random phrases, personal notes, nonsense, jokes, typos that change meaning.
   * Common errors to detect: "muerte" instead of "muestra", wrong anatomical terms, sentences about non-medical topics, placeholder text, gibberish.
-  * Report these as "error" severity with the exact problematic fragment quoted.
+  * Report these as "error" severity. In the "finding" field, QUOTE the exact problematic text in single quotes, e.g.: "Texto no clínico: 'Cuando el astronauta llega a la luna'".
   * If a sentence has NO relation to pathology (e.g. about astronauts, weather, personal life), it MUST be flagged as error.
 - COMPLETENESS CHECK: If the report has very few clinical data points (<5 fields identifiable), warn that the report appears too incomplete for meaningful audit.
 - suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
