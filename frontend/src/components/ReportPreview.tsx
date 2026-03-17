@@ -47,6 +47,9 @@ export function ReportPreview({
   const [reviewResult, setReviewResult] = useState<AIReviewResult | null>(null)
   const [formatVersion, setFormatVersion] = useState(0)
   const reportRef = useRef<HTMLDivElement>(null)
+  const [editableText, setEditableText] = useState('')
+  const [hasBeenGenerated, setHasBeenGenerated] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Listen for format config changes (localStorage)
   useEffect(() => {
@@ -108,8 +111,32 @@ export function ReportPreview({
     return result
   }, [rawReport, formatVersion])
 
+  // Generate text into textarea (only on first render or explicit regenerate)
+  const generateIntoTextarea = useCallback(() => {
+    // Strip HTML tags for plain text textarea
+    const plainText = rawReport.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '')
+    setEditableText(plainText)
+    setHasBeenGenerated(true)
+  }, [rawReport])
+
+  // Auto-generate on first render when report becomes available
+  useEffect(() => {
+    if (rawReport && !hasBeenGenerated) {
+      generateIntoTextarea()
+    }
+  }, [rawReport, hasBeenGenerated, generateIntoTextarea])
+
+  const handleRegenerate = () => {
+    const msg = lang === 'es'
+      ? '¿Regenerar el informe desde el formulario? Se perderán las ediciones manuales.'
+      : 'Regenerate report from form? Manual edits will be lost.'
+    if (window.confirm(msg)) {
+      generateIntoTextarea()
+    }
+  }
+
   const handleCopy = async () => {
-    const text = reportRef.current?.innerText || report
+    const text = editableText || rawReport
     if (text) {
       await navigator.clipboard.writeText(text)
       setCopied(true)
@@ -117,17 +144,12 @@ export function ReportPreview({
     }
   }
 
-  const applyFormat = useCallback((command: string, value?: string) => {
-    document.execCommand(command, false, value)
-    reportRef.current?.focus()
-  }, [])
-
   const handleReview = useCallback(async () => {
-    if (!report || reviewing) return
+    if (!editableText || reviewing) return
     setReviewing(true)
     setReviewResult(null)
     try {
-      const reportText = reportRef.current?.innerText || report
+      const reportText = editableText
       const res = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -492,21 +514,29 @@ export function ReportPreview({
         <div className="p-3 flex-1">
           {report ? (
             <>
-              <div className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] mb-2 inline-block">
-                {t('report.draft', lang)}
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-[var(--color-warning-bg)] text-[var(--color-warning-text)] inline-block">
+                  {t('report.draft', lang)}
+                </div>
+                <button
+                  onClick={handleRegenerate}
+                  className="text-[10px] text-[var(--color-primary)] hover:underline"
+                >
+                  {lang === 'es' ? '↺ Regenerar desde formulario' : '↺ Regenerate from form'}
+                </button>
               </div>
-              <div
-                ref={reportRef}
-                contentEditable
-                suppressContentEditableWarning
-                className="outline-none whitespace-pre-wrap break-words text-[var(--color-text)] report-text min-h-[200px] p-1"
-                style={{ fontFamily: 'var(--font-sans)' }}
-                dangerouslySetInnerHTML={{ __html: report.replace(/\n/g, '<br>') }}
+              <textarea
+                ref={textareaRef}
+                value={editableText}
+                onChange={(e) => setEditableText(e.target.value)}
+                className={`w-full min-h-[300px] p-3 rounded-lg border text-sm resize-y ${
+                  dm ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-[var(--color-border-input)] text-[var(--color-text)]'
+                } focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent`}
+                style={{ fontFamily: 'var(--font-sans)', lineHeight: '1.6' }}
               />
               <div className="text-[10px] text-[var(--color-text-tertiary)] mt-1 italic">
-                {lang === 'es' ? 'Puede editar este texto libremente. "Revisar con IA" leerá lo que esté aquí.' : 'You can edit this text freely. "Review with AI" will read whatever is here.'}
+                {lang === 'es' ? 'Edite libremente. "Revisar con IA" leerá este texto. Los cambios del formulario no sobreescriben.' : 'Edit freely. "Review with AI" reads this text. Form changes don\'t overwrite.'}
               </div>
-              {/* AI Review results are shown in the alert panel above */}
             </>
           ) : (
             <div className="flex items-center justify-center h-full min-h-[200px] text-sm text-[var(--color-text-tertiary)]">
