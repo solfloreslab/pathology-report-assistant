@@ -361,6 +361,8 @@ Rules:
     - Young patient with diffuse gastric cancer (consider CDH1)
     - Low lymph node count for the procedure type
   * RULE: If the finding is anatomically/logically impossible → "error". If it is rare but can exist in clinical practice → "warning". When in doubt → "warning".
+- TEXT QUALITY CHECK: Detect spelling errors, nonsensical phrases, text that does not belong in a pathology report (e.g. "borde de la muerte" instead of "borde de la muestra", random words like "casa", "hola", gibberish). Report these as "error" with finding like "Posible error de texto: '[fragment]'" and suggestion to verify.
+- COMPLETENESS CHECK: If the report has very few clinical data points (<5 fields identifiable), warn that the report appears too incomplete for meaningful audit.
 - suggested_coding: derive CIE-O codes from the histologic type and tumor location in the report.
 - Keep ALL text SHORT and scannable. The pathologist has 2 seconds to read each item.
 - "finding" must be ONE LINE (max 15 words). Example: "Ganglios positivos (9) > examinados (8)"
