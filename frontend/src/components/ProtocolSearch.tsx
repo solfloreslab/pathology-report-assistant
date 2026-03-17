@@ -50,7 +50,6 @@ export function ProtocolSearch({ lang, onSelect, selected }: ProtocolSearchProps
         className="w-full flex items-center justify-between p-3 bg-[var(--color-surface)] rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-colors"
       >
         <div className="flex items-center gap-3">
-          <span className="text-lg">{selected.icon}</span>
           <div className="text-left">
             <div className="text-sm font-semibold text-[var(--color-text)]">
               {lang === 'es' ? selected.name_es : selected.name_en}
@@ -106,7 +105,6 @@ export function ProtocolSearch({ lang, onSelect, selected }: ProtocolSearchProps
                 } ${selected?.id === p.id ? 'bg-[var(--color-primary-light)]' : ''}`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{p.icon}</span>
                   <div>
                     <div className="text-sm font-medium text-[var(--color-text)]">
                       {lang === 'es' ? p.name_es : p.name_en}

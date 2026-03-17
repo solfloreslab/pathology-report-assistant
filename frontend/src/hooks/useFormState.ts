@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react'
-import type { ProtocolDef, FieldDef, SectionId } from '../data/protocols'
+import type { ProtocolDef, SectionId } from '../data/protocols'
 import { sectionOrder } from '../data/protocols'
 
 export type FormValues = Record<string, string>
@@ -60,7 +60,7 @@ export function useFormState(protocol: ProtocolDef | null) {
         const status: SectionStatus['status'] =
           filled === 0 ? 'empty' :
           filled === sectionFields.length ? 'complete' : 'partial'
-        return { id: sectionId, total: sectionFields.length, filled, status }
+        return { id: sectionId, total: sectionFields.length, filled, status } as SectionStatus
       })
       .filter((s): s is SectionStatus => s !== null)
   }, [protocol, values])

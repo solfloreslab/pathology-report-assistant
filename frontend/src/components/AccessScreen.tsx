@@ -9,16 +9,19 @@ import { ParticleCanvas } from './ParticleCanvas'
 interface AccessScreenProps {
   lang: Lang
   toggleLang: () => void
-  onLogin: (code: string) => boolean
+  onLogin: (code: string) => Promise<boolean>
 }
 
 export function AccessScreen({ lang, toggleLang, onLogin }: AccessScreenProps) {
   const [code, setCode] = useState('')
   const [error, setError] = useState(false)
+  const [validating, setValidating] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const success = onLogin(code)
+    setValidating(true)
+    const success = await onLogin(code)
+    setValidating(false)
     if (!success) {
       setError(true)
       setTimeout(() => setError(false), 2000)
@@ -99,8 +102,8 @@ export function AccessScreen({ lang, toggleLang, onLogin }: AccessScreenProps) {
             type="submit"
             className="w-full mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--color-primary-dark)] transition-all hover:shadow-lg active:scale-[0.98]"
           >
-            {t('access.submit', lang)}
-            <ArrowRight className="w-4 h-4" />
+            {validating ? (lang === 'es' ? 'Verificando...' : 'Verifying...') : t('access.submit', lang)}
+            {!validating && <ArrowRight className="w-4 h-4" />}
           </button>
         </motion.form>
 

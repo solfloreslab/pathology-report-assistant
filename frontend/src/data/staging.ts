@@ -2,7 +2,7 @@
 // These are SUGGESTIONS only — the pathologist always decides
 
 import type { FormValues } from '../hooks/useFormState'
-import type { Lang } from './i18n'
+// Lang type available via ./i18n if needed
 
 export interface StagingSuggestion {
   field: string
@@ -206,7 +206,7 @@ function suggestGastricPt(values: FormValues): StagingSuggestion | null {
   }
   const stage = mapping[depth]
   if (!stage) return null
-  return { field: 'pt_stage', value: stage, reason_es: `Profundidad: ${depth}`, reason_en: `Depth: ${depth}` }
+  return { field: 'pt_stage', value: stage, reasoning_es: `Profundidad: ${depth}`, reasoning_en: `Depth: ${depth}` }
 }
 
 // --- GASTRIC pN from nodes ---
@@ -219,7 +219,7 @@ function suggestGastricPn(values: FormValues): StagingSuggestion | null {
   else if (pos <= 6) stage = 'pN2'
   else if (pos <= 15) stage = 'pN3a'
   else stage = 'pN3b'
-  return { field: 'pn_stage', value: stage, reason_es: `${pos} ganglios positivos`, reason_en: `${pos} positive nodes` }
+  return { field: 'pn_stage', value: stage, reasoning_es: `${pos} ganglios positivos`, reasoning_en: `${pos} positive nodes` }
 }
 
 // --- BREAST pT from size ---
@@ -235,7 +235,7 @@ function suggestBreastPt(values: FormValues): StagingSuggestion | null {
   else if (mm <= 20) stage = 'pt1c'
   else if (mm <= 50) stage = 'pt2'
   else stage = 'pt3'
-  return { field: 'pt_category', value: stage, reason_es: `Tamaño: ${mm}mm`, reason_en: `Size: ${mm}mm` }
+  return { field: 'pt_category', value: stage, reasoning_es: `Tamaño: ${mm}mm`, reasoning_en: `Size: ${mm}mm` }
 }
 
 // --- BREAST pN from nodes ---
@@ -247,7 +247,7 @@ function suggestBreastPn(values: FormValues): StagingSuggestion | null {
   else if (macro <= 3) stage = 'pn1a'
   else if (macro <= 9) stage = 'pn2a'
   else stage = 'pn3a'
-  return { field: 'pn_category', value: stage, reason_es: `${macro} ganglios con macrometástasis`, reason_en: `${macro} nodes with macrometastases` }
+  return { field: 'pn_category', value: stage, reasoning_es: `${macro} ganglios con macrometástasis`, reasoning_en: `${macro} nodes with macrometastases` }
 }
 
 // --- CERVIX pT from stromal invasion depth + tumor size ---
@@ -257,22 +257,22 @@ function suggestCervixPt(values: FormValues): StagingSuggestion | null {
   if (isNaN(depth) && isNaN(size)) return null
 
   let stage: string
-  let reason_es: string
-  let reason_en: string
+  let reasoning_es: string
+  let reasoning_en: string
 
   if (!isNaN(depth) && depth <= 3) {
-    stage = 'pt1a1'; reason_es = `Invasión estromal ${depth}mm (≤3mm)`; reason_en = `Stromal invasion ${depth}mm (≤3mm)`
+    stage = 'pt1a1'; reasoning_es = `Invasión estromal ${depth}mm (≤3mm)`; reasoning_en = `Stromal invasion ${depth}mm (≤3mm)`
   } else if (!isNaN(depth) && depth <= 5) {
-    stage = 'pt1a2'; reason_es = `Invasión estromal ${depth}mm (>3-5mm)`; reason_en = `Stromal invasion ${depth}mm (>3-5mm)`
+    stage = 'pt1a2'; reasoning_es = `Invasión estromal ${depth}mm (>3-5mm)`; reasoning_en = `Stromal invasion ${depth}mm (>3-5mm)`
   } else if (!isNaN(size) && size <= 2) {
-    stage = 'pt1b1'; reason_es = `Tumor ${size}cm (≤2cm)`; reason_en = `Tumor ${size}cm (≤2cm)`
+    stage = 'pt1b1'; reasoning_es = `Tumor ${size}cm (≤2cm)`; reasoning_en = `Tumor ${size}cm (≤2cm)`
   } else if (!isNaN(size) && size <= 4) {
-    stage = 'pt1b2'; reason_es = `Tumor ${size}cm (>2-4cm)`; reason_en = `Tumor ${size}cm (>2-4cm)`
+    stage = 'pt1b2'; reasoning_es = `Tumor ${size}cm (>2-4cm)`; reasoning_en = `Tumor ${size}cm (>2-4cm)`
   } else if (!isNaN(size) && size > 4) {
-    stage = 'pt1b3'; reason_es = `Tumor ${size}cm (>4cm)`; reason_en = `Tumor ${size}cm (>4cm)`
+    stage = 'pt1b3'; reasoning_es = `Tumor ${size}cm (>4cm)`; reasoning_en = `Tumor ${size}cm (>4cm)`
   } else return null
 
-  return { field: 'pt_category', value: stage, reason_es, reason_en }
+  return { field: 'pt_category', value: stage, reasoning_es, reasoning_en }
 }
 
 export function getSuggestions(protocolId: string, values: FormValues): StagingSuggestion[] {
@@ -327,7 +327,7 @@ export function getReference(protocolId: string, fieldName: string): StagingRefe
   return null
 }
 
-export function getMatchingStage(reference: StagingReference, suggestion: StagingSuggestion | undefined): string | null {
+export function getMatchingStage(_reference: StagingReference, suggestion: StagingSuggestion | undefined): string | null {
   if (!suggestion) return null
   return suggestion.value || null
 }

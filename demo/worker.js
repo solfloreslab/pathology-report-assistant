@@ -447,6 +447,16 @@ export default {
       );
     }
 
+    // Quick access code validation endpoint
+    const url = new URL(request.url);
+    if (url.pathname === "/api/validate") {
+      const body = await request.json();
+      if (body.access_code && body.access_code === env.ACCESS_CODE) {
+        return Response.json({ valid: true }, { headers: corsHeaders });
+      }
+      return Response.json({ valid: false }, { status: 401, headers: corsHeaders });
+    }
+
     const ip = request.headers.get("cf-connecting-ip") || "unknown";
     if (!checkRateLimit(ip)) {
       return Response.json(
@@ -458,10 +468,8 @@ export default {
     try {
       const body = await request.json();
 
-      // Access code
-      // Support multiple access codes: ACCESS_CODE (primary) + DEMO_CODE (public demo)
-      const validCodes = [env.ACCESS_CODE, env.DEMO_CODE].filter(Boolean)
-      if (!body.access_code || !validCodes.includes(body.access_code)) {
+      // Access code validation (server-side only)
+      if (!body.access_code || body.access_code !== env.ACCESS_CODE) {
         return Response.json(
           { error: "Invalid access code", user_message: "Código de acceso incorrecto." },
           { status: 401, headers: corsHeaders }

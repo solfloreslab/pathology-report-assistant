@@ -11,10 +11,8 @@ import { useFormState } from './hooks/useFormState'
 import type { ProtocolDef } from './data/protocols'
 import { t } from './data/i18n'
 import type { ReportStyle } from './data/templates'
-import { MicroscopeMascot } from './components/MicroscopeMascot'
 import { BodySelector } from './components/BodySelector'
 import { AuditorResults } from './components/AuditorResults'
-import { highlightClinical } from './data/utils'
 import { DictionaryEditor } from './components/DictionaryEditor'
 import { FormatConfig } from './components/FormatConfig'
 
@@ -24,7 +22,6 @@ export default function App() {
   const { lang, toggleLang } = useLang()
   const { authenticated, login, getCode } = useAccessCode()
   const [protocol, setProtocol] = useState<ProtocolDef | null>(null)
-  const [includeMacro, setIncludeMacro] = useState(false)
   const [fontSize, setFontSize] = useState(15)
   const [darkMode, setDarkMode] = useState(false)
   const [reportStyle, setReportStyle] = useState<ReportStyle>('prose')
@@ -37,7 +34,7 @@ export default function App() {
 
   const {
     values, setValue, bulkSetValues, resetValues,
-    filledFields, pendingFields, completionPercent, sectionStatuses,
+    pendingFields, completionPercent, sectionStatuses,
   } = useFormState(protocol)
 
   const handleSelectProtocol = useCallback((p: ProtocolDef) => {
@@ -110,7 +107,6 @@ export default function App() {
       <Header
         lang={lang}
         toggleLang={toggleLang}
-        completionPercent={protocol ? completionPercent : undefined}
         fontSize={fontSize}
         onFontSizeChange={setFontSize}
         darkMode={darkMode}

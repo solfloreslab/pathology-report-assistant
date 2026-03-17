@@ -87,8 +87,6 @@ export function ProtocolForm({ protocol, values, onChange, sectionStatuses, lang
         const status = sectionStatuses.find(s => s.id === sectionId)
         const isCollapsed = collapsedSections.has(sectionId)
 
-        const renderedGroups = new Set<string>()
-
         return (
           <div
             key={sectionId}

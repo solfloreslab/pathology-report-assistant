@@ -59,7 +59,6 @@ export function MicroscopeMascot({ size = 'medium', className = '' }: Microscope
   const rightEyeX = useTransform(smoothX, [-1, -0.2, 0, 0.2, 1], [-9, -8, -7, 5, 9])
 
   const s = size === 'small' ? 42 : 200
-  const scale = s / 240
 
   return (
     <div

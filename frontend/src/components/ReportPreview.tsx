@@ -11,7 +11,6 @@ import type { FieldDef } from '../data/protocols'
 
 import { highlightClinical } from '../data/utils'
 import { evaluateRules } from '../data/rules'
-import type { InlineAlert } from '../data/rules'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
 
@@ -46,7 +45,6 @@ export function ReportPreview({
   const [reviewing, setReviewing] = useState(false)
   const [reviewResult, setReviewResult] = useState<AIReviewResult | null>(null)
   const [formatVersion, setFormatVersion] = useState(0)
-  const reportRef = useRef<HTMLDivElement>(null)
   const [editableText, setEditableText] = useState('')
   const [hasBeenGenerated, setHasBeenGenerated] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -182,9 +180,12 @@ export function ReportPreview({
 
   const dm = darkMode
   const cardClass = dm ? 'bg-gray-900 border-gray-700' : 'bg-white border-[var(--color-border)]'
-  const textMain = dm ? 'text-gray-200' : 'text-[var(--color-text)]'
   const textSec = dm ? 'text-gray-400' : 'text-[var(--color-text-secondary)]'
   const toolbarBtn = `p-1.5 rounded transition-colors ${dm ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/10'}`
+
+  const applyFormat = (command: string) => {
+    document.execCommand(command, false)
+  }
 
   return (
     <div className="space-y-2">
