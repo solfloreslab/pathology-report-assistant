@@ -119,9 +119,9 @@ export function ReportPreview({
     setHasBeenGenerated(true)
   }, [rawReport])
 
-  // Auto-generate on first render when report becomes available
+  // Auto-generate whenever form fields change
   useEffect(() => {
-    if (rawReport && !hasBeenGenerated) {
+    if (rawReport) {
       generateIntoTextarea()
     }
   }, [rawReport, hasBeenGenerated, generateIntoTextarea])
