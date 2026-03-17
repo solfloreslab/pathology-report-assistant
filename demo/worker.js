@@ -396,7 +396,8 @@ async function runAuditor(env, reportText, protocol, protocolId, lang = 'es') {
     .replace("{FIELDS}", fieldsText)
     .replace("{RULES}", rulesText)
     .replace(/{LANG}/g, langFull);
-  const validateRaw = await callLLM(env, validatorPrompt, JSON.stringify(extractedData, null, 2));
+  const validateInput = `--- ORIGINAL REPORT TEXT (review for errors, nonsense, non-clinical text) ---\n${reportText}\n\n--- EXTRACTED DATA (review for completeness and inconsistencies) ---\n${JSON.stringify(extractedData, null, 2)}`;
+  const validateRaw = await callLLM(env, validatorPrompt, validateInput);
   const validation = parseJSON(validateRaw);
 
   return { extractedData, validation };
