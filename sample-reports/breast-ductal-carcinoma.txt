@@ -1,0 +1,25 @@
+INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00342
+Paciente: López Fernández, María (ID: 00102)
+Fecha recepción: 2026-03-11
+Médico solicitante: Dra. Sánchez Vega (Ginecología)
+Tipo de muestra: BAG mama izquierda (CSE), 4 cilindros
+
+DESCRIPCIÓN MICROSCÓPICA:
+Los cuatro cilindros muestran infiltración por carcinoma ductal infiltrante de tipo no especial (NOS), grado histológico 2 (formación tubular: 3, pleomorfismo nuclear: 2, índice mitótico: 1; score de Nottingham 6/9).
+Se observa componente de carcinoma ductal in situ asociado, patrón cribiforme, grado nuclear intermedio, sin necrosis.
+
+DIAGNÓSTICO:
+Carcinoma ductal infiltrante, tipo NOS, grado histológico 2 (Nottingham).
+Componente in situ asociado (CDIS cribiforme, grado intermedio).
+
+INMUNOHISTOQUÍMICA / BIOMARCADORES:
+- Receptores de estrógeno (RE): Positivo, 90% de células tumorales, intensidad fuerte (Allred 8/8)
+- Receptores de progesterona (RP): Positivo, 70%, intensidad moderada (Allred 7/8)
+- HER2/neu: Negativo (score 1+)
+- Ki-67: 15%
+Perfil molecular subrogado: Luminal A-like
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-14

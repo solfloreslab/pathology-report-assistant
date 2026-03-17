@@ -1,0 +1,163 @@
+protocol:
+  id: colon-resection
+  name: "Colon Resection — CAP/ICCR-based"
+  version: "1.0"
+  organ: colon
+  specimen_types:
+    - resection
+
+fields:
+  - name: procedure_type
+    label_es: "Tipo de procedimiento"
+    label_en: "Procedure type"
+    severity: required
+    type: string
+    description: "Tipo de procedimiento quirurgico"
+
+  - name: tumor_location
+    label_es: "Localización del tumor"
+    label_en: "Tumor location"
+    severity: required
+    type: string
+    description: "Localizacion anatomica del tumor"
+
+  - name: histologic_type
+    label_es: "Tipo histológico"
+    label_en: "Histologic type"
+    severity: required
+    type: string
+    reference: "WHO Classification"
+    description: "Tipo histologico segun OMS"
+
+  - name: histologic_grade
+    label_es: "Grado histológico"
+    label_en: "Histologic grade"
+    severity: required
+    type: string
+    values: ["G1", "G2", "G3"]
+    description: "Grado de diferenciacion"
+
+  - name: depth_of_invasion
+    label_es: "Profundidad de invasión"
+    label_en: "Depth of invasion"
+    severity: required
+    type: string
+    description: "Extension de la invasion (submucosa, muscular, subserosa, serosa)"
+
+  - name: pTNM
+    label_es: "Estadificación pTNM"
+    label_en: "pTNM staging"
+    severity: required
+    type: string
+    description: "Estadificacion patologica AJCC (edicion vigente)"
+
+  - name: lymph_nodes_examined
+    label_es: "Ganglios examinados"
+    label_en: "Lymph nodes examined"
+    severity: required
+    type: integer
+    minimum: 0
+    description: "Numero total de ganglios aislados"
+
+  - name: lymph_nodes_positive
+    label_es: "Ganglios positivos"
+    label_en: "Lymph nodes positive"
+    severity: required
+    type: integer
+    minimum: 0
+    description: "Numero de ganglios con metastasis"
+
+  - name: margins_proximal
+    label_es: "Margen proximal"
+    label_en: "Proximal margin"
+    severity: required
+    type: string
+    description: "Estado del margen proximal (libre/afecto + distancia)"
+
+  - name: margins_distal
+    label_es: "Margen distal"
+    label_en: "Distal margin"
+    severity: required
+    type: string
+    description: "Estado del margen distal (libre/afecto + distancia)"
+
+  - name: margins_radial
+    label_es: "Margen radial"
+    label_en: "Radial margin"
+    severity: required
+    type: string
+    description: "Estado del margen radial/circunferencial"
+
+  - name: lymphovascular_invasion
+    label_es: "Invasión linfovascular"
+    label_en: "Lymphovascular invasion"
+    severity: required
+    type: string
+    values: ["present", "absent", "not_reported"]
+    description: "Invasion linfovascular"
+
+  - name: perineural_invasion
+    label_es: "Invasión perineural"
+    label_en: "Perineural invasion"
+    severity: required
+    type: string
+    values: ["present", "absent", "not_reported"]
+    description: "Invasion perineural"
+
+  - name: mmr_msi
+    label_es: "MMR/MSI"
+    label_en: "MMR/MSI status"
+    severity: required
+    type: string
+    description: "Estado MMR/MSI — obligatorio en todo colorrectal"
+
+  - name: tumor_size
+    label_es: "Tamaño tumoral"
+    label_en: "Tumor size"
+    severity: recommended
+    type: string
+    description: "Tamano del tumor (cm)"
+
+  - name: tumor_perforation
+    label_es: "Perforación tumoral"
+    label_en: "Tumor perforation"
+    severity: recommended
+    type: string
+    description: "Perforacion tumoral"
+
+  - name: extranodal_extension
+    label_es: "Extensión extranodal"
+    label_en: "Extranodal extension"
+    severity: recommended
+    type: string
+    description: "Extension extranodal en ganglios positivos"
+
+  - name: tumor_deposits
+    label_es: "Depósitos tumorales"
+    label_en: "Tumor deposits"
+    severity: recommended
+    type: string
+    description: "Depositos tumorales"
+
+  - name: associated_findings
+    label_es: "Hallazgos asociados"
+    label_en: "Associated findings"
+    severity: recommended
+    type: string
+    description: "Hallazgos asociados (polipos, colitis, etc.)"
+
+rules:
+  - condition: "pT >= pT3"
+    check: "lymph_nodes_examined must be reported"
+    severity: critical
+    message: "En tumores pT3+ el conteo de ganglios es obligatorio"
+
+  - condition: "lymph_nodes_examined < 12"
+    check: "warning"
+    severity: warning
+    message: "Menos de 12 ganglios examinados — por debajo del minimo recomendado"
+
+  - condition: "always"
+    check: "mmr_msi must be reported"
+    severity: required
+    message: "MMR/MSI es obligatorio en todo carcinoma colorrectal"

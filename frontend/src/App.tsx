@@ -1,0 +1,254 @@
+import { useState, useCallback } from 'react'
+import { Header } from './components/Header'
+import { AccessScreen } from './components/AccessScreen'
+import { ProtocolSearch } from './components/ProtocolSearch'
+import { ProtocolForm } from './components/ProtocolForm'
+import { QuickNotes } from './components/QuickNotes'
+import { ReportPreview } from './components/ReportPreview'
+import { useLang } from './hooks/useLang'
+import { useAccessCode } from './hooks/useAccessCode'
+import { useFormState } from './hooks/useFormState'
+import type { ProtocolDef } from './data/protocols'
+import { t } from './data/i18n'
+import type { ReportStyle } from './data/templates'
+import { BodySelector } from './components/BodySelector'
+import { AuditorResults } from './components/AuditorResults'
+import { DictionaryEditor } from './components/DictionaryEditor'
+import { FormatConfig } from './components/FormatConfig'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787'
+
+export default function App() {
+  const { lang, toggleLang } = useLang()
+  const { authenticated, login, getCode } = useAccessCode()
+  const [protocol, setProtocol] = useState<ProtocolDef | null>(null)
+  const [fontSize, setFontSize] = useState(15)
+  const [darkMode, setDarkMode] = useState(false)
+  const [reportStyle, setReportStyle] = useState<ReportStyle>('prose')
+  const [mode, setMode] = useState<'copilot' | 'auditor'>('copilot')
+  const [auditorText, setAuditorText] = useState('')
+  const [auditorResult, setAuditorResult] = useState<any>(null)
+  const [auditorReviewing, setAuditorReviewing] = useState(false)
+  const [dictOpen, setDictOpen] = useState(false)
+  const [formatOpen, setFormatOpen] = useState(false)
+  const [unitVersion, setUnitVersion] = useState(0)
+
+  const {
+    values, setValue, bulkSetValues, resetValues,
+    pendingFields, completionPercent, sectionStatuses,
+  } = useFormState(protocol)
+
+  const handleSelectProtocol = useCallback((p: ProtocolDef) => {
+    setProtocol(p)
+    resetValues()
+  }, [resetValues])
+
+  const handlePrefill = useCallback(async (notes: string) => {
+    if (!protocol) return
+    try {
+      const res = await fetch(`${API_URL}/api/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'copilot',
+          report_text: notes,
+          access_code: getCode(),
+          protocol_id: protocol.id,
+        }),
+      })
+      if (!res.ok) throw new Error('API error')
+      const data = await res.json()
+
+      if (data.extracted_fields) {
+        const newValues: Record<string, string> = {}
+        for (const [key, val] of Object.entries(data.extracted_fields)) {
+          if (val && val !== 'not_reported' && val !== 'N/A') {
+            newValues[key] = String(val)
+          }
+        }
+        bulkSetValues(newValues)
+      }
+    } catch (err) {
+      console.error('Pre-fill failed:', err)
+    }
+  }, [protocol, getCode, bulkSetValues])
+
+  const handleAudit = useCallback(async () => {
+    if (!auditorText.trim() || auditorReviewing) return
+    setAuditorReviewing(true)
+    setAuditorResult(null)
+    try {
+      const res = await fetch(`${API_URL}/api/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'auditor',
+          report_text: auditorText,
+          access_code: getCode(),
+          lang,
+        }),
+      })
+      if (!res.ok) throw new Error('API error')
+      const data = await res.json()
+      setAuditorResult(data)
+    } catch (err: any) {
+      console.error('Audit failed:', err)
+      setAuditorResult({ error: true, message: err.message || 'Error al auditar' })
+    } finally {
+      setAuditorReviewing(false)
+    }
+  }, [auditorText, auditorReviewing, getCode, lang])
+
+  if (!authenticated) {
+    return <AccessScreen lang={lang} toggleLang={toggleLang} onLogin={login} />
+  }
+
+  return (
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-950 text-gray-200' : 'bg-[var(--color-page)] text-[var(--color-text)]'}`} style={{ zoom: fontSize / 15 }}>
+      <Header
+        lang={lang}
+        toggleLang={toggleLang}
+        fontSize={fontSize}
+        onFontSizeChange={setFontSize}
+        darkMode={darkMode}
+        onDarkModeToggle={() => setDarkMode(d => !d)}
+        onHome={protocol ? () => { setProtocol(null); resetValues() } : undefined}
+        onLogout={() => { localStorage.removeItem('patho-access'); localStorage.removeItem('patho-code'); window.location.reload() }}
+        mode={mode}
+        onModeChange={(m) => { setMode(m) }}
+      />
+
+      <main className="mx-auto px-[10px] py-3 pb-16" style={{ maxWidth: 'calc(100vw - 20px)' }}>
+        {/* AUDITOR MODE */}
+        {mode === 'auditor' ? (
+          <div className="mx-auto mt-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Input area — left column */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h3 className="text-base font-bold">{lang === 'es' ? 'Pegar informe para auditar' : 'Paste report to audit'}</h3>
+                  <p className="text-xs text-gray-500">{lang === 'es' ? 'La IA detectará inconsistencias, campos faltantes y sugerirá codificación CIE-O.' : 'AI will detect inconsistencies, missing fields and suggest ICD-O coding.'}</p>
+                </div>
+                <button
+                  onClick={handleAudit}
+                  disabled={auditorReviewing || !auditorText.trim()}
+                  className={`px-6 py-2.5 rounded-lg text-white text-sm font-medium flex items-center gap-2 transition-all ${
+                    auditorReviewing ? 'bg-green-600 animate-pulse cursor-wait' : 'bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-50'
+                  }`}
+                >
+                  {auditorReviewing ? (
+                    <><span className="animate-spin">⏳</span> {lang === 'es' ? 'Analizando...' : 'Analyzing...'}</>
+                  ) : (
+                    <>{lang === 'es' ? 'Auditar informe' : 'Audit report'}</>
+                  )}
+                </button>
+              </div>
+              <textarea
+                value={auditorText}
+                onChange={(e) => { setAuditorText(e.target.value); setAuditorResult(null) }}
+                placeholder={lang === 'es' ? 'Pegue aquí el informe completo de anatomía patológica...' : 'Paste the full pathology report here...'}
+                className={`w-full min-h-[calc(100vh-220px)] p-3 rounded-xl border text-sm resize-y ${darkMode ? 'bg-gray-800 border-gray-700 text-gray-200' : 'bg-white border-gray-300'}`}
+              />
+            </div>
+
+            {/* Results — right column */}
+            <div className="space-y-3">
+                {auditorResult?.error ? (
+                  <div className="p-4 bg-red-50 rounded-xl border border-red-200 text-red-700 text-sm">
+                    {lang === 'es' ? 'Error al auditar: ' : 'Audit error: '}{auditorResult.message}
+                  </div>
+                ) : auditorResult?.validation ? (
+                  <AuditorResults validation={auditorResult.validation} lang={lang} darkMode={darkMode} />
+                ) : !auditorReviewing ? (
+                  <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+                    {lang === 'es' ? 'Pegue un informe y pulse Auditar' : 'Paste a report and click Audit'}
+                  </div>
+                ) : null}
+            </div>
+            </div>{/* close grid */}
+          </div>
+        ) : !protocol ? (
+          <div className="mt-4">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-[var(--color-text)]">
+                {t('protocol.select', lang)}
+              </h2>
+              <p className="text-sm text-[var(--color-text-tertiary)] mt-1">
+                {t('app.subtitle', lang)}
+              </p>
+            </div>
+            <BodySelector lang={lang} onSelect={handleSelectProtocol} darkMode={darkMode} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-[40%_1fr] gap-3">
+            <div className="space-y-3">
+              <ProtocolSearch lang={lang} onSelect={handleSelectProtocol} selected={protocol} />
+
+<QuickNotes
+                lang={lang}
+                onPrefill={handlePrefill}
+                protocolId={protocol.id}
+                onOpenDictionary={() => setDictOpen(true)}
+                onRealtimeParse={(matches) => {
+                  const newValues: Record<string, string> = {}
+                  for (const m of matches) {
+                    newValues[m.field] = m.value
+                  }
+                  bulkSetValues(newValues)
+                }}
+              />
+
+              <ProtocolForm
+                protocol={protocol}
+                values={values}
+                onChange={setValue}
+                onUnitChange={() => setUnitVersion(v => v + 1)}
+                sectionStatuses={sectionStatuses}
+                lang={lang}
+                darkMode={darkMode}
+              />
+            </div>
+
+            <div>
+              <div className="lg:sticky lg:top-[60px] lg:max-h-[calc(100vh-70px)] lg:overflow-y-auto">
+                <ReportPreview
+                  protocol={protocol}
+                  values={values}
+                  lang={lang}
+                  includeMacro={false}
+                  completionPercent={completionPercent}
+                  pendingFields={pendingFields}
+                  sectionStatuses={sectionStatuses}
+                  accessCode={getCode()}
+                  darkMode={darkMode}
+                  reportStyle={reportStyle}
+                  onStyleChange={setReportStyle}
+                  onOpenFormatConfig={() => setFormatOpen(true)}
+                  unitVersion={unitVersion}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <footer className={`fixed bottom-0 left-0 right-0 py-2 text-center border-t z-10 ${darkMode ? 'border-gray-800 bg-gray-950' : 'border-[var(--color-border)] bg-[var(--color-page)]'}`}>
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] opacity-50">
+          <span>{t('footer.disclaimer', lang)}</span>
+          <span>·</span>
+          <span>{t('footer.synthetic', lang)}</span>
+          <span>·</span>
+          <a href="https://github.com/solfloreslab/pathology-report-assistant" target="_blank" rel="noopener" className="text-[var(--color-primary)] hover:underline">GitHub</a>
+          <span>·</span>
+          <span>{t('footer.built', lang)}</span>
+          <span>·</span>
+          <span>© 2026 solfloreslab</span>
+        </div>
+      </footer>
+
+      <DictionaryEditor lang={lang} open={dictOpen} onClose={() => setDictOpen(false)} protocolId={protocol?.id} />
+      <FormatConfig lang={lang} open={formatOpen} onClose={() => setFormatOpen(false)} />
+    </div>
+  )
+}

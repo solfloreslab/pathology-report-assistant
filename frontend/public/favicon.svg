@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <!-- Rounded square background -->
+  <rect width="48" height="48" rx="10" fill="#0E6B5E"/>
+  <!-- Stylized P letter - clean, modern, no eyes -->
+  <path d="M16 10h12c5.523 0 10 4.477 10 10v0c0 5.523-4.477 10-10 10H22v8h-6V10z" fill="white" opacity="0.95"/>
+  <path d="M22 16h6c2.209 0 4 1.791 4 4v0c0 2.209-1.791 4-4 4h-6V16z" fill="#0E6B5E"/>
+</svg>

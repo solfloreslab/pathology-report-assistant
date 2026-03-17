@@ -1,0 +1,45 @@
+{
+  "classification": {
+    "specimen_type": "biopsy",
+    "organ_system": "breast",
+    "tumor_type_suspected": "Infiltrating ductal carcinoma NOS type, histological grade 2, with associated DCIS cribriform component",
+    "protocol_to_apply": "breast-biopsy",
+    "confidence": 0.98
+  },
+  "extracted_data": {
+    "histologic_type": "Carcinoma ductal infiltrante, tipo NOS",
+    "histologic_grade": "Grado 2 (Nottingham 6/9)",
+    "tubule_formation": 3,
+    "nuclear_pleomorphism": 2,
+    "mitotic_count": 1,
+    "estrogen_receptor": "Positivo, 90%, intensidad fuerte (Allred 8/8)",
+    "progesterone_receptor": "Positivo, 70%, intensidad moderada (Allred 7/8)",
+    "her2_status": "Negativo (score 1+)",
+    "ki67": "15%",
+    "in_situ_component": "CDIS cribiforme, grado intermedio, sin necrosis",
+    "molecular_subtype": "Luminal A-like",
+    "tumor_size": "not_reported"
+  },
+  "validation": {
+    "completeness_score": 95,
+    "total_required_fields": 10,
+    "reported_fields": 10,
+    "missing_fields": 0,
+    "status": "complete",
+    "missing_required": [],
+    "inconsistencies": [],
+    "quality_notes": "Report is complete with all required fields present. Nottingham score correctly calculated (tubule 3 + nuclear 2 + mitotic 1 = 6, Grade 2). Molecular subtype Luminal A-like is consistent with biomarker profile (ER+, PR+, HER2-, Ki-67 15%). Tumor size not reported but is only recommended for biopsy specimens."
+  },
+  "audit_trail": {
+    "timestamp": "2026-03-14T02:37:18.517803Z",
+    "input_hash": "8a4c010c9e8cdbb5fd0268a6e8aacf9da9f5c05ce855581df26c908b392400a3",
+    "classification_confidence": 0.98,
+    "protocol_used": "breast-biopsy",
+    "completeness_score": 95,
+    "model_version": "z-ai/glm-5",
+    "provider": "openrouter",
+    "processing_time_ms": 22344,
+    "pipeline_version": "0.1.0"
+  },
+  "needs_human_review": false
+}

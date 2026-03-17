@@ -1,0 +1,134 @@
+protocol:
+  id: melanoma
+  name: "Cutaneous Melanoma — CAP/ICCR-based"
+  version: "1.0"
+  organ: skin
+  specimen_types:
+    - biopsy
+    - resection
+
+fields:
+  - name: histologic_type
+    label_es: "Tipo histológico"
+    label_en: "Histologic type"
+    severity: required
+    type: string
+    description: "Tipo histologico (extension superficial, nodular, lentigo maligno, acral)"
+
+  - name: breslow_thickness
+    label_es: "Espesor de Breslow"
+    label_en: "Breslow thickness"
+    severity: required
+    type: number
+    unit: mm
+    description: "Espesor de Breslow en mm — campo critico"
+
+  - name: ulceration
+    label_es: "Ulceración"
+    label_en: "Ulceration"
+    severity: required
+    type: string
+    values: ["present", "absent", "not_reported"]
+    description: "Presencia de ulceracion"
+
+  - name: mitotic_index
+    label_es: "Índice mitótico"
+    label_en: "Mitotic index"
+    severity: required
+    type: string
+    description: "Indice mitotico (mitosis/mm2) — obligatorio si Breslow <=1mm"
+
+  - name: clark_level
+    label_es: "Nivel de Clark"
+    label_en: "Clark level"
+    severity: required
+    type: string
+    values: ["I", "II", "III", "IV", "V"]
+    description: "Nivel de Clark"
+
+  - name: margins_lateral
+    label_es: "Margen lateral"
+    label_en: "Lateral margin"
+    severity: required
+    type: string
+    description: "Estado del margen lateral (libre/afecto + distancia)"
+
+  - name: margins_deep
+    label_es: "Margen profundo"
+    label_en: "Deep margin"
+    severity: required
+    type: string
+    description: "Estado del margen profundo (libre/afecto + distancia)"
+
+  - name: lymphovascular_invasion
+    label_es: "Invasión linfovascular"
+    label_en: "Lymphovascular invasion"
+    severity: required
+    type: string
+    values: ["present", "absent", "not_identified"]
+    description: "Invasion linfovascular"
+
+  - name: neurotropism
+    label_es: "Neurotropismo"
+    label_en: "Neurotropism"
+    severity: required
+    type: string
+    values: ["present", "absent", "not_identified"]
+    description: "Neurotropismo/invasion perineural"
+
+  - name: microsatellitosis
+    label_es: "Satelitosis microscópica"
+    label_en: "Microsatellitosis"
+    severity: required
+    type: string
+    values: ["present", "absent", "not_identified"]
+    description: "Satelitosis microscopica"
+
+  - name: pT_stage
+    label_es: "Estadio pT"
+    label_en: "pT stage"
+    severity: required
+    type: string
+    description: "Estadificacion pT segun AJCC 8a edicion"
+
+  - name: regression
+    label_es: "Regresión"
+    label_en: "Regression"
+    severity: recommended
+    type: string
+    description: "Presencia/ausencia de regresion"
+
+  - name: til_status
+    label_es: "Infiltrado linfocitario (TILs)"
+    label_en: "TIL status"
+    severity: recommended
+    type: string
+    description: "Infiltrado linfocitario tumoral (brisk/non-brisk/absent)"
+
+  - name: growth_phase
+    label_es: "Fase de crecimiento"
+    label_en: "Growth phase"
+    severity: recommended
+    type: string
+    description: "Fase de crecimiento (radial/vertical)"
+
+rules:
+  - condition: "breslow_thickness is missing"
+    check: "error"
+    severity: critical
+    message: "Sin Breslow el melanoma no se puede estadificar — campo critico"
+
+  - condition: "breslow_thickness > 1.0 and ulceration is missing"
+    check: "warning"
+    severity: warning
+    message: "Breslow >1mm sin informar ulceracion"
+
+  - condition: "margins_lateral < 1mm or margins_deep < 1mm"
+    check: "warning"
+    severity: warning
+    message: "Margenes <1mm — valorar ampliacion"
+
+  - condition: "pT_stage >= pT2b"
+    check: "recommend sentinel lymph node"
+    severity: warning
+    message: "pT2b+ — recomendar biopsia de ganglio centinela si no realizada"

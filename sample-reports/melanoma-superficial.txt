@@ -1,0 +1,27 @@
+INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00343
+Paciente: Navarro Blanco, Pedro (ID: 00103)
+Fecha recepción: 2026-03-09
+Médico solicitante: Dr. Rodríguez Pérez (Dermatología)
+Tipo de muestra: Biopsia escisional lesión pigmentada espalda
+
+DESCRIPCIÓN MACROSCÓPICA:
+Elipse cutánea de 2,5 x 1,8 x 0,6 cm con lesión pigmentada asimétrica de 1,2 cm de diámetro mayor, coloración heterogénea marrón-negra.
+
+DESCRIPCIÓN MICROSCÓPICA:
+Melanoma de extensión superficial con componente invasivo.
+Espesor de Breslow: 1,8 mm. Nivel de Clark: IV (infiltra dermis reticular).
+Índice mitótico: 3 mitosis/mm². Ulceración: Presente.
+Invasión linfovascular: No identificada. Neurotropismo: No identificado.
+Satelitosis microscópica: No identificada. Regresión: Ausente.
+Bordes laterales: Libres (margen más cercano 3 mm). Borde profundo: Libre (margen 2 mm).
+Infiltrado linfocitario tumoral: No intenso (non-brisk).
+
+DIAGNÓSTICO:
+Melanoma cutáneo de extensión superficial, espalda.
+Breslow 1,8 mm, Clark IV, ulcerado, 3 mitosis/mm².
+pT2b (AJCC 8ª edición). Márgenes libres (recomendable ampliación a 1-2 cm según protocolo).
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-13

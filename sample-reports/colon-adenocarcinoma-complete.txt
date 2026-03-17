@@ -1,0 +1,31 @@
+INFORME DE ANATOMÍA PATOLÓGICA
+
+Nº Biopsia: AP-2026-00341
+Paciente: Martínez Ruiz, Carmen (ID: 00101)
+Fecha recepción: 2026-03-10
+Médico solicitante: Dr. García López (Cirugía General)
+Tipo de muestra: Hemicolectomía derecha
+
+DESCRIPCIÓN MACROSCÓPICA:
+Segmento de colon derecho de 22 cm de longitud que incluye 8 cm de íleon terminal y apéndice cecal. A 6 cm del margen de resección distal se identifica una lesión exofítica de 4,5 x 3,2 cm que ocupa el 60% de la circunferencia. La lesión infiltra hasta la grasa pericolónica. Se aíslan 18 ganglios linfáticos.
+
+DESCRIPCIÓN MICROSCÓPICA:
+Adenocarcinoma de tipo intestinal moderadamente diferenciado (G2) que infiltra a través de la muscular propia hasta la subserosa (tejido adiposo pericolónico) sin alcanzar la superficie serosa. Se identifica invasión linfovascular. No se observa invasión perineural. Márgenes de resección proximal y distal libres de tumor (margen más cercano a 4,2 cm). Margen radial libre (>1 mm).
+De los 18 ganglios aislados, 3 presentan metástasis de adenocarcinoma (3/18), sin extensión extranodal.
+Apéndice cecal sin alteraciones significativas.
+Mucosa adyacente con adenoma tubular con displasia de bajo grado.
+
+DIAGNÓSTICO:
+Adenocarcinoma de colon derecho (ciego), tipo intestinal, moderadamente diferenciado (G2).
+Estadificación patológica: pT3 N1a (3/18) M0 — Estadio IIIB (AJCC 8ª ed.)
+Márgenes libres. Invasión linfovascular presente. Invasión perineural ausente.
+
+INMUNOHISTOQUÍMICA:
+- MLH1: Expresión conservada
+- MSH2: Expresión conservada
+- MSH6: Expresión conservada
+- PMS2: Expresión conservada
+Conclusión: Sin pérdida de expresión de proteínas reparadoras (no sugestivo de inestabilidad de microsatélites).
+
+Firmado: Dra. [Patóloga responsable]
+Fecha informe: 2026-03-14
