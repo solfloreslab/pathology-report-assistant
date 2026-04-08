@@ -224,6 +224,10 @@ See [DISCLAIMER.md](DISCLAIMER.md) and [docs/regulatory.md](docs/regulatory.md).
 
 ---
 
+## Acknowledgments
+
+Developed with assistance from Claude Code (Anthropic).
+
 ## License
 
 [MIT](LICENSE) — © 2026 solfloreslab
