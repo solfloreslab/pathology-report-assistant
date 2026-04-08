@@ -239,7 +239,7 @@ export default function App() {
           <span>·</span>
           <span>{t('footer.synthetic', lang)}</span>
           <span>·</span>
-          <a href="https://github.com/solfloreslab/pathology-report-agent" target="_blank" rel="noopener" className="text-[var(--color-primary)] hover:underline">GitHub</a>
+          <a href="https://github.com/solfloreslab/pathology-report-assistant" target="_blank" rel="noopener" className="text-[var(--color-primary)] hover:underline">GitHub</a>
           <span>·</span>
           <span>{t('footer.built', lang)}</span>
           <span>·</span>
