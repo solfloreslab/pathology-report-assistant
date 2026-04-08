@@ -1,4 +1,4 @@
-# Patho Report Assistant
+# Pathology Report Assistant
 
 [![React 19](https://img.shields.io/badge/react-19-61dafb.svg)](https://react.dev/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
@@ -223,6 +223,10 @@ See [DISCLAIMER.md](DISCLAIMER.md) and [docs/regulatory.md](docs/regulatory.md).
 5. International Collaboration on Cancer Reporting. [iccr-cancer.org](https://www.iccr-cancer.org/)
 
 ---
+
+## Acknowledgments
+
+Developed with assistance from Claude Code (Anthropic).
 
 ## License
 
